@@ -1,2 +1,5 @@
 # wiki
-personal wiki
+
+用于记录一些个人资料，技巧等
+
+
