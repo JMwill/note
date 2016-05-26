@@ -1,0 +1,38 @@
+/*body {
+	font-size: 62.5%;
+	text-align: center;
+}*/
+/* line 8, ../sass/global.scss */
+.hero {
+  text-align: center;
+}
+/* line 11, ../sass/global.scss */
+.hero header {
+  overflow: hidden;
+  *zoom: 1;
+}
+/* line 12, ../sass/global.scss */
+.hero header img {
+  width: 8rem;
+  height: 2rem;
+  float: left;
+}
+/* line 18, ../sass/global.scss */
+.hero header ul {
+  float: right;
+}
+/* line 21, ../sass/global.scss */
+.hero header ul li {
+  float: left;
+  margin: 0 .5rem;
+  padding: 1rem;
+}
+/* line 30, ../sass/global.scss */
+.hero h1 {
+  font-size: 4rem;
+  padding: 1rem 0 .5rem 0;
+}
+/* line 35, ../sass/global.scss */
+.hero h2 {
+  font-size: 2rem;
+}

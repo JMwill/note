@@ -1,0 +1,251 @@
+@import "compass/utilities/general";
+@import "compass/css3";
+
+$bg-color: #efefef;
+$text-color: #4f4f4f;
+body {
+	/*font-size: 62.5%;*/
+	/*text-align: center;*/
+	font-family: 'Open Sans', fantasy, sans-serif;
+	margin: 0;
+}
+
+.hero {
+	$secondy-text-color: #D9DADA;
+	$highlight-text-color: white;
+	$button-color: #6cdcac;
+
+	text-align: center;
+	/* background-image: url(/images/find-an-agent-hero.png); */
+	background-image: url(https://drscdn.500px.org/photo/115449731/m%3D2048/de36ebde35ec474d7d543171a2f6f02d);
+	background-size: 200%;
+	background-position: center;
+	background-repeat: no-repeat;
+	color: $highlight-text-color;
+	padding-bottom: 4rem;
+	
+	@include transition-property(background-size);
+	@include transition-duration(1s);
+	@include transition-timing-function(ease);
+
+	&:hover {
+		background-size: 300%;
+	}
+
+	header {
+		$nav-padding: .5rem 1rem;
+		$nav-margin: 1rem .5rem;
+		$double-nav-margin: 2 * 1rem 2 * .5rem;
+
+		.logo {
+			float: left;
+			width: 8rem;
+			height: 100%;
+			margin: $double-nav-margin;
+    		padding: $nav-padding;
+
+
+			img[alt="logo"] {
+				margin: $nav-margin;
+    			padding: $nav-padding;
+				width: 8rem;
+				height: 2rem;
+				float: left;
+			}
+		}
+
+		ul {
+			text-align: right;
+
+			li {
+				display: inline-block;
+				margin: $nav-margin;
+				padding: $nav-padding;
+				border: 1px solid transparent;
+				@border-radius: 2px;
+
+				&:last-child {
+					border: 1px solid $highlight-text-color;
+				}
+
+				a {
+					color: $highlight-text-color;
+					text-decoration: none;
+				}
+			}
+		}
+
+		@include clearfix;
+	}
+	h1 {
+		font-size: 4rem;
+		padding: 1rem 0 .5rem 0;
+		color: $highlight-text-color;
+	}
+
+	h2 {
+		font-size: 2rem;
+		color: $secondy-text-color;
+	}
+
+	form {
+		padding: 2rem 0 4rem 0;
+		font-size: 0;
+		text-transform: uppercase;
+
+		input[type="text"] {
+			padding: 1rem;
+			border: 0;
+			width: 18rem;
+			@include border-radius(2px 0 0 2px);
+			background-color: $bg-color;
+			@include opacity(.7);
+
+		}
+		input[type="button"] {
+			color: $highlight-text-color;
+			padding: 1rem;
+			border: 0;
+			width: 6rem;
+			@include border-radius(0 2px 2px 0);
+			background-color: $button-color;
+		}
+	}
+}
+
+.numbers {
+	width: 80%;
+	margin: -4rem auto 0;
+	background-color: $bg-color;
+	ul {
+		$border-color: #ccc;
+		$li-border-style: 1px solid $border-color;
+
+		padding: 0;
+		text-align: center;
+		li {
+			display: inline-block;
+			@include box-sizing(border-box);
+			float: left;
+			width: 25%;
+			margin-left: -1px;
+
+			border-top: $li-border-style;
+			border-bottom: $li-border-style;
+			border-left: $li-border-style;
+
+			&:last-child {
+				border-right: $li-border-style;
+				margin-left: -2px;
+			}
+		}
+
+		h2 {
+			font-size: 150%;
+		}
+
+		h3 {
+
+		}
+	}
+
+	@include clearfix
+}
+
+.how-it-works {
+	font-family: sans-serif;
+	$text-color: #aeaeae;
+	text-align: center;
+
+	>p {
+		text-transform: uppercase;
+		font-weight: bold;
+		font-size: 3rem;
+
+		&::after {
+			content: '';
+			display: block;
+			width: 0;
+			margin: 0 auto;
+			border-bottom: 2px solid $text-color;
+
+			@include transition-property(width);
+			@include transition-duration(.5s);
+			@include transition-timing-function(ease);
+		}
+
+		&:hover {
+			&::after {
+				width: 16rem;
+			}
+		}
+	}
+
+	ul {
+		padding: 0;
+		@include clearfix;
+	}
+	li {
+		$icon-list-color: #EBA858;
+		$icon-pencil-color: #AC9CD2;
+		$icon-user-color: #4D99CB;
+		$number-bg-color: #fff;
+
+
+		position: relative;
+		display: inline-block;
+		@include box-sizing(border-box);
+		float: left;
+		width: 33.333%;
+
+		&::before {
+			display: block;
+			content: "";
+			border-bottom: 1px solid $text-color;
+			width: 100%;
+			position: absolute;
+			left: 50%;
+			top: 1.5rem;
+
+			z-index: -1;
+		}
+
+		&:last-child::before {
+			display: none;
+		}
+
+
+		i.fa-list {color: $icon-list-color;}
+		i.fa-pencil {color: $icon-pencil-color;}
+		i.fa-user {color: $icon-user-color;}
+		i {
+			font-size: 3rem;
+			display: block;
+			margin: 2rem;
+		}
+
+		span {
+			display: inline-block;
+			width: 3rem;
+			height: 3rem;
+			line-height: 3rem;
+			border: 1px solid $text-color;
+			@include border-radius(50%);
+
+			background-color: $number-bg-color;
+			font-size: 150%;
+			font-weight: bold;
+		}
+		p {
+			max-width: 14rem;
+			margin: 0 auto;
+		}
+
+		p, span {
+			color: $text-color;
+		}
+	}
+	.detail {
+
+	}
+}
