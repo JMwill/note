@@ -13,14 +13,55 @@
  * 2. 开始进行逐个数匹配，同时对于已经进行匹配尝试，却没有答案的数据可以进行忽略。
  */
 
-var testDataArr = [].push(() => {
-	[]
-})
-var twoSum = function (nums, target) {
-	nums = nums.filter((num, index) => {
-		return num < target;
-	});
+/*******************************************
+ * tools function
+ * @type {function}
+ * 
+ *******************************************/
+var assert = console.assert;
+var log = console.log;
 
-	console.log(nums);
+var twoSum = function (nums, target) {
+	for (var i = 0, l = nums.length; i < l; i++) {
+		if (isNaN(nums[i]))
+			continue;
+		for (var j = i + 1; j < l; j++) {
+			if (nums[i] + nums[j] === target)
+				return [i, j];
+			if (nums[i] === nums[j])
+				nums[j] = NaN;
+		}
+	}
+	return [];
 }
+
+var twoSum2 = function (nums, target) {
+	for (var i = 0, l = nums.length; i < l; i++) {
+		var minusNum = target - nums[i];
+		var nextNumIndex = nums.indexOf(minusNum, i + 1);
+		if (nextNumIndex != -1)
+			return [i, nextNumIndex];
+	}
+	return [];
+}
+
+/**
+ * Test data and the last is target
+ * @type {Array}
+ */
+var testArr = [
+	[1, 2, 3, 4, 5, 9],
+	[0, 12, 3, 0, 0],
+	[-1, 2, 1, 0]
+];
+testArr.forEach((numsArr, index) => {
+	log('------------begin----------->');
+	log(
+		'Test Arr is: ' + numsArr +
+		'\nIndex is: ' + index + 
+		// '\nResult is: '+ twoSum(numsArr, numsArr.pop())
+		'\nResult is: '+ twoSum2(numsArr, numsArr.pop())
+	);
+	log('---------------------------->');
+})
 
