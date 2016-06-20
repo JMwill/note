@@ -4,7 +4,8 @@
     this.el = $(el);
     this.init('PopSelect', el, options);
   }
-
+  
+  PopSelect.prop = {};
   PopSelect.DEFAULTS = {
     trigger: 'click',
     selectWrapTmpl:
@@ -13,7 +14,7 @@
         + '</div>',
     selectTmpl:
         '<div class="pop-select-cover">'
-            + '<div class="pop-select-container">'
+            + '<div class="pop-select-container" id="pop-select-container">'
                 + '<div class="pop-select-list-container"></div>'
                 + '<button class="pop-select-cancel">取消</button>'
             + '</div>'
@@ -25,42 +26,47 @@
 
   PopSelect.prototype.select = function (wrap) {
     var $select = this.el;
-
+    var popSelect = PopSelect.prop['popSelect'];
     var options = wrap.find('option');
     var popSelectOptions = $('<ul></ul>');
     options.each(function (o) {
         var $o = $(this);
         popSelectOptions.append('<li data-value="' + $o.attr('value') + '">' + $o.text() + '</li>');
     });
-    this.popSelect
+    popSelect
         .find('.pop-select-list-container')
         .html(popSelectOptions);
-    this.popSelect.addClass('show');
-  }
+    popSelect.addClass('show');
+  };
 
+  PopSelect.prototype.addVal = function (target, val) {
+      
+  };
+  
   PopSelect.prototype.init = function () {
     // insert pop select container
     var $that = this;
     var $select = this.el;
 
     // select element wrapper
-    var selectWrap = $(PopSelect.DEFAULTS.selectWrapTmpl);
+    var $selectWrap = $(PopSelect.DEFAULTS.selectWrapTmpl);
 
     // replace select element
     var selectHeight = $select.outerHeight();
-    var selectCover = selectWrap.find('.pop-select-target-cover');
-    $select.clone().appendTo(selectWrap);
-    $select.replaceWith(selectWrap);
+    var selectCover = $selectWrap.find('.pop-select-target-cover');
+    $select.clone().appendTo($selectWrap);
+    $select.replaceWith($selectWrap);
     selectCover.height(selectHeight);
 
-    selectWrap.on(PopSelect.DEFAULTS.trigger, function (e) {
+    $selectWrap.on(PopSelect.DEFAULTS.trigger, function (e) {
         var $target = $(e.target);
         if ($target.hasClass('pop-select-target-cover')) {
-            $that.select(selectWrap);
+            PopSelect.prop.selectElem = $selectWrap.find('select');
+            $that.select($selectWrap);
         }
     });
 
-    if ($('.pop-select-container').length === 0) {
+    if ($('#pop-select-container').length === 0) {
         var $popSelect = $(PopSelect.DEFAULTS.selectTmpl);
 
         var windowHeight = $(window).height();
@@ -71,14 +77,14 @@
 
         $('body').append($popSelect)
 
-        this.popSelect = $popSelect;
+        PopSelect.prop['popSelect'] = $popSelect;
         $popSelect.on(PopSelect.DEFAULTS.trigger, function (e) {
             var $target = $(e.target);
             if ($target.hasClass('pop-select-cancel')) {
                 $popSelect.removeClass('show');
             } else if ($target.prop('tagName') === 'LI') {
-                selectWrap
-                    .find('select')
+                PopSelect
+                    .prop.selectElem
                     .val($target.attr('data-value'));
                 $popSelect.removeClass('show');
             }
