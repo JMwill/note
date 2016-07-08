@@ -85,3 +85,34 @@ git branch
 ```
 git grep <PATHTERN> [PATH]
 ```
+
+## 分支
+
+### 切换到分支BRANCH
+
+```
+git checkout <BRANCH>
+```
+
+### 把分支B1 合并到分支B2 中
+
+```
+git checkout <B2>
+git merge <B1>
+```
+
+### 在当前的HEAD分支上创建一个分支
+
+```
+git branch <BRANCH>
+```
+
+### 在其的分支BASE上创建一个新分支NEW
+
+```
+git branch <NEW> <BASE>
+```
+
+### 删除分支
+
+git branch -d <BRANCH>
