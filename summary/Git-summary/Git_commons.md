@@ -115,4 +115,27 @@ git branch <NEW> <BASE>
 
 ### 删除分支
 
+```
 git branch -d <BRANCH>
+```
+
+## 更新
+
+### 从远端origin中获取最新的变更记录
+
+```
+git fetch # 不会进行合并操作
+```
+
+### 从远端origin获取最新的变更
+
+```
+git pull # 获取变更之后会进行合并操作
+```
+
+### 应用别处获得的补丁
+
+```
+git am -3 patch.mbox # 如果发生冲突，解决之后运行下面的命令
+git am --resolve
+```
