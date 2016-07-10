@@ -139,3 +139,35 @@ git pull # 获取变更之后会进行合并操作
 git am -3 patch.mbox # 如果发生冲突，解决之后运行下面的命令
 git am --resolve
 ```
+
+## 恢复
+
+### 恢复到最后的提交状态
+
+```
+git checkout -f | git reset --hard   # 无法撤销硬重置
+```
+
+### 撤销最后的提交
+
+```
+git revert HEAD   # 会生成新的提交记录
+```
+
+### 撤销特定的提交
+
+```
+git revert <ID>   # 会生成新的提交记录
+```
+
+### 修改最后的提交
+
+```
+git commit -a --amend   # 在编辑了一个损坏的文件之后
+```
+
+### 签出文件的一个特定的版本ID
+
+```
+git checkout <ID> <FILE>
+```
