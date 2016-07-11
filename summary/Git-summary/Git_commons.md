@@ -171,3 +171,29 @@ git commit -a --amend   # 在编辑了一个损坏的文件之后
 ```
 git checkout <ID> <FILE>
 ```
+
+## 发布
+
+### 提交本地所有修改
+
+```
+git commit -a
+```
+
+### 给他人准备一个补丁
+
+```
+git format-patch origin
+```
+
+### 把变更发布到远端origin
+
+```
+git push [REMOTE] [BRANCH]
+```
+
+### 标记一个版本或者里程碑
+
+```
+git tag <VERSION_NAME>
+```
