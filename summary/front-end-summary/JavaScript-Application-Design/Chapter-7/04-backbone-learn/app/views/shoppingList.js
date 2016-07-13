@@ -1,4 +1,5 @@
 var fs          = require('fs');
+var base        = require('../commons/base');
 var ShoppingList= require('../collections/shoppingList');
 var ListItemView= require('./listItem');
 
@@ -25,7 +26,7 @@ module.exports = base.extend({
         this.partials[model.cid] = item;
     },
     removeItem: function (model) {
-        var item = partials[model.cid];
+        var item = this.partials[model.cid];
         item.$el.remove();
         delete this.partials[model.cid];
     }

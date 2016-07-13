@@ -6,7 +6,7 @@
 
 {{#editing}}
 <span>{{name}}</span>
-<input type="button" name="edit-quantity" value="{{quantity}}" type="number">
+<input type="text" name="edit-quantity" value="{{quantity}}" type="number">
 <button type="button" class="cancel">Cancel</button>
 <button type="button" class="save">Save</button>
 {{/editing}}
