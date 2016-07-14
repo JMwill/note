@@ -20,6 +20,10 @@ module.exports = base.extend({
         this.viewModel = vm || {};
         this.render();
     },
+    updateViewWithValidation: function(vm) {
+        this.viewModel = {error: vm.error};
+        this.render();
+    },
     addItem: function (e) {
         var name = this.$('input[name="name"]').val();
         var quantity = parseInt(this.$('input[name="quantity"]').val(), 10);

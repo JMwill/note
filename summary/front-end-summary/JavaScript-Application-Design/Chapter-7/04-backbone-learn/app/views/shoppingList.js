@@ -12,11 +12,11 @@ module.exports = base.extend({
     template: tmpl,
     initialize: function () {
         this.partials = {};
+        this.render();
+        this.$list = this.$('.items');
         list.collection.on('add', this.addItem, this);
         list.collection.on('remove', this.removeItem, this);
         list.collection.models.forEach(this.addItem, this);
-        this.render();
-        this.$list = this.$('.items');
     },
     addItem: function (model) {
         var item = new ListItemView({
