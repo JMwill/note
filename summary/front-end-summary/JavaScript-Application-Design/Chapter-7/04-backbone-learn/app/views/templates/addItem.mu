@@ -1,3 +1,4 @@
+<a href="#items" class="cancel">Cancel</a>
 <legend>Add Groceries</legend>
 <label for="name">Name</label>
 <input type="text" name="name" value="{{name}}">

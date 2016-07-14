@@ -1,17 +1,10 @@
-// var ShoppingListView = require('../views/shopping_list.js');
-// var shoppingListView = new ShoppingListView();
-//
 var Backbone        = require('backbone');
-Backbone.$          = require('jquery');
+var $               = require('jquery');
+Backbone.$          = $;
 
-var ShoppingListView= require('../views/shoppingList');
-var shoppingListView= new ShoppingListView();
+var ViewRouter = require('../routers/viewRouter.js');
+new ViewRouter();
 
-var AddItemView     = require('../views/addItem');
-var addItemView     = new AddItemView({ collection: shoppingListView.collection });
-// shoppingListView.viewModel = {
-//     shopping_list: [
-//     ]
-// };
-//
-// shoppingListView.render();
+$(function () {
+    Backbone.history.start();
+})

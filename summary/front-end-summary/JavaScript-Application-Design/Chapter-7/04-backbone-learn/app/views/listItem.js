@@ -3,6 +3,7 @@ var base        = require('../commons/base');
 var tmpl        = fs.readFileSync(
     __dirname + '/templates/listItem.mu', {encoding: 'utf8'}
 );
+var list        = require('../services/itemCollections');
 
 module.exports = base.extend({
     tagName: 'li',
@@ -23,7 +24,7 @@ module.exports = base.extend({
         this.render();
     },
     removeItem: function (e) {
-        this.collection.remove(this.model);
+        list.collection.remove(this.model);
     },
     editItem: function (e) {
         this.model.validationError = null;

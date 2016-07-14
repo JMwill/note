@@ -1,28 +1,28 @@
-var fs          = require('fs');
-var base        = require('../commons/base');
-var ShoppingList= require('../collections/shoppingList');
-var ListItemView= require('./listItem');
+var fs           = require('fs');
+var base         = require('../commons/base');
+var ShoppingList = require('../collections/shoppingList');
+var ListItemView = require('./listItem');
+var list         = require('../services/itemCollections');
+var tmpl         = fs.readFileSync(
+    __dirname + '/templates/list.mu', {encoding: 'utf8'}
+)
 
 module.exports = base.extend({
-    el: '.list-view',
-    collection: new ShoppingList([
-        {name: 'Banana', quantity: 3},
-        {name: 'Strawberry', quantity: 8},
-        {name: 'Almond', quantity: 34},
-        {name: 'Chocolate Bar', quantity: 1}
-    ]),
+    el: '.view',
+    template: tmpl,
     initialize: function () {
         this.partials = {};
-        this.collection.on('add', this.addItem, this);
-        this.collection.on('remove', this.removeItem, this);
-        this.collection.models.forEach(this.addItem, this);
+        list.collection.on('add', this.addItem, this);
+        list.collection.on('remove', this.removeItem, this);
+        list.collection.models.forEach(this.addItem, this);
+        this.render();
+        this.$list = this.$('.items');
     },
     addItem: function (model) {
         var item = new ListItemView({
-            model: model,
-            collection: this.collection
+            model: model
         });
-        this.$el.append(item.el);
+        this.$list.append(item.el);
         this.partials[model.cid] = item;
     },
     removeItem: function (model) {
