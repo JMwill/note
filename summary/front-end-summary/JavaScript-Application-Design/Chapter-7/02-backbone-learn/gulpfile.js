@@ -8,7 +8,7 @@ var buffer 		= require('vinyl-buffer');
 var sourcemaps 	= require('gulp-sourcemaps');
 var browserSync = require('browser-sync').create();
 
-gulp.task('browserSync', ['build'], function () {
+gulp.task('browserSync', function () {
 	browserSync.init({
 		server: {
 			baseDir: './'
@@ -39,9 +39,9 @@ gulp.task('browserify', ['clean:build'], function () {
 
 gulp.task('watch:app', function () {
 	gulp.watch('app/**/*.js', ['browserify']);
-	gulp.watch('app/**/*.mu', ['browserify']);
 	gulp.watch('index.html', browserSync.reload);
+	gulp.watch('app/**/*.mu', browserSync.reload);
 });
 
 gulp.task('build', ['browserify']);
-gulp.task('default', ['browserSync', 'watch:app']);
+gulp.task('default', ['build', 'browserSync', 'watch:app']);

@@ -1,15 +1,10 @@
-var SampleView      = require('../views/sample.js');
-var sampleView      = new SampleView();
+var Backbone        = require('backbone');
+var $               = require('jquery');
+Backbone.$          = $;
 
-sampleView.viewModel = {
-    name: 'Marian',
-    orderId: '1234',
-    items: [
-        '1 Kite',
-        '2 Manning Books',
-        '7 Random Candy',
-        '3 Mars Bars'
-    ]
-};
+var ViewRouter = require('../routers/viewRouter.js');
+new ViewRouter();
 
-sampleView.render();
+$(function () {
+    Backbone.history.start();
+})
