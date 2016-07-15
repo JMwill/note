@@ -13,7 +13,7 @@
     "express": "^3.0.0",
     "jquery": "^3.1.0",
     "mustache": "^2.2.1",
-    "rendr": "^0.5.1",
+    "rendr": "^0.5.0",
     "rendr-handlebars": "^0.2.2"
   },
   "devDependencies": {

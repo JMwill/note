@@ -44,13 +44,13 @@ var browserifySet = {
 	}
 };
 gulp.task('browserify', ['clean:build'], function () {
-	return browserify('app/app.js', browserifySet)
+	return browserify('app.js', browserifySet)
 			.bundle()
 			.pipe(source('bundle.js'))
 			.pipe(buffer())
 			.pipe(sourcemaps.init({loadMaps: true}))
 			.on('error', gutil.log.bind(gutil, 'Browserify Error'))
-			.pipe(gulp.dest('build/js/'))
+			.pipe(gulp.dest('public/'))
 			.pipe(browserSync.reload({
 				stream: true
 			}));

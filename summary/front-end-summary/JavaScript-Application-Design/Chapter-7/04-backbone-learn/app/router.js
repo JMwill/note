@@ -6,3 +6,4 @@ var Router = module.exports = function Router (options) {
 
 Router.prototype = Object.create(BaseClientRouter.prototype);
 Router.prototype.constructor = BaseClientRouter;
+
