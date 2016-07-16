@@ -11,6 +11,7 @@ var handlebars	= require('gulp-handlebars');
 var concat		= require('gulp-concat');
 var declare		= require('gulp-declare');
 var wrap		= require('gulp-wrap');
+var glob 		= require('glob');
 
 gulp.task('browserSync', ['build'], function () {
 	browserSync.init({
@@ -21,7 +22,7 @@ gulp.task('browserSync', ['build'], function () {
 });
 
 gulp.task('clean:build', function () {
-	return del(['build/*']);
+	return del(['public/bundle.js', 'app/templates/compiledTemplates.js']);
 });
 
 var browserifySet = {
@@ -37,47 +38,104 @@ var browserifySet = {
 			path: 'assets/vendor/jquery-1.9.1.min.js',
 			exports: '$'
 		}
-	},
-	app: {
-		src: ['app/**/*.js'],
-		dest: 'public/bundle.js'
 	}
 };
-gulp.task('browserify', ['clean:build'], function () {
-	return browserify('app.js', browserifySet)
-			.bundle()
-			.pipe(source('bundle.js'))
-			.pipe(buffer())
-			.pipe(sourcemaps.init({loadMaps: true}))
-			.on('error', gutil.log.bind(gutil, 'Browserify Error'))
-			.pipe(gulp.dest('public/'))
-			.pipe(browserSync.reload({
-				stream: true
-			}));
+
+// error handling
+var handleError = function (err) {
+    gutil.log(err.toString());
+    this.emit('end');
+};
+
+var gulpPlumber = require('gulp-plumber');
+var plumber = function () {
+    return gulpPlumber({ errorHandler : handleError });
+};
+
+//------------------------------------------------
+// HANDLEBARS
+//------------------------------------------------
+gulp.task('handlebars:compile', ['clean:build'], function () {
+
+    return gulp.src('./app/templates/**/[!__]*.hbs')
+        .pipe(plumber())
+        .pipe(handlebars({ wrapped : true }))
+        .pipe(wrap('templates["<%= file.relative.replace(/\\\\/g, "/").replace(/.js$/, "") %>"] = <%= file.contents %>;\n'))
+        .pipe(concat('compiledTemplates.js'))
+        .pipe(wrap('module.exports = function(Handlebars){\ntemplates = {};\n<%= contents %>\nreturn templates \n};'))
+        .pipe(gulp.dest('app/templates/'));
 });
 
-gulp.task('handlebars:compile', function () {
-	return gulp.src('app/templates/**/*.hbs')
-		.pipe(handlebars({
-			namespace: false,
-			commonjs: true,
-			processName: function (filename) {
-				return filename.replace('app/templates/', '').replace('.hbs', '');
-			}
-		}))
-		.pipe(wrap('Handlebars.template(<%= contents %>)'))
-		.pipe(declare({
-			noRedeclare: true
-		}))
-		.pipe(concat('compiledTemplates.js'))
-		.pipe(gulp.dest('app/templates/'));
+gulp.task('handlebars:watch', function () {
+    return gulp.watch('./app/templates/**/*.hbs', [ 'handlebars:compile' ]);
+});
+//------------------------------------------------
+// BROWSERIFY
+//------------------------------------------------
+
+// get rendr shared & client files list
+rendrClientFiles = glob.sync('rendr/{client,shared}/**/*.js', { cwd : './node_modules/' });
+
+rendrModules = rendrClientFiles.map(function (file) {
+    return file.replace('.js', '')
 });
 
-gulp.task('watch:app', function () {
-	gulp.watch('app/**/*.js', ['browserify']);
-	gulp.watch('app/**/*.mu', ['browserify']);
-	gulp.watch('index.html', browserSync.reload);
+var getBundler = function (globs) {
+
+    var bundler, files;
+
+    bundler = browserify({
+        fullPaths : false,
+        entries   : []
+    });
+
+    globs.forEach(function (pattern) {
+        files = glob.sync(pattern, { cwd : './' });
+        files.forEach(function (file) {
+            // it's nesessary for some app modules (e.g. 'app/app')
+            // to be exposed otherwise rendr couldn't require them
+            moduleName = file.replace(/.js$/, '')
+            bundler.require('./' + file, { expose: moduleName});
+        });
+    });
+
+    rendrModules.forEach(function (moduleName) {
+        bundler.require(moduleName);
+    });
+
+    bundler.require('rendr-handlebars');
+    bundler.require('./assets/vendor/jquery-1.9.1.min.js', { expose : 'jquery' });
+
+    return bundler;
+};
+
+gulp.task('browserify:app', [ 'handlebars:compile' ], function () {
+
+    var bundler = getBundler([ 'app/**/*.js' ]),
+        options = { insertGlobals : false, debug : true };
+
+    return bundler.bundle(options)
+        .on('error', handleError)
+        .pipe(plumber())
+        .pipe(source('bundle.js'))
+        .pipe(gulp.dest('./public'));
 });
 
-gulp.task('build', ['browserify']);
+gulp.task('browserify:test', function () {
+
+    var bundler = getBundler([ 'test/app/**/*.js', 'app/**/*.js', 'test/helper.js' ]),
+        options = { insertGlobals : false, debug : true };
+
+    return bundler.bundle(options)
+        .on('error', handleError)
+        .pipe(plumber())
+        .pipe(source('testBundle.js'))
+        .pipe(gulp.dest('./public'));
+});
+
+gulp.task('browserify:watch', function () {
+    gulp.watch('./app/**/*.js', [ 'browserify:app' ])
+});
+
+gulp.task('build', ['browserify:app']);
 gulp.task('default', ['browserSync', 'watch:app']);
