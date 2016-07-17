@@ -197,3 +197,42 @@ git push [REMOTE] [BRANCH]
 ```
 git tag <VERSION_NAME>
 ```
+
+## 有用的技巧
+
+### 获取帮助
+
+```
+git help [command]
+```
+
+### 创建空分支
+
+```
+git symbolic-ref HEAD refs/heads/newbranch
+rm .git/index
+git clean -fdx
+<DO WORK>
+git add your files
+git commit -m 'Initial commit'
+```
+
+### 图形化日志
+
+```
+git log --graph
+git log --graph --pretty=online --abbrev-commit
+```
+
+### 把分支提交到远端
+
+```
+git push <REMOTE> <BRANCH>
+```
+
+### 删除远端和本地分支
+
+```
+git push <REMOTE> :<BRANCH>
+git branch -d <BRANCH>
+```
