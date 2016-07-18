@@ -236,3 +236,41 @@ git push <REMOTE> <BRANCH>
 git push <REMOTE> :<BRANCH>
 git branch -d <BRANCH>
 ```
+
+## 解决合并时的冲突
+
+### 查看合并冲突
+
+```
+git diff
+```
+
+### 与共同的祖先文件来比较合并时的冲突之处
+
+```
+git diff --base <FILE>
+```
+
+### 与别人修改的版本来比较合并时的冲突之处
+
+```
+git dirr --theirs <FILE>
+```
+
+### 与我们的修改版本来比较合并时的冲突之处
+
+```
+git diff --ours <FILE>
+```
+
+### 放弃冲突时的修改
+
+```
+git reset --hard
+git rebase --skip
+
+# 解决冲突后
+
+git add <CONFLICTING FILE>
+git rebase --continue
+```
