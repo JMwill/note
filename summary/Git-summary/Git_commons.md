@@ -274,3 +274,24 @@ git rebase --skip
 git add <CONFLICTING FILE>
 git rebase --continue
 ```
+
+## 配置
+
+```
+git config [--global]
+
+# 全局配置保存在 ~/.gitconfig
+
+user----------|--user.name <NAME>
+              |--user.email <EMAIL>
+
+color---------|--color.ui auto
+
+github--------|--github.user <USER>
+              |--github.token <TOKEN>
+
+optimisation--|--pack.threads 0
+              |--diff.renamelimit 0 # 不要在小内存机子上用
+
+windows-------|--core.autocrlf true
+```
