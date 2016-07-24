@@ -6,6 +6,7 @@ var zlib            = require('zlib');
 var mkdirp          = require('mkdirp');
 var async           = require('async');
 
+
 // get config
 var globalConfig    = require('./config/config.json');
 var urls = JSON.parse(fs.readFileSync('./task/task_urls.json'));
@@ -21,7 +22,7 @@ var headers = {
     'Upgrade-insecure-Requests': 1,
 };
 
-urls.forEach(function (url) {
+urls.forEach(function (url, index) {
     var opt = {
         url: url,
         headers: headers,
@@ -39,7 +40,7 @@ urls.forEach(function (url) {
 
         var isGzip = false;
         var filePath = path.resolve(
-            __dirname, './source/save.html'
+            __dirname, './source/' + url.slice(url.lastIndexOf('/')) + '-' + index + '.html'
         );
         if (response.headers['content-encoding'].toLowerCase().indexOf('gzip') != -1) {
             isGzip = true;
