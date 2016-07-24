@@ -39,18 +39,25 @@ function getContent(url) {
 
             // 提取图片信息
             let imgsContent = $('.commentlist li .text p');
-            imgsContent.forEach((i, $imgGetter) => {
-                let imgLink = $imgGetter.find('a.view_img_link').prop('href');
-                if (!imgLink) {
-                    imgLink = $imgGetter.find('img').prop('src');
-                }
+            imgsContent.each(function (i, elem) {
+                let $imgGetter = $(this);
+
+                let imgLink = $imgGetter.find('a.view_img_link');
+                imgLink = imgLink.length > 0 ? imgLink.prop('href') : null;
+
+                let imgSrc = $imgGetter.find('img');
+                imgSrc = imgSrc.length > 0 ? imgSrc.prop('src') : null;
 
                 if (imgLink) {
                     imgQueue.push(imgLink);
+                } else if (imgSrc) {
+                    imgQueue.push(imgSrc);
                 }
             });
             sitePage.close();
             phInstance.exit();
+            log.info(imgQueue);
+            log.info(urlQueue);
         })
         .catch(err => {
             log.error(err);
@@ -59,6 +66,3 @@ function getContent(url) {
 }
 
 getContent(entryUrl);
-
-log.info(imgQueue);
-log.info(urlQueue);
