@@ -5,13 +5,23 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "webpack-dev-server --watch --devtool eval --progress --colors",
+    "dev-webpack-server": "webpack-dev-server --content-base app/ --devtool eval --progress --colors",
     "deploy": "NODE_ENV=production webpack -p"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "babel-core": "^6.11.4",
-    "babel-loader": "^6.2.4"
+    "babel-loader": "^6.2.4",
+    "babel-preset-es2015": "^6.9.0",
+    "babel-preset-react": "^6.11.1",
+    "css-loader": "^0.23.1",
+    "node-sass": "^3.8.0",
+    "sass-loader": "^4.0.0",
+    "style-loader": "^0.13.1",
+    "webpack": "^1.13.1"
+  },
+  "dependencies": {
+    "react": "^15.2.1"
   }
 }
