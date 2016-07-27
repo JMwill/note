@@ -1,10 +1,13 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
+import TodoInput from '../TodoInput/todoInput';
+import TodoList from '../TodoList/todoList';
+import { connect } from 'react-redux';
 
 class App extends Component {
     constructor(props) {
         super(props);
         this.state = {title: props.title, oldTitle: 'Temp'};
-        // this.replaceTitle.bind(this);
+        this.replaceTitle.bind(this);
     };
 
     replaceTitle(e) {
@@ -15,9 +18,23 @@ class App extends Component {
 
     render () {
         return (
-            <div onClick={this.replaceTitle.bind(this)}>{this.state.title}</div>
+            <div>
+                <h1> Todo List </h1>
+                <TodoInput
+                    dispatch={this.props.dispatch}
+                />
+                <TodoList
+                    todos={this.props.todos}
+                />
+            </div>
         )
     };
 }
 
-export default App;
+function mapStateToProps(state) {
+    return {
+        todos: state.todos
+    };
+}
+
+export default connect(mapStateToProps)(App);
