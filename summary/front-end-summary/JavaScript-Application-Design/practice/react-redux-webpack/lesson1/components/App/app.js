@@ -1,30 +1,32 @@
 import React, { Component } from 'react';
-import TodoInput from '../TodoInput/todoInput';
+import { bindActionCreators } from 'redux';
 import TodoList from '../TodoList/todoList';
+import TodoInput from '../TodoInput/todoInput';
 import { connect } from 'react-redux';
+import actions from '../../redux/actions';
+import UserInfo from '../UserInfo/userInfo';
+
 
 class App extends Component {
     constructor(props) {
         super(props);
-        this.state = {title: props.title, oldTitle: 'Temp'};
-        this.replaceTitle.bind(this);
-    };
-
-    replaceTitle(e) {
-        var oldTitle = e.target.innerText;
-        this.setState({title: this.state.oldTitle});
-        this.setState({oldTitle: oldTitle});
+        console.log(props);
     };
 
     render () {
         return (
             <div>
-                <h1> Todo List </h1>
+                <h1> Todo List: </h1>
+                <UserInfo
+                    user={this.props.user}
+                    actions={this.props.actions}
+                />
                 <TodoInput
-                    dispatch={this.props.dispatch}
+                    addTodo={this.props.actions.addTodo}
                 />
                 <TodoList
                     todos={this.props.todos}
+                    actions={this.props.actions}
                 />
             </div>
         )
@@ -33,8 +35,15 @@ class App extends Component {
 
 function mapStateToProps(state) {
     return {
-        todos: state.todos
+        todos: state.todos,
+        user: state.user
     };
 }
 
-export default connect(mapStateToProps)(App);
+function mapDispatchToProps(dispatch) {
+    return {
+        actions: bindActionCreators(actions, dispatch)
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
