@@ -1,0 +1,42 @@
+.board-wrapper {
+    text-align: center;
+}
+
+.board{
+    position: relative;
+    display: inline-block;
+    width: 410px;
+    height: 410px;
+    background-color: #78f9f3;
+    border-radius: 10px;
+}
+
+.board-block {
+    position: absolute;
+    width: 90px;
+    height: 90px;
+    background: #c0f7ff;
+    box-sizing: border-box;
+    margin: 5px;
+    border-radius: 5px;
+}
+
+.has-num {
+    background-color: #47e0f7;
+}
+
+.board-block span {
+    font-size: 40px;
+    line-height: 2;
+    font-family: sans-serif;
+}
+
+.board-block-posx-0 {left: 5px;}
+.board-block-posx-1 {left: 105px;}
+.board-block-posx-2 {left: 205px;}
+.board-block-posx-3 {left: 305px;}
+
+.board-block-posy-0 {top: 5px;}
+.board-block-posy-1 {top: 105px;}
+.board-block-posy-2 {top: 205px;}
+.board-block-posy-3 {top: 305px;}
