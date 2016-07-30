@@ -7,7 +7,7 @@ export default (props) =>
             `board-block
             board-block-posx-${props.info.posX}
             board-block-posy-${props.info.posY}
-            ${(props.num ? 'has-num' : '')}`
+            ${props.num ? 'has-num' : ''}`
         }
     ><span>{props.num ? props.num : ''}</span></div>;
 // }

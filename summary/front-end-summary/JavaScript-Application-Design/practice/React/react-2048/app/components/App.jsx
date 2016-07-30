@@ -3,7 +3,10 @@ import Board from './Board/board.jsx';
 
 require('./App.css');
 
-export default () => <Board boardWidth="4" />;
+export default () =>
+    <div>
+        <Board boardWidth="4" />
+    </div>;
 
 /*
 export default class App extends React.Component {
