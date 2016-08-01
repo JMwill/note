@@ -1,4 +1,10 @@
 {
     "sourcePath": "./source",
-    "LogLocation": "./log/log"
+    "LogLocation": "./log/log",
+    "meizi_spider_db": {
+        "host": "localhost",
+        "user": "root",
+        "password": "ljm",
+        "database": "meizi_spider"
+    }
 }
