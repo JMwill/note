@@ -12,6 +12,7 @@
 
 + [廖雪峰git教程学习记录][git liao]
 + [Githug 通关记录][githug game]
++ [Git常用][git commons]
 
 
 
@@ -22,3 +23,4 @@
 
 [git liao]:	        https://github.com/JMwill/wiki/blob/master/summary/Git-summary/lxfGit.md
 [githug game]: 	    https://github.com/JMwill/wiki/blob/master/summary%2FGit-summary%2FGitHug_game_log.md
+[git commons]:      https://github.com/JMwill/wiki/blob/master/summary/Git-summary/Git_commons.md
