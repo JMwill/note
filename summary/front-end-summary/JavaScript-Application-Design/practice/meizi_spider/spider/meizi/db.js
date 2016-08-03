@@ -7,16 +7,16 @@ const dbConfig    = require(
     path.resolve('../../config/config.json')
 )[dbConfigName];
 
-const cnt =
-mysql
-    .createConnection(dbConfigName)
-    .connect((err) => {
-        if (err) {
-            let errorStr = 'Create Database ' + dbConfig.database + ' Fail: ' + err.stack;
-            log.error(errorStr);
-            throw new Error(errorStr);
-            return ;
-        }
+const cnt = mysql.createPool(dbConfigName);
 
-        exports.cnt = cnt;
-    });
+exports.poolCnt = cnt;
+    // .connect((err) => {
+    //     if (err) {
+    //         let errorStr = 'Create Database ' + dbConfig.database + ' Fail: ' + err.stack;
+    //         log.error(errorStr);
+    //         throw new Error(errorStr);
+    //         return ;
+    //     }
+    //
+    //     exports.cnt = cnt;
+    // });

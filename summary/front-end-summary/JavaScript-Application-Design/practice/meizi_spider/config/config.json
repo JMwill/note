@@ -5,6 +5,7 @@
         "host": "localhost",
         "user": "root",
         "password": "ljm",
-        "database": "meizi_spider"
+        "database": "node_spiders",
+        "connectionLimit": 20
     }
 }

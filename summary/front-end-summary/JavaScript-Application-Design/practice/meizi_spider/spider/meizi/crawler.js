@@ -23,15 +23,9 @@ function crawl(url, optionArr, optionObj) {
             }
         })
         .then(content => {
-            worker.process(content, (err, result) => {
-                if (err) {
-                    log.error(err);
-                    throw err;
-                    return;
-                }
-                sitePage.close();
-                phInstance.exit();
-            });
+            worker.process(content);
+            sitePage.close();
+            phInstance.exit();
         })
         .catch(err => {
             log.error(err);
