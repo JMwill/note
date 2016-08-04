@@ -1,0 +1,34 @@
+{
+  "name": "backbone-boilerplate",
+  "version": "0.0.0",
+  "description": "personal backbone boilerplate",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "gulp serve:isclean"
+  },
+  "keywords": [
+    "backbone",
+    "boilerplate",
+    "requirejs",
+    "gulp"
+  ],
+  "author": "JMwill",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-core": "^6.11.4",
+    "babel-eslint": "^6.1.2",
+    "babel-preset-es2015": "^6.9.0",
+    "browser-sync": "^2.14.0",
+    "eslint": "^3.2.2",
+    "eslint-config-airbnb": "^10.0.0",
+    "eslint-plugin-import": "^1.12.0",
+    "eslint-plugin-jsx-a11y": "^2.0.1",
+    "eslint-plugin-react": "^6.0.0",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2",
+    "gulp-eslint": "^3.0.1",
+    "gulp-sass": "^2.3.2",
+    "gulp-sourcemaps": "^1.6.0"
+  }
+}
