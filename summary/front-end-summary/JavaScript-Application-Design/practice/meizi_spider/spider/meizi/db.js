@@ -4,10 +4,10 @@ const log         = require('../../lib/Commons/log').logger;
 
 const dbConfigName= path.basename(__dirname) + '_spider_db';
 const dbConfig    = require(
-    path.resolve('../../config/config.json')
+    path.resolve('./config/config.json')
 )[dbConfigName];
 
-const cnt = mysql.createPool(dbConfigName);
+const cnt = mysql.createPool(dbConfig);
 
 exports.poolCnt = cnt;
     // .connect((err) => {

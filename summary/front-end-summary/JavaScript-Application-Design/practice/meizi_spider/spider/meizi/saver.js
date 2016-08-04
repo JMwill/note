@@ -1,26 +1,46 @@
-var poolCnt = require('./db').poolCnt;
+const log             = require('../../lib/Commons/log').logger;
+let poolCnt = require('./db').poolCnt;
+
 function _createInsertSql(sourceObj) {
-    var keys = [
+    let keys = [
         'page_num',
         'original_url',
-        'local_location',
         'img_up',
-        'img_down'
+        'img_down',
+        'img_md5',
+        'downloaded'
     ]
-    var values = keys.map(function (key) {
+    let values = keys.map(function (key) {
         return sourceObj[key];
     });
 
-    return 'INSERT INTO meizi_spider (' + keys.join(',') + ')VALUES (' + values.join(',') + ')';
+    return 'INSERT INTO meizi_spider (' + keys.join(',') + ') VALUES (' + values.join(',') + ')';
 }
 
-function save(saveObj) {
-    var sql = _createInsertSql(saveObj);
-    poolCnt.getConnection(function (err, cnt) {
-        if (err) { log.error('get connection with error: ' + err.stack); return; }
-        cnt.query(sql, function (err, result) {
-            if (err) { log.error('insert with error: ' + err.stack); return;}
-            log.info('insert successful: ' + sql + ' ' + result);
+function save(spider, saveObj) {
+    // 插入下一次访问的链接
+    if (!saveObj.nextPage) {
+        return;
+    }
+    spider.urlQueue.push(saveObj.nextPage);
+
+    saveObj.imgInfos.forEach((imgInfo, index) => {
+        let sql = _createInsertSql(imgInfo);
+        poolCnt.getConnection((err, cnt) => {
+            if (err) {
+                log.error('get connection with error: ' + err.stack);
+                cnt.release();
+                return;
+            }
+            cnt.query(sql, (err, result) => {
+                if (err) {
+                    log.error('insert with error: ' + err.stack);
+                    cnt.release();
+                    return;
+                }
+                log.info('insert successful: ' + sql + ' ');
+                cnt.release();
+            });
         });
     });
 }
