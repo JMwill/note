@@ -5,10 +5,11 @@ import sass from 'gulp-sass';
 import babel from 'gulp-babel';
 import del from 'del';
 import eslint from 'gulp-eslint';
+import scsslint from 'gulp-scss-lint';
 
 const browserSync = BrowserSync.create();
 
-gulp.task('browser-sync', () => {
+gulp.task('browser-sync', ['clean:all'], () => {
     browserSync.init({
         server: {
             baseDir: './app'
@@ -16,16 +17,16 @@ gulp.task('browser-sync', () => {
     });
 });
 
-gulp.task('sass', () =>
+gulp.task('sass', ['lint:css'], () =>
     gulp.src('app/src/scss/**/*.scss')
         .pipe(sourcemaps.init())
         .pipe(sass().on('error', sass.logError))
         .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest('app/css'))
+        .pipe(gulp.dest('app/dest/css'))
         .pipe(browserSync.stream())
 );
 
-gulp.task('babel', () =>
+gulp.task('babel', ['lint:js'], () =>
     gulp.src('app/src/js/**/*.js')
         .pipe(sourcemaps.init())
         .pipe(babel())
@@ -33,30 +34,38 @@ gulp.task('babel', () =>
         .pipe(gulp.dest('app/dest/js'))
 );
 
-gulp.task('babel:lint', ['babel'], () =>
-    gulp.src(['app/src/js/**/*.js'])
+gulp.task('lint:js', () =>
+    gulp.src('app/src/js/**/*.js')
         .pipe(eslint())
         .pipe(eslint.format())
         .pipe(eslint.failAfterError())
-)
-gulp.task('clean:build', () => {
-    return del([
-        'app/build/**'
-    ]);
-});
+);
 
-gulp.task('clean:dest', () => {
-    return del([
+gulp.task('lint:css', () =>
+    gulp.src('app/src/scss/**/*.scss')
+        .pipe(scsslint({
+            config: '.scss-lint.yml',
+            reporterOutput: 'scssReport.json'
+        }))
+);
+
+gulp.task('clean:build', () =>
+    del([
+        'app/build/css/**',
+        'app/build/js/**'
+    ])
+);
+
+gulp.task('clean:dest', () =>
+    del([
         'app/dest/css/**',
         'app/dest/js/**'
-    ]);
-});
+    ])
+);
 
 gulp.task('clean:all', ['clean:build', 'clean:dest']);
-gulp.task('serve', ['sass', 'browser-sync'], () => {
-    gulp.watch('app/src/scss/*.scss', ['sass']);
-    gulp.watch('app/src/js/*.js', ['babel:lint']);
-    gulp.watch('app/*.html').on('change', browserSync.reload);
+gulp.task('serve', ['babel', 'sass', 'browser-sync'], () => {
+    gulp.watch('app/src/scss/**/*.scss', ['sass']);
+    gulp.watch('app/src/js/**/*.js', ['babel']);
+    gulp.watch('app/**/*.html').on('change', browserSync.reload);
 });
-
-gulp.task('serve:isclean', ['clean:all', 'serve']);

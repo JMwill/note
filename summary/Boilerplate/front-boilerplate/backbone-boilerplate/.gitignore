@@ -1,3 +1,5 @@
 node_modules
+npm-debug.log
+scssReport.json
 app/build/
 npm-debug.log
