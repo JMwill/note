@@ -1,0 +1,20 @@
+.purple-skin {
+    color: purple;
+}
+
+.temperature-show {
+    text-align: center;
+}
+
+.temperature-show .__temperature {
+    font-size: 40px;
+}
+
+.temperature-show .__location {
+    color: black;
+}
+
+.temperature-show .__location span {
+    border-bottom-style: dashed;
+    border-bottom-width: 1px;
+}
