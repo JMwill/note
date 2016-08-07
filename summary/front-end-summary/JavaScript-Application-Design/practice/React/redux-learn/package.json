@@ -9,11 +9,12 @@
   },
   "devDependencies": {
     "babel-preset-es2015": "^6.13.2",
+    "babel-preset-stage-2": "^6.13.0",
     "del": "^2.2.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "babel": "babel src -d lib; node lib/index.js"
+    "babel": "babel src -d lib; node lib/08-action.js"
   },
   "author": "",
   "license": "ISC"

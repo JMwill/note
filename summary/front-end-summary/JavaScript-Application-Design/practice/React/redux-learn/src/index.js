@@ -11,7 +11,7 @@
 
 
 // 04 
-import { createStore } from 'redux';
+//import { createStore } from 'redux';
 //var reducer0 = (state, action) => {
     //console.log('reducer0 was called with state', state, 'and action', action);
 //}
@@ -29,19 +29,74 @@ import { createStore } from 'redux';
 
 //console.log('store 1 state after initialization: ', store1.getState());
 
-var reducer2 = (state = {}, action) => {
-    console.log('reducer 2 was called with state', state, 'and action', action);
+//var reducer2 = (state = {}, action) => {
+    //console.log('reducer 2 was called with state', state, 'and action', action);
 
+    //switch (action.type) {
+        //case 'SAY_SOMETHING':
+            //return {
+                //...state,
+                //message: action.value
+            //}
+        //default:
+            //return state
+    //}
+//};
+
+//var store2 = createStore(reducer2);
+//console.log('store 2 state after initialization: ', store2.getState());
+
+
+// 05
+import { createStore, combineReducers } from 'redux';
+
+let userReducer = (state = {}, action) => {
+    console.log('user Reducer was called with state', state, 'and action', action);
     switch (action.type) {
-        case 'SAY_SOMETHING':
+        case 'SET_NAME': 
             return {
                 ...state,
-                message: action.value
+                name: action.name
             }
         default:
-            return state
+            return state;
     }
 };
 
-var store2 = createStore(reducer2);
-console.log('store 2 state after initialization: ', store2.getState());
+let itemsReducer = (state = [], action) => {
+    console.log('itemsReducer was called with state', state, 'and action', action);
+    switch (action.type) {
+        case 'ADD_ITEM':
+            return [
+                ...state,
+                action.item
+            ]
+        default:
+            return state;
+    }
+};
+
+let reducer = combineReducers({
+    user: userReducer,
+    items: itemsReducer
+});
+
+let store0 = createStore(reducer);
+
+console.log('\n', '### It starts here');
+console.log('store 0 state after initialization:', store0.getState());
+
+//store0.dispatch({
+    //type: 'AN_ACTION'
+//});
+//console.log('store 0 state after initialization:', store0.getState());
+
+let setNameActionCreator = (name) => {
+    return {
+        type: 'SET_NAME',
+        name: name
+    }
+};
+
+store0.dispatch(setNameActionCreator('bob'));
+console.log('sotre 0 state after action SET_NAME: ', store0.getState());
