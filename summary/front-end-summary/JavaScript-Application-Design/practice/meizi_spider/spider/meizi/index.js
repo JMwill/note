@@ -1,7 +1,8 @@
-const crawler  = require('./crawler.js');
-const log      = require('../../lib/Commons/log').logger;
-const urlTool  = require('url');
-const poolCnt  = require('./db').poolCnt;
+const crawler       = require('./crawler.js');
+const log           = require('../../lib/Commons/log').logger;
+const urlTool       = require('url');
+const poolCnt       = require('./db').poolCnt;
+const proxyList     = require('../../config/proxy');
 
 function _isUrl(url) {
     let isUrl = true;
@@ -33,7 +34,8 @@ function Spider(option) {
 
 
 Spider.prototype.stop = function() {
-    clearInterval(spiderInterval);
+    clearInterval(this.spiderInterval);
+    clearTimeout(this.spiderInterval);
 }
 
 Spider.prototype.crawl = function(url, options) {
@@ -101,10 +103,18 @@ Spider.prototype.randomSpide = function (second) {
     setTimeout(() => {
         let url = this.urlQueue.pop();
         if (!url) {return;}
-        log.info(url);
         this.crawl(url, this.options.phantomSet);
         this.randomSpide(second);
     }, time);
+}
+
+Spider.prototype.getProxy = function () {
+    // let proxyList =
+    //     this.options.proxyList && this.options.proxyList.length > 0 ?
+    //     this.options.proxyList :
+    //     gloProxyList;
+    // return proxyList[Math.floor(Math.random() * proxyList.length)];
+    return proxyList.shift();
 }
 
 function wrapper(entryUrl, options) {
@@ -113,7 +123,7 @@ function wrapper(entryUrl, options) {
         Object.assign(spider.options, options);
     }
     spider.queuePush(entryUrl);
-    spider.processEntryUrl();
+    // spider.processEntryUrl();
     return spider;
 }
 

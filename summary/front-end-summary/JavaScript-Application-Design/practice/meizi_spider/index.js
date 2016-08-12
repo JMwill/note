@@ -1,6 +1,6 @@
 let MeiziSpider = require('./spider/meizi/index');
 
-let meiziSpider = MeiziSpider('http://jandan.net/ooxx/page-1', {
-    phantomSet: ['--ignore-ssl-errors=yes', '--load-images=no', '--proxy=120.52.72.59:80']
+let meiziSpider = MeiziSpider('http://jandan.net/ooxx', {
+    phantomSet: ['--ignore-ssl-errors=yes', '--load-images=no']
 });
-meiziSpider.randomSpide(10);
+meiziSpider.randomSpide(20);
