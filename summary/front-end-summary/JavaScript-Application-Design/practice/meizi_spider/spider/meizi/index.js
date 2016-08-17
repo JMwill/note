@@ -1,4 +1,4 @@
-const crawler       = require('./crawler.js');
+const crawler       = new (require('./simpleCrawler.js'));
 const log           = require('../../lib/Commons/log').logger;
 const urlTool       = require('url');
 const poolCnt       = require('./db').poolCnt;
@@ -15,10 +15,11 @@ function Spider(option) {
     this.spiderInterval;
     this.urlQueue = [];
     this.imgQueue = [];
-    this.options = {
-        timeout: 1000,
-        phantomSet: ['--ignore-ssl-errors=yes', '--load-images=no']
-    };
+    this.options = {};
+    // this.options = {
+    //     timeout: 1000,
+    //     phantomSet: ['--ignore-ssl-errors=yes', '--load-images=no']
+    // };
     // let argv = process.argv.slice(2);
     // proxyReg = /\-\-proxy=(.+)/;
     // argv.forEach((arg, i) => {
@@ -38,9 +39,9 @@ Spider.prototype.stop = function() {
     clearTimeout(this.spiderInterval);
 }
 
-Spider.prototype.crawl = function(url, options) {
-    crawler.crawl(this, url, options);
-}
+Spider.prototype.crawl = function (url) {
+    crawler.crawl(this, url)
+};
 
 Spider.prototype.queuePush = function (url) {
     let args = Array.prototype.slice.call(arguments, 0);
@@ -88,7 +89,7 @@ Spider.prototype.infinitySpide = function () {
         let url = this.urlQueue.pop();
         if (!url) {return;}
         log.info(url);
-        this.crawl(url, this.options.phantomSet);
+        this.crawl(url);
     }, this.options.timeout);
 }
 
@@ -103,7 +104,7 @@ Spider.prototype.randomSpide = function (second) {
     setTimeout(() => {
         let url = this.urlQueue.pop();
         if (!url) {return;}
-        this.crawl(url, this.options.phantomSet);
+        this.crawl(url);
         this.randomSpide(second);
     }, time);
 }
@@ -121,6 +122,11 @@ function wrapper(entryUrl, options) {
     let spider = new Spider(options);
     if (options) {
         Object.assign(spider.options, options);
+    }
+    if (spider.options.crawlSet) {
+        crawler.set(
+            spider.options.crawlSet
+        )
     }
     spider.queuePush(entryUrl);
     // spider.processEntryUrl();

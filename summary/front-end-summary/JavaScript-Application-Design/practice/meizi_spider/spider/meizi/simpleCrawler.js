@@ -1,5 +1,6 @@
 const log             = require('../../lib/Commons/log').logger;
-const phantom         = require('phantom');
+const request         = require('request');
+const HttpProxyAgent  = require('http-proxy-agent');
 const saver           = require('./saver');
 const cheerio         = require('cheerio');
 const crypto          = require('crypto');
@@ -8,65 +9,46 @@ function _genMd5(str) {
     return crypto.createHash('md5').update(str).digest('hex');
 }
 
-function Crawl() {};
+const ReqOption = {
+    headers: {
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'
+    },
+    followRedirect: true,
+    maxRedirects: 5
+};
 
-Crawl.prototype.crawl = function(spider, url, optionArr, optionObj) {
-    let sitePage = null;
-    let phInstance = null;
-    let crawler = phantom.create.call(phantom, optionArr, optionObj);
-    crawler
-        .then(instance => {
-            phInstance = instance;
-            return instance.createPage();
-        })
-        .then(page => {
-            sitePage = page;
-            page.setting('resourceTimeout', 10000);
-            return page.open(url);
-        })
-        .then(status => {
-            if (status === 'success') {
-                return sitePage.property('content');
-            } else {
-                throw new Error('Receive Status: ' + status);
-            }
-        })
-        .then(content => {
-            sitePage.close();
-            phInstance.exit();
-            let accessDeny = false;
-            if (content.indexOf('current-comment-page') === -1) {
-                accessDeny = true;
-            }
-            if ( accessDeny ) { this.reCrawlWithProxy(spider, url, optionArr, optionObj); }
-            else { saver.save(spider, this.process(url, content)); }
-        })
-        .catch(err => {
+function Crawl(setting) {
+    Object.assign(ReqOption, setting);
+};
+
+Crawl.prototype.set = function (setting) {
+    Object.assign(ReqOption, setting);
+}
+
+Crawl.prototype.crawl = function(spider, url) {
+    ReqOption.url = url;
+    request.get(ReqOption, (err, res, body) => {
+        if (err || res.statusCode != 200) {
             log.error(err);
-            sitePage.close();
-            phInstance.exit();
-            this.reCrawlWithProxy(spider, url, optionArr, optionObj);
-            // spider.queuePush(url);
-        });
-}
-
-Crawl.prototype.reCrawlWithProxy = function (spider, url, optionArr, optionObj) {
-    let proxy = '--proxy=' + spider.getProxy();
-    let oldProxyIndex = optionArr.findIndex((elem) => {
-        if (elem.indexOf('--proxy=') != -1) { return true; }
+            log.error(res && res.statusCode);
+            this.reCrawlWithProxy(spider, url);
+        } else {
+            let accessDeny = body.indexOf('current-comment-page') != -1 ? false : true;
+            if ( accessDeny ) { this.reCrawlWithProxy(spider, url); }
+            else { saver.save(spider, this.process(url, body)); }
+        }
     });
-
-    if (oldProxyIndex != -1) {
-        optionArr[oldProxyIndex] = proxy;
-    } else {
-        optionArr.push(proxy);
-    }
-    log.info('recrawl with proxy optionArr is: ' + optionArr);
-    this.crawl(spider, url, optionArr, optionObj);
 }
 
-Crawl.prototype.process = function (oldUrl, content) {
-    let $ = cheerio.load(content);
+Crawl.prototype.reCrawlWithProxy = function (spider, url) {
+    let proxy = 'http://' + spider.getProxy();
+    let agent = new HttpProxyAgent(proxy);
+    ReqOption.agent = agent;
+    this.crawl(spider, url);
+}
+
+Crawl.prototype.process = function (oldUrl, body) {
+    let $ = cheerio.load(body);
 
     let pageInfo = {
         nextPage: oldUrl,
@@ -91,7 +73,7 @@ Crawl.prototype.process = function (oldUrl, content) {
     } catch (e) {
         log.error('can not get next page');
         log.error(e);
-        log.error(content)
+        log.error(body)
         return pageInfo;
     }
     log.info('next page is ' + pageInfo.nextPage);
@@ -154,4 +136,4 @@ Crawl.prototype.process = function (oldUrl, content) {
     return pageInfo;
 }
 
-module.exports = new Crawl();
+module.exports = Crawl;
