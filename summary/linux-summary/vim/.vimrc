@@ -58,12 +58,22 @@ Plugin 'ervandew/supertab'
 
 " syntax check
 Plugin 'scrooloose/syntastic'
+" python sytax checker
+Plugin 'nvie/vim-flake8'
+Plugin 'vim-scripts/Pydiction'
+Plugin 'vim-scripts/indentpython.vim'
+
+" code folding
+Plugin 'tmhedberg/SimpylFold'
 
 " auto close quotes etc
 Plugin 'spf13/vim-autoclose'
 
 " tmux complete plugin
 Plugin 'wellle/tmux-complete.vim'
+
+" python virtualenv's vim patch
+Plugin 'jmcantrell/vim-virtualenv'
 
 call vundle#end()
 filetype plugin indent on
@@ -72,6 +82,11 @@ filetype plugin indent on
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Plugin setting
 map <C-n> :NERDTreeToggle<CR>
+
+let g:SimpylFold_docstring_preview = 1
+
+" ignore files in NERDTree
+let NERDTreeIgnore=['\.pyc$', '\~$'] "ignore files in NERDTree"
 
 " To ignore plugin indent changes, instead use:
 " filetype plugin on
@@ -495,3 +510,41 @@ endif
 " Set relative number
 set number
 set relativenumber
+
+" Enable folding with the spacebar
+nnoremap <space> za
+
+" make backspaces more powerfull
+set backspace=indent,eol,start
+
+"it would be nice to set tag files by the active virtualenv here
+":set tags=~/mytags "tags for ctags and taglist
+"omnicomplete
+autocmd FileType python set omnifunc=pythoncomplete#Complete
+
+" Python setting
+
+" Keep indentation level from previous line:
+autocmd FileType python set autoindent
+
+" Folding based on indentation:
+autocmd FileType python set foldmethod=indent
+
+let python_highlight_all=1
+syntax on
+au BufRead,BufNewFile *.py,*pyw,*.c,*.h
+\ set textwidth=100 |
+\ set softtabstop=4 |
+\ set expandtab |
+\ set cursorcolumn |
+\ set autoindent |
+\ set fileformat=unix |
+\ set foldmethod=indent |
+\ set foldlevel=99 |
+
+" highlight unnecessary white space
+highlight BadWhitespace ctermbg=red guibg=red
+au BufRead,BufNewFile *.py,*.pyw,*.c,*.h match BadWhitespace /\s\+$/
+
+" Display tabs at the beginning of a line in Python mode as bad.
+au BufRead,BufNewFile *.py,*.pyw match BadWhitespace /^\t\+/
