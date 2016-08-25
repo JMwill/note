@@ -55,3 +55,22 @@ console.log(bonus.getBonus());
 
 bonus.setStrategy(new performanceB());
 console.log(bonus.getBonus());
+
+// JavaScript式的策略模式
+var strategies = {
+    'S': function (salary) {
+        return salary * 4;
+    },
+    'A': function (salary) {
+        return salary * 3;
+    },
+    'B': function (salary) {
+        return salary * 2;
+    }
+};
+
+var calculateBonus = function (salary, strategy) {
+    return strategies[strategy](salary);
+}
+
+console.log(calculateBonus(4000, 'S'));
