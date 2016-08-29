@@ -86,7 +86,7 @@ map <C-n> :NERDTreeToggle<CR>
 let g:SimpylFold_docstring_preview = 1
 
 " Pydiction setting
-let g:pydiction_location='~/.vim/tools/pydiction/complete-dict'
+let g:pydiction_location='~/.vim/bundle/Pydiction/complete-dict'
 
 " ignore files in NERDTree
 let NERDTreeIgnore=['\.pyc$', '\~$'] "ignore files in NERDTree"
