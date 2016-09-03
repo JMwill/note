@@ -58,11 +58,32 @@ DEFAULT_REQUEST_HEADERS = {
 #    'meizi.middlewares.MyCustomSpiderMiddleware': 543,
 #}
 
+# Retry many times since proxies often fail
+RETRY_TIMES = 10
+
+# Retry on most error codes since proxies fail for different reasons
+RETRY_HTTP_CODES = [500, 503, 504, 400, 403, 404, 408]
+
 # Enable or disable downloader middlewares
 # See http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
 #DOWNLOADER_MIDDLEWARES = {
 #    'meizi.middlewares.MyCustomDownloaderMiddleware': 543,
 #}
+
+# Proxy list containing entries like
+# http://host1:port
+# http://username:password@host2:port
+# http://host3:port
+# ...
+# PROXY_LIST = '/path/to/proxy/list.txt'
+# settings.get('PROXY_LIST')
+
+DOWNLOADER_MIDDLEWARES = {
+    'scrapy.downloadermiddlewares.retry.RetryMiddleware': 90,
+    # path to randomproxy module
+    'meizi.randomproxy.RandomProxy': 100,
+    'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 110,
+}
 
 # Enable or disable extensions
 # See http://scrapy.readthedocs.org/en/latest/topics/extensions.html

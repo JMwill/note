@@ -31,7 +31,7 @@ class MeiziImgSpider(CrawlSpider):
 
     def parse(self, response):
         totalPage = self._get_page_num(response)
-        for page in range(1, 2):
+        for page in range(1, totalPage):
             pageUrl = response.urljoin('ooxx/page-' + str(page))
             yield scrapy.Request(pageUrl, callback=self.parse_page)
 

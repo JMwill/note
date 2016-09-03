@@ -37,6 +37,12 @@ class MeiziMysqlStorePipeline(object):
             "WHERE img_md5 = %s "
         )
 
+        self.UPDATE_IMG_ITEM = (
+            "UPDATE meizi_spider "
+            "SET up_vote=%(up_vote)s, down_vote=%(down_vote)s "
+            "WHERE img_md5=%(img_md5)s"
+        )
+
     def insert_img_item(self, item):
         try:
             self.cursor.execute(
@@ -47,17 +53,29 @@ class MeiziMysqlStorePipeline(object):
         except mysql.connector.Error as err:
             print('Insert img item err {0}'.format(err))
 
-    def existed_item(self, item):
+    def update_img_item(self, item):
+        try:
+            self.cursor.execute(
+                self.UPDATE_IMG_ITEM,
+                dict(item)
+            )
+            self.cnt.commit()
+        except mysql.connector.Error as err:
+            print('Update img item err {0}'.format(err))
+
+    def not_existed_item(self, item):
         self.cursor.execute(
             self.CHECK_EXISTED_ITEM,
             (item['img_md5'],)
         )
         row = self.cursor.fetchone()
-        return row is not None
+        return row is None
 
     def process_item(self, item, spider):
-        if not self.existed_item(item):
+        if self.not_existed_item(item):
             self.insert_img_item(item)
+        else:
+            self.update_img_item(item)
         return item
 
     def close_spider(self, spider):
