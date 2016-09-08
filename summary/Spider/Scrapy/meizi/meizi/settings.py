@@ -62,7 +62,7 @@ DEFAULT_REQUEST_HEADERS = {
 RETRY_TIMES = 10
 
 # Retry on most error codes since proxies fail for different reasons
-RETRY_HTTP_CODES = [500, 503, 504, 400, 403, 404, 408]
+RETRY_HTTP_CODES = [500, 502, 503, 504, 400, 403, 404, 408]
 
 # Enable or disable downloader middlewares
 # See http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html

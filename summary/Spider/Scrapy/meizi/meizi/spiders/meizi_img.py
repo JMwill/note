@@ -40,7 +40,7 @@ class MeiziImgSpider(CrawlSpider):
         imgInfos = response.xpath('//ol[@class="commentlist"]/li[contains(@id, "comment")]')
 
         for index, info in enumerate(imgInfos):
-            imgUrl = info.css('a.view_img_link::attr(href), div.text img::attr(src)').extract()
+            imgUrl = info.css('.commenttext p a.view_img_link::attr(href), .commenttext p img::attr(src)').extract()
             if len(imgUrl):
                 imgUrl = '; '.join(imgUrl).encode('utf-8')
                 item    = MeiziItem()

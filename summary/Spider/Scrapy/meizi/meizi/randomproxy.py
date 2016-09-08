@@ -68,6 +68,7 @@ class RandomProxy(object):
         log.msg('Removing failed proxy <%s>, %d proxies left' % (
                     proxy, len(self.proxies)))
         try:
-            del self.proxies[proxy]
-        except ValueError:
+            if (proxy in self.proxies):
+                del self.proxies[proxy]
+        except KeyError:
             pass
