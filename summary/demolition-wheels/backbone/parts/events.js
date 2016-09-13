@@ -46,7 +46,7 @@
 
     var _keys = function(obj) {
         if (!_isObject(obj)) {return [];}
-        if (_.isFunction(Object.keys)) {
+        if (_isFunction(Object.keys)) {
             return Object.keys(obj);
         }
         var keys = [];
@@ -56,6 +56,49 @@
             }
         }
         return keys;
+    };
+
+    var _uniqueId = (function() {
+        var idCounter = 0;
+        return function(prefix) {
+            var id = idCounter++ + '';
+            return (
+                prefix === undefined ||
+                prefix === null ||
+                prefix !== prefix ? id : prefix + id
+            );
+        }
+    })();
+
+    var Ctor = function() {};
+    var baseCreate = function(prototype) {
+        if(!_isObject(prototype)) return {};
+        if(Object.create) return Object.create(prototype);
+        Ctor.prototype = prototype;
+        var result = new Ctor();
+        Ctor.prototype = null;
+        return result;
+    }
+
+    var executeBound = function(sourceFunc, boundFunc, context, callingContext, args) {
+        if (!(callingContext instanceof boundFunc)) { return sourceFunc.apply(context, args); }
+        var self = baseCreate(sourceFunc.prototype);
+        var result = sourceFunc.apply(self, args);
+        if(_isObject(result)) return result;
+        return self;
+    }
+
+    var _bind = function(func, context) {
+        var nativeBind = Function.prototype.bind;
+        if (nativeBind && nativeBind === func.bind) {
+            return nativeBind.apply(func, [].slice.call(arguments, 1));
+        }
+        if (!_isFunction(func)) { throw new TypeError('Bind must be called on a function'); }
+        var args = [].slice.call(arguments, 2);
+        var bound = function() {
+            return executeBound(func, bound, context, this, args.concat([].slice.call(arguments)));
+        }
+        return bound;
     }
 
     /**
@@ -130,14 +173,14 @@
     Events.listenTo = function (obj, name, callback) {
         if (!obj) { return this; }
         // 找出正在监听的对象或新建一个记录监听对象的对象
-        var id = obj._listenId || (obj._listenId = _.uniqueId('l'));
+        var id = obj._listenId || (obj._listenId = _uniqueId('l'));
         var listeningTo = this._listeningTo || (this._listeningTo = {});
         var listening = listeningTo[id];
 
         // 如果对象还没有正在监听其他绑定在‘obj’上的事件
         // 建立必要的引用去追踪正在监听的回调函数
         if (!listening) {
-            var thisId = this._listenId || (this._listenId = _.uniqueId('l'));
+            var thisId = this._listenId || (this._listenId = _uniqueId('l'));
             listening = listeningTo[id] = {
                 obj: obj,
                 objId: id,
