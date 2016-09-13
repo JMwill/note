@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import unittest
+import time
 
 
 class NewVisitorTest(unittest.TestCase):
@@ -36,18 +37,25 @@ class NewVisitorTest(unittest.TestCase):
         # 待办事项表格中显示“1: Buy peacock feathers”
         inputbox.send_keys(Keys.ENTER)
 
-        table = self.browser.find_element_by_id('id_list_table')
-        rows = table.find_elements_by_tag_name('tr')
-        self.assertTrue(
-            any(row.text == '1: Buy peacock feathers' for row in rows),
-            'New to-do item did not appear in table'
-        )
-
         # 页面中又显示了一个文本框，可以输入其他的待办事项
         # 用户输入了“Use peacock feathers to make fly”（使用孔雀羽毛做假蝇）
-        self.fail('Finish the test!')
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox.send_keys('Use peacock feathers to make fly')
+        inputbox.send_keys(Keys.ENTER)
 
         # 页面再次更新，用户清单上显示两个待办事项
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertIn(
+            '1: Buy peacock feathers',
+            [row.text for row in rows]
+        )
+        self.assertIn(
+            '2: Use peacock feathers to make fly',
+            [row.text for row in rows]
+        )
+
+        self.fail('Finish the test!')
 
         # 用户想知道网站是否会记住清单内容
         # 用户看到网站为他生成一个文字解说功能
