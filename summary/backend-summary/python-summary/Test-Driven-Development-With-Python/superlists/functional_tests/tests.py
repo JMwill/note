@@ -1,10 +1,11 @@
+from django.test import LiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import unittest
 import time
 
 
-class NewVisitorTest(unittest.TestCase):
+class NewVisitorTest(LiveServerTestCase):
     """Web Application visitor"""
     def setUp(self):
         self.browser = webdriver.Firefox()
@@ -20,7 +21,7 @@ class NewVisitorTest(unittest.TestCase):
 
     def test_can_start_a_list_and_retrieve_it_later(self):
         # 访问应用首页
-        self.browser.get('http://localhost:8000')
+        self.browser.get(self.live_server_url)
 
         # 首页标题以及头部都具有“To-Do”这个词
         self.assertIn('To-Do', self.browser.title)
@@ -62,6 +63,3 @@ class NewVisitorTest(unittest.TestCase):
         # 用户访问那个URL，发现待办事项列表还在
 
         # 用户结束查看网站，退出了网站
-
-if __name__ == "__main__":
-    unittest.main()
