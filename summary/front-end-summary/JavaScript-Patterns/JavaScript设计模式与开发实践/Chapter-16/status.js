@@ -269,3 +269,197 @@ Upload.prototype.sign = function() {
     this.plugin.sign();
     this.currState = this.signState;
 }
+
+Upload.prototype.uploading = function() {
+    this.button1.innerHTML = '正在上传，点击暂停';
+    this.plugin.uploading();
+    this.currState = this.uploadingState;
+};
+
+Upload.prototype.pause = function() {
+    this.button1.innerHTML = '已暂停，点击继续上传';
+    this.plugin.pause();
+    this.currState = this.pauseState;
+};
+
+Upload.prototype.done = function() {
+    this.button1.innerHTML = '上传完成';
+    this.plugin.done();
+    this.currState = this.doneState;
+};
+
+Upload.prototype.error = function() {
+    this.button1.innerHTML = '上传失败';
+    this.currState = this.errorState;
+};
+
+Upload.prototype.del = function() {
+    this.plugin.del();
+    this.dom.parentNode.removeChild(this.dom);
+};
+
+var StateFactory = (function() {
+    var State = function() {};
+    State.prototype.clickHandler1 = function() {
+        throw new Error('子类必须重写父类的方法');
+    };
+    State.prototype.clickHandler2 = function() {
+        throw new Error('子类必须重写父类的方法');
+    };
+
+    return function(param) {
+        var F = function(uploadObj) {
+            this.uploadObj = uploadObj;
+        }
+        F.prototype = new State();
+
+        for (var i in param) {
+            F.prototype[i] = param[i];
+        }
+        return F;
+    }
+})();
+
+var SignState = StateFactory({
+    clickHandler1: function() {
+        console.log('扫描中，点击无效...');
+    },
+    clickHandler2: function() {
+        console.log('文件正在上传中，不能删除');
+    }
+});
+
+var UploadingState = StateFactory({
+    clickHandler1: function() {
+        this.uploadObj.pause();
+    },
+    clickHandler2: function() {
+        console.log('文件正在上传中，不能删除');
+    }
+});
+
+var PauseState = StateFactory({
+    clickHandler1: function() {
+        this.uploadObj.uploading();
+    },
+    clickHandler2: function() {
+        this.uploadObj.del();
+    }
+});
+
+var DoneState = StateFactory({
+    clickHandler1: function() {
+        console.log('文件已经上传完成，点击无效');
+    },
+    clickHandler2: function() {
+        this.uploadObj.del();
+    }
+});
+
+var ErrorState = StateFactory({
+    clickHandler1: function() {
+        console.log('文件上传失败，点击无效');
+    },
+    clickHandler2: function() {
+        this.uploadObj.del();
+    }
+});
+
+var uploadObj = new Upload('设计模式');
+uploadObj.init();
+
+window.external.upload = function(state) {
+    uploadObj[state]();
+};
+
+window.external.upload('sign');
+
+setTimeout(function() {
+    window.external.upload('uploading');
+}, 1000);
+setTimeout(function() {
+    window.external.upload('done');
+}, 5000);
+
+
+// JavaScript版的状态机
+var Light = function() {
+    this.currState = FSM.off;
+    this.button = null;
+};
+
+Light.prototype.init = function() {
+    var button = document.createElement('button'),
+        self = this;
+    button.innerHTML = '已关灯';
+    this.button = document.body.appendChild(button);
+    this.button.onclick = function() {
+        self.currState.buttonWasPressed.call(self);
+    }
+};
+
+var FSM = {
+    off: {
+        buttonWasPressed: function() {
+            console.log('关灯');
+            this.button.innerHTML = '下一次按我是开灯';
+            this.currState = FSM.on;
+        }
+    },
+    on: {
+        buttonWasPressed: function() {
+            this.button.innerHTML = '下一次按我是关灯';
+            this.currState = FSM.off;
+        }
+    }
+};
+
+var light = new Light();
+light.init();
+
+// 使用闭包来完成对象创建
+var delegate = function(client, delegation) {
+    return {
+        buttonWasPressed: function() { // 将客户操作委托给delegation对象
+            return delegation.buttonWasPressed.apply(client, arguments);
+        }
+    }
+};
+
+var FSM = {
+    off: {
+        buttonWasPressed: function() {
+            console.log('关灯');
+            this.button.innerHTML = '下一次按我是开灯';
+            this.currState = this.onState;
+        }
+    },
+    on: {
+        buttonWasPressed: function() {
+            this.button.innerHTML = '下一次按我是关灯';
+            this.currState = this.offState;
+        }
+    }
+};
+
+var Light = function() {
+    this.offState = delegate(this, FSM.off);
+    this.onState = delegate(this, FSM.on);
+    this.currState = this.offState;
+    this.button = null;
+};
+
+Light.prototype.init = function() {
+    var button = document.createElement('button'),
+        self = this;
+    button.innerHTML = '已关灯';
+    this.button = document.body.appendChild(button);
+    this.button.onclick = function() {
+        self.currState.buttonWasPressed();
+    }
+};
+
+var light = new Light();
+light.init();
+
+// 另一种实现有限状态机的方法是通过表驱动来实现  https://github.com/jakesgordon/javascript-state-machine
