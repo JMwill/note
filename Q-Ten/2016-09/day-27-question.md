@@ -145,3 +145,7 @@ from . import something # 从当前组件引入something
 from .. import something # 从父级组件引入something
 from ..module import something # 从父级的module组件引入something
 ```
+
+Q5: 在__init__.py中的__all__有什么用：
+
+__init__.py中的__all__属性可以用于定义当使用`from onepackage import *`时，onepackage输出的子模块是哪几个，假设onepackage包含有很多的函数，子模块等，但是我只想默认输出slice、goback、out这三个方法，可以在onepackage的__init__.py中定义`__all__ = ['slice', 'goback', 'out']`
