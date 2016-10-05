@@ -25,6 +25,48 @@ def solve(formula):
 			return f
 			# print(f) # all values
 
+# 通过减少调用eval次数，使用lambda实现一次编译
+def compile_word(word):
+	"""Compile a word of uppercase letters as numeric digits.
+	E.g., compile_word('YOU') => '(1 * U + 10 * O + 100 * Y)'
+	Non-uppercase words unchanged; compile_word('+') => '+'"""
+	if word.isupper():
+		terms = [('%s*%s' % (10 ** i, d))
+				for (i, d) in enumerate(word[::-1])]
+		return '(' + '+'.join(terms) + ')'
+	else:
+		return word
+
+def compile_formula(formula, verbose=False):
+	"""Compile formula into a function. Also return letters found, as a str,
+	in same order as parms of function. For example, 'YOU == ME ** 2' returns
+	(lambda Y, M, E, U, O: (U+10*O+100*Y) == (E+10*M)**2), 'YMEUO' """
+	letters = ''.join(set(re.findall(r'[A-Z]', formula)))
+	firstletters = set(re.findall(r'\b([A-Z])[A-Z]', formula))
+	parms = ', '.join(letters)
+	tokens = map(compile_word, re.split(r'([A-Z]+)', formula))
+	body = ''.join(tokens)
+	if firstletters:
+		tests = ' and '.join(L + '!=0' for L in firstletters)
+		body = '%s and (%s)' % (tests, body)
+	f = 'lambda %s: %s' % (parms, body)
+	if verbose: print(f)
+	return eval(f), letters
+
+def faster_solve(formula):
+	"""Given a formula like 'ODD + ODD == EVEN', fill in digits to solve it.
+	Input formula is a string; output is a digit-filled-in string or None.
+	This version percompiles the formula; only one eval per formula."""
+	f, letters = compile_formula(formula)
+	for digits in itertools.permutations(set(range(10)), len(letters)):
+		try:
+			if f(*digits) is True:
+				table = str.maketrans(letters, ''.join(map(str, digits)))
+				return formula.translate(table)
+		except ArithmeticError:
+			pass
+
+
 # 效率测试代码
 # 计时函数
 def timedcall(fn, *args):
@@ -53,7 +95,7 @@ def test():
 	t0 = time.clock()
 	for example in examples:
 		print('\n', 13 * ' ', example)
-		print('%6.4f sec: %s ' % timedcall(solve, example))
+		print('%6.4f sec: %s ' % timedcall(faster_solve, example))
 	print('%6.4f tot.' % (time.clock() - t0))
 
 if __name__ == '__main__':
