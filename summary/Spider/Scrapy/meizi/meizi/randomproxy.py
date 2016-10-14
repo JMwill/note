@@ -26,8 +26,7 @@ from scrapy import log
 
 class RandomProxy(object):
     def __init__(self, settings):
-        self.proxy_list = os.path.abspath('../proxy-list.txt')
-        print(os.path.abspath('../proxy-list.txt'))
+        self.proxy_list = os.path.abspath('../resource/working-proxy.txt')
         fin = open(self.proxy_list)
 
         self.proxies = {}

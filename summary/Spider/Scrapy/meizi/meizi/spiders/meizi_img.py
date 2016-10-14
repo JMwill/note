@@ -51,4 +51,5 @@ class MeiziImgSpider(CrawlSpider):
                 item['up_vote']     = int(item['up_vote']) if item['up_vote'] else 0
                 item['down_vote']   = info.css('span[id^=cos_unsupport]::text').extract_first()
                 item['down_vote']   = int(item['down_vote']) if item['down_vote'] else 0
+                print(item)
                 yield item
