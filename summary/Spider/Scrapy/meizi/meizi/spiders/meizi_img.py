@@ -31,16 +31,20 @@ class MeiziImgSpider(CrawlSpider):
 
     def parse(self, response):
         totalPage = self._get_page_num(response)
-        for page in range(1, totalPage):
+        for page in range(1, totalPage + 1):
             pageUrl = response.urljoin('ooxx/page-' + str(page))
             yield scrapy.Request(pageUrl, callback=self.parse_page)
 
     def parse_page(self, response):
         pageNum = self._get_page_num(response)
-        imgInfos = response.xpath('//ol[@class="commentlist"]/li[contains(@id, "comment")]')
+        # imgInfos = response.xpath('//ol[@class="commentlist"]/li[contains(@id, "comment")]')
+        imgInfos = response.css('.commentlist li[id^=comment]')
+        print('================================')
+        print(len(imgInfos))
+        print('================================')
 
         for index, info in enumerate(imgInfos):
-            imgUrl = info.css('.commenttext p a.view_img_link::attr(href), .commenttext p img::attr(src)').extract()
+            imgUrl = info.css('.text p a.view_img_link::attr(href), .text p img::attr(src)').extract()
             if len(imgUrl):
                 imgUrl = '; '.join(imgUrl).encode('utf-8')
                 item    = MeiziItem()
@@ -51,5 +55,4 @@ class MeiziImgSpider(CrawlSpider):
                 item['up_vote']     = int(item['up_vote']) if item['up_vote'] else 0
                 item['down_vote']   = info.css('span[id^=cos_unsupport]::text').extract_first()
                 item['down_vote']   = int(item['down_vote']) if item['down_vote'] else 0
-                print(item)
                 yield item
