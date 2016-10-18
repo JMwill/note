@@ -16,3 +16,6 @@ class MeiziItem(scrapy.Item):
     img_md5      = scrapy.Field()
     up_vote      = scrapy.Field()
     down_vote    = scrapy.Field()
+
+    image_urls   = scrapy.Field()
+    images       = scrapy.Field()

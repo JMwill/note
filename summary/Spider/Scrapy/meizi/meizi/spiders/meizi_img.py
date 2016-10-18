@@ -39,18 +39,16 @@ class MeiziImgSpider(CrawlSpider):
         pageNum = self._get_page_num(response)
         # imgInfos = response.xpath('//ol[@class="commentlist"]/li[contains(@id, "comment")]')
         imgInfos = response.css('.commentlist li[id^=comment]')
-        print('================================')
-        print(len(imgInfos))
-        print('================================')
 
         for index, info in enumerate(imgInfos):
             imgUrl = info.css('.text p a.view_img_link::attr(href), .text p img::attr(src)').extract()
             if len(imgUrl):
-                imgUrl = '; '.join(imgUrl).encode('utf-8')
-                item    = MeiziItem()
+                imgUrlStr = '; '.join(imgUrl).encode('utf-8')
+                item = MeiziItem()
+                item['image_urls']  = imgUrl
                 item['page_num']    = pageNum
-                item['img_url']     = imgUrl.decode('utf-8')
-                item['img_md5']     = self._gen_md5(imgUrl)
+                item['img_url']     = imgUrlStr.decode('utf-8')
+                item['img_md5']     = self._gen_md5(imgUrlStr)
                 item['up_vote']     = info.css('span[id^=cos_support]::text').extract_first()
                 item['up_vote']     = int(item['up_vote']) if item['up_vote'] else 0
                 item['down_vote']   = info.css('span[id^=cos_unsupport]::text').extract_first()
