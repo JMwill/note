@@ -4,7 +4,6 @@
 from gevent import monkey
 monkey.patch_all()
 
-import schedule
 import time
 import requests
 import gevent
@@ -118,9 +117,4 @@ if __name__ == '__main__':
     })
 
     # 定期运行
-    schedule.every().monday.at('22:00').do(proxy_graber.run)
-    schedule.every().wednesday.at('22:00').do(proxy_graber.run)
-    schedule.every().friday.at('22:00').do(proxy_graber.run)
-    while True:
-        schedule.run_pending()
-        time.sleep(10)
+    proxy_graber.run()
