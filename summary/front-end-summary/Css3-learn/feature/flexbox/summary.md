@@ -28,4 +28,31 @@ flex背后的主要目的是让容器有能力去改变内部元素的宽度/高
     - **cross-start | cross-end**-从容器内十字轴的开端到结束一端填充元素的柔性线
     - **cross size**-内部柔性元素的宽或高，取决于横向尺寸，横向尺寸的大小取决于元素横向的`width`或`height`属性
 
+## 父级的属性（flex container）
+
+> **display**
+
+下面的属性用于定义flex的容器，行内或者是块级元素取决于给定的值。这个属性为直接子元素提供柔性布局上下文环境。
+
+```css
+.container {
+    display: flex; /* or inline-flex */
+}
+```
+
+> **flex-direction**
+
+这个属性用于设置主轴，从而定义柔性元素的在柔性容器内的排列方向。Flexbox的概念是以单方向布局（除了可选包含）。可以想象柔性元素要么以横向排列要么竖向排列。
+
+```css
+.container {
+    flex-direction: row | row-reverse | column | column-reverse;
+}
+```
+
+- row (默认): 在`ltr`中是从左到右；`rtl`中是从右到左
+- row-reverse: `ltr`中是从右到左;`rtl`中是从左到右
+- column: 跟row一样，但是是从上到下
+- column-reverse: 跟row-reverse一样，但是是从下到上
+
   [9b8bfc75]: http://css-tricks.com/snippets/css/complete-guide-grid/ "Grid"
