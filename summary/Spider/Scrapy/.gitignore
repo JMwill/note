@@ -2,3 +2,4 @@
 meizi/meizi/db.cfg
 *.pyc
 _config.json
+*.log
