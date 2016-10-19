@@ -116,5 +116,4 @@ if __name__ == '__main__':
         'proxy_list_file': abspath('../../resource/working-proxy.txt')
     })
 
-    # 定期运行
     proxy_graber.run()
