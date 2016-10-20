@@ -20,3 +20,9 @@ find . -name '*.txt' -print | xargs perl -pi -e's/Windows/Linux/ig' *.txt   作�
 find -type f -name '*.txt' -print0 | xargs --null perl -pi -e 's/Windows/Linux/'   只作用于普通文件上
 ```
 
+## 将系列进程杀死
+
+```
+lsof是展示已打开的文件，可以用ps aux替代，grep用于筛选
+lsof | grep deleted | grep mysqld | awk '{print $2}' | xargs kill -9
+```
