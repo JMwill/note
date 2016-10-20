@@ -25,13 +25,19 @@ class Downloader(object):
             self._config = json.load(f)
 
         self.GET_DOWNLOAD_URL = (
-            "SELECT img_md5, img_url FROM meizi_spider "
-            "WHERE downloaded = FALSE LIMIT 0 , 30"
+            "SELECT img_md5, img_url, up_vote, down_vote, pretty_img FROM meizi_spider "
+            "WHERE downloaded = FALSE AND pretty_img = TRUE LIMIT 0 , 30"
         )
 
-        self.UPDATE_IMG_ITEM = (
+        self.UPDATE_IMG_DOWNLOADED = (
             "UPDATE meizi_spider "
             "SET downloaded=%(downloaded)s "
+            "WHERE img_md5=%(img_md5)s"
+        )
+
+        self.UPDATE_IMG_PRETTY = (
+            "UPDATE meizi_spider "
+            "SET pretty_img=%(pretty_img)s "
             "WHERE img_md5=%(img_md5)s"
         )
 
@@ -49,15 +55,16 @@ class Downloader(object):
         time_str = '-'.join(str(datetime.now()).split(' ')).split('.')[0]
         line_limit = 2000
         try:
-            with open('./download.log', 'r+') as f:
+            with open(self._config['log_path'], 'r+') as f:
                 lines = f.readlines()
                 f.seek(0)
                 if len(lines) > line_limit:
                     lines = lines[len(lines) - line_limit:]
                 lines.append('{}-{}\n'.format(time_str, msg))
                 f.writelines(lines)
+                f.truncate()
         except FileNotFoundError as e:
-            with open('./download.log', 'w') as f:
+            with open(self._config['log_path'], 'w') as f:
                 f.write('{}-{}\n'.format(time_str, msg))
 
     def download_img(self, url, sign):
@@ -72,7 +79,7 @@ class Downloader(object):
                 self.save_img(res, sign)
         except Exception as e:
             self.log('Picture Could Download: {}-with Error: {}'.format(url, e))
-            self.update_state(sign)
+            self.update_download_state(sign)
 
     def save_img(self, res, sign):
         hash_obj = hashlib.md5()
@@ -88,7 +95,7 @@ class Downloader(object):
             for chunk in res:
                 f.write(chunk)
 
-            self.update_state(sign)
+            self.update_download_state(sign)
 
     def get_db_items(self):
         try:
@@ -106,7 +113,7 @@ class Downloader(object):
             return []
 
     def download(self):
-        db_items = self.get_db_items()
+        db_items = self.filter_valid_item(self.get_db_items())
         if len(db_items) == 0:
             self.log('All Images Downloaded')
             return
@@ -119,7 +126,18 @@ class Downloader(object):
                 ))
         gevent.joinall(self.img_download_pool)
 
-    def update_state(self, sign):
+    def filter_valid_item(self, items):
+        result = []
+        for i in items:
+            if i[3] - i[2] > self._config['is_ugly_img']:
+                self.update_pretty_state(i[0])
+                break
+            if not i[4]:
+                break
+            result.append(i)
+        return result
+
+    def update_download_state(self, sign):
         try:
             cnt = mysql.connector.connect(
                 **self._config['dbconfig']
@@ -127,7 +145,24 @@ class Downloader(object):
             update_obj = {'img_md5': sign, 'downloaded': True}
             cursor = cnt.cursor()
             cursor.execute(
-                self.UPDATE_IMG_ITEM,
+                self.UPDATE_IMG_DOWNLOADED,
+                update_obj
+            )
+            cnt.commit()
+            cursor.close()
+            cnt.close()
+        except mysql.connector.Error as err:
+            self.log('Update img item err {0}'.format(err))
+
+    def update_pretty_state(self, sign):
+        try:
+            cnt = mysql.connector.connect(
+                **self._config['dbconfig']
+            )
+            update_obj = {'img_md5': sign, 'pretty_img': False}
+            cursor = cnt.cursor()
+            cursor.execute(
+                self.UPDATE_IMG_PRETTY,
                 update_obj
             )
             cnt.commit()

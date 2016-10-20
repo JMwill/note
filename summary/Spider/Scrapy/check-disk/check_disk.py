@@ -5,6 +5,9 @@ import shutil
 import json
 from datetime import datetime
 
+with open('./_config.json', 'r') as f:
+    _config = json.load(f)
+
 
 def get_sys_size(path='/'):
     try:
@@ -33,39 +36,40 @@ def remind(sizes):
     from email.mime.text import MIMEText
     from email.header import Header
 
-    with open('./_config.json', 'r') as f:
-        mail_info = json.load(f)
-
-    smtp = SMTP_SSL(mail_info['hostname'])
+    smtp = SMTP_SSL(_config['mail_info']['hostname'])
 
     smtp.set_debuglevel(1)
-    smtp.ehlo(mail_info['hostname'])
-    smtp.login(mail_info['username'], mail_info['password'])
+    smtp.ehlo(_config['mail_info']['hostname'])
+    smtp.login(_config['mail_info']['username'], _config['mail_info']['password'])
 
-    msg = MIMEText(mail_info['mail_text'].format(sizes[2]), 'plain', mail_info['mail_encoding'])
-    msg['Subject'] = Header(mail_info['mail_subject'], mail_info['mail_encoding'])
-    msg['From'] = mail_info['from']
-    msg['To'] = mail_info['to']
+    msg = MIMEText(_config['mail_info']['mail_text'].format(sizes[2]), 'plain', _config['mail_info']['mail_encoding'])
+    msg['Subject'] = Header(_config['mail_info']['mail_subject'], _config['mail_info']['mail_encoding'])
+    msg['From'] = _config['mail_info']['from']
+    msg['To'] = _config['mail_info']['to']
 
-    smtp.sendmail(mail_info['from'], mail_info['to'], msg.as_string())
+    smtp.sendmail(_config['mail_info']['from'], _config['mail_info']['to'], msg.as_string())
     smtp.quit()
 
 
 def main():
     sizes = get_human_readable_size(get_sys_size())
-    if sizes[2] < 9:
+    if sizes[2] < _config['min_size']:
         remind(sizes)
         archive_folder('/home/ubuntu/image_store')
     else:
         time_str = '-'.join(str(datetime.now()).split(' ')).split('.')[0]
-        with open('../resource/check_disk.log', 'r+') as f:
-            lines = f.readlines()
-            f.seek(0)
-            if len(lines) > 10:
-                lines = lines[len(lines) - 10:]
-            lines.append('{}: Rest size: {}\n'.format(time_str, sizes[2]))
-            f.writelines(lines)
-            # f.truncate()
+        try:
+            with open(_config['log_path'], 'r+') as f:
+                lines = f.readlines()
+                f.seek(0)
+                if len(lines) > 10:
+                    lines = lines[len(lines) - 10:]
+                lines.append('{}: Rest size: {}\n'.format(time_str, sizes[2]))
+                f.writelines(lines)
+                f.truncate()
+        except FileNotFoundError as e:
+            with open(_config['log_path'], 'w') as f:
+                f.write('{}: Rest size: {}\n'.format(time_str, sizes[2]))
 
 if __name__ == '__main__':
     main()
