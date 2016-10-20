@@ -57,8 +57,15 @@ def main():
         remind(sizes)
         archive_folder('/home/ubuntu/image_store')
     else:
-        with open('../resource/check_disk.log', 'a+') as f:
-            f.write('Rest size: {}\n'.format(sizes[2]))
+        time_str = '-'.join(str(datetime.now()).split(' ')).split('.')[0]
+        with open('../resource/check_disk.log', 'r+') as f:
+            lines = f.readlines()
+            f.seek(0)
+            if len(lines) > 10:
+                lines = lines[len(lines) - 10:]
+            lines.append('{}: Rest size: {}\n'.format(time_str, sizes[2]))
+            f.writelines(lines)
+            # f.truncate()
 
 if __name__ == '__main__':
     main()

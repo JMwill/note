@@ -99,7 +99,8 @@ DOWNLOADER_MIDDLEWARES = {
 IMAGES_STORE = '/home/ubuntu/image_store'
 ITEM_PIPELINES = {
    'meizi.pipelines.MeiziMysqlStorePipeline': 300,
-   'scrapy.pipelines.images.ImagesPipeline': 1,
+   # 'meizi.pipelines.MeiziImagesPipeline': 1,
+   # 'scrapy.pipelines.images.ImagesPipeline': 1,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

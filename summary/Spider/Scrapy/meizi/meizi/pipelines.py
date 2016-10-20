@@ -15,7 +15,7 @@ from scrapy.exceptions import DropItem
 
 
 class MeiziImagesPipeline(ImagesPipeline):
-    def __init__(self):
+    def connect_to_db(self):
         self.cfg = configparser.ConfigParser()
         self.cfg.read(os.path.abspath('./meizi/db.cfg'))
         self.cnt = mysql.connector.connect(
@@ -48,7 +48,7 @@ class MeiziImagesPipeline(ImagesPipeline):
     def update_img_item(self, item):
         try:
             tmp_dict = {
-                'img_md5': item.img_md5,
+                'img_md5': item['img_md5'],
                 'downloaded': True,
             }
             self.cursor.execute(
@@ -64,6 +64,7 @@ class MeiziImagesPipeline(ImagesPipeline):
         self.cnt.close()
 
     def get_media_requests(self, item, info):
+        self.connect_to_db()
         if not self.exist_item_images_downloaded(item):
             for image_url in item['image_urls']:
                 yield scrapy.Request(image_url)
