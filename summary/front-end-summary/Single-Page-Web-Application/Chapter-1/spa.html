@@ -30,7 +30,7 @@
                 background-color: #f00;
             }
         </style>
-        <script type="text/javascript" src="./js/jq/jquery-1.9.0.js"></script>
+        <script type="text/javascript" src="./jquery-1.9.0.js"></script>
         <script type="text/javascript">
             /* jslint          browser : true,  continue : true,
                 devel   : true, indent : 2,     maxerr   : 50,
@@ -38,6 +38,7 @@
                 regexp  : true, sloppy : true,  vars     : true,
                 white   : true
             */
+            /* global jQuery */
 
             // Module /spa/
             // Provides chat slider capability
@@ -73,23 +74,46 @@
                     }
 
                     // retract slider if fully extended
+                    else if (slider_height === configMap.extended_height) {
+                        $chatSlider
+                            .animate({ height: configMap.retracted_height })
+                            .attr('title', configMap.retracted_title);
+                        return true;
+                    }
+                    return false;
                 };
 
                 // Event handler /onClickSlider/
                 // receives click event and calls toggleSlider
                 //
-                onClickSlider = function(event) {};
+                onClickSlider = function(event) {
+                    toggleSlider();
+                    return false;
+                };
 
                 // Public method /initModule/
                 // sets initial state and provides feature
                 //
                 initModule = function($container) {
                     // render HTML
+                    $container.html(configMap.template_html);
+
+                    $chatSlider = $container.find('.spa-slider');
                     // initialize slider height and title
                     // bind the user click event to the event handler
+                    $chatSlider
+                        .attr('title', configMap.retracted_title)
+                        .click(onClickSlider);
+                    return true;
                 };
-            }());
+                return { initModule: initModule };
+            }(jQuery));
             // Start spa once DOM is ready
+            jQuery(document).ready(
+                function () {
+                    spa.initModule(jQuery('#spa'));
+                }
+            );
         </script>
     </head>
     <body>
