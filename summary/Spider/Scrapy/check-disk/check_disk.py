@@ -31,6 +31,22 @@ def archive_folder(archive_folder_path):
     shutil.make_archive(output_path, 'zip', archive_folder_path)
 
 
+def log_size(sizes):
+    time_str = '-'.join(str(datetime.now()).split(' ')).split('.')[0]
+    try:
+        with open(_config['log_path'], 'r+') as f:
+            lines = f.readlines()
+            f.seek(0)
+            if len(lines) > 10:
+                lines = lines[len(lines) - 10:]
+            lines.append('{}: Rest size: {}\n'.format(time_str, sizes[2]))
+            f.writelines(lines)
+            f.truncate()
+    except FileNotFoundError as e:
+        with open(_config['log_path'], 'w') as f:
+            f.write('{}: Rest size: {}\n'.format(time_str, sizes[2]))
+
+
 def remind(sizes):
     from smtplib import SMTP_SSL
     from email.mime.text import MIMEText
@@ -55,21 +71,9 @@ def main():
     sizes = get_human_readable_size(get_sys_size())
     if sizes[2] < _config['min_size']:
         remind(sizes)
-        archive_folder('/home/ubuntu/image_store')
-    else:
-        time_str = '-'.join(str(datetime.now()).split(' ')).split('.')[0]
-        try:
-            with open(_config['log_path'], 'r+') as f:
-                lines = f.readlines()
-                f.seek(0)
-                if len(lines) > 10:
-                    lines = lines[len(lines) - 10:]
-                lines.append('{}: Rest size: {}\n'.format(time_str, sizes[2]))
-                f.writelines(lines)
-                f.truncate()
-        except FileNotFoundError as e:
-            with open(_config['log_path'], 'w') as f:
-                f.write('{}: Rest size: {}\n'.format(time_str, sizes[2]))
+        # archive_folder('/home/ubuntu/image_store')
+
+    log_size(sizes)
 
 if __name__ == '__main__':
     main()
