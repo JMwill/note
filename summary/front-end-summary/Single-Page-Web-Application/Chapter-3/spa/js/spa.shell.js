@@ -14,6 +14,9 @@ spa.shell = (function() {
     // --------------------- BEGIN MODULE SCOPE VARIABLE -----------------------
     var
         configMap = {
+            anchor_schema_map: {
+                chat: { open: true, closed: true }
+            },
             main_html: ''+
                 '<div class="spa-shell-head">' +
                     '<div class="spa-shell-head-logo"></div>' +
@@ -36,15 +39,22 @@ spa.shell = (function() {
             chat_retracted_title    : 'Click to extend',
         },
         stateMap = {
-            $container: null,
-            is_chat_retracted: true,
+            $container          : null,
+            anchor_map          : {},
+            is_chat_retracted   : true,
         },
         jqueryMap = {},
 
-        setJqueryMap, toggleChat, onClickChat, initModule;
+        setJqueryMap, toggleChat, onClickChat,
+        copyAnchorMap, changeAnchorPart, onHashchange,
+        initModule
     // ------------------- ENG MODULE SCOPE VARIABLE ---------------------------
 
     // ------------------------ BEGIN UTILITY METHODS --------------------------
+    // Returns copy of stored anchor map; minimizes overhead
+    copyAnchorMap = function() {
+        return $.extend(true, {}, stateMap.anchor_map);
+    };
     // ------------------------ END UTILITY METHODS ----------------------------
 
     // ------------------------ BEGIN DOM METHODS ------------------------------
@@ -116,8 +126,14 @@ spa.shell = (function() {
 
     // ----------------------- BEGIN EVENT HANDLERS ----------------------------
     onClickChat = function(event) {
-        toggleChat(stateMap.is_chat_retracted);
+        if (toggleChat(stateMap.is_chat_retracted)) {
+            $.uriAnchor.setAnchor({
+                chat: (stateMap.is_chat_retracted ? 'open' : 'closed')
+            });
+        }
         return false;
+        // toggleChat(stateMap.is_chat_retracted);
+        // return false;
     };
     // -------------------------- END EVENT HANDLERS ---------------------------
 
