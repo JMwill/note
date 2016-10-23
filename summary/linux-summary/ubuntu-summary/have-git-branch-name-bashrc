@@ -142,3 +142,12 @@ fi
 export NVM_DIR="/home/duoyi/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
 
+if [ -f /usr/local/bin/virtualenvwrapper.sh ]; then
+export VIRTUALENVWRAPPER_PYTHON='/usr/bin/python3' # This needs to be placed before the virtualenvwrapper command
+if [ ! -d ~/Envs ]; then
+    mkdir ~/Envs
+fi
+export WORKON_HOME=~/Envs
+source /usr/local/bin/virtualenvwrapper.sh
+fi
+workon default
