@@ -270,7 +270,6 @@ removeSlider = function() {
 // Throws: none
 //
 handleResize = function() {
-    console.log('resing');
     // don't do anything if we don't have a slider container
     if (!jqueryMap.$slider) { return false; }
 
