@@ -12,7 +12,7 @@ spa.model = (function() {
             anon_user: null,
             cid_serial: 0,
             people_cid_map: {},
-            people_db: TAFFY()
+            people_db: TAFFY(),
             user: null,
         },
         isFakeData = true,
