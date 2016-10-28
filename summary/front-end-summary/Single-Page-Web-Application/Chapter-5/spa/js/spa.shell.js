@@ -11,6 +11,7 @@
 /* global $, spa */
 
 spa.shell = (function() {
+    'use strict';
     // --------------------- BEGIN MODULE SCOPE VARIABLE -----------------------
     var
         configMap = {
@@ -19,7 +20,10 @@ spa.shell = (function() {
             },
             main_html: ''+
                 '<div class="spa-shell-head">' +
-                    '<div class="spa-shell-head-logo"></div>' +
+                    '<div class="spa-shell-head-logo">' +
+                        '<h1>SPA</h1>' +
+                        '<p>JavaScript end to end</p>' +
+                    '</div>' +
                     '<div class="spa-shell-head-acct"></div>' +
                     '<div class="spa-shell-head-search"></div>' +
                 '</div>' +
@@ -46,8 +50,9 @@ spa.shell = (function() {
         },
         jqueryMap = {},
 
-        setJqueryMap, copyAnchorMap,
+        setJqueryMap, copyAnchorMap, toggleChat,
         changeAnchorPart, onHashchange, onResize,
+        onTabAcct, onLogin, onLogout,
         setChatAnchor, initModule
     // ------------------- ENG MODULE SCOPE VARIABLE ---------------------------
 
@@ -63,7 +68,9 @@ spa.shell = (function() {
     setJqueryMap = function() {
         var $container = stateMap.$container;
         jqueryMap = {
-            $container: $container,
+            $container  : $container,
+            $acct       : $container.find('.spa-shell-head-acct'),
+            $nav        : $container.find('.spa-shell-main-nav'),
         };
     };
     // End DOM method /setJqueryMap/
@@ -264,6 +271,40 @@ spa.shell = (function() {
         return true;
     };
     // End Event handler /onResize/
+
+    onTabAcct = function(event) {
+        var SIGN_IN_WORD = 'Please sign-in';
+        var acct_text, user_name, user = spa.model.people.get_user();
+        if (user.get_is_anon()) {
+            user_name = prompt(SIGN_IN_WORD).trim();
+            if (user_name) {
+                spa.model.people.login(user_name);
+                jqueryMap.$acct.text('...processing...');
+            } else {
+                jqueryMap.$acct.text('Please sign-in a valid name!');
+                setTimeout(function() {
+                    jqueryMap.$acct.text(SIGN_IN_WORD);
+                }, 5000);
+            }
+        }
+        else {
+            spa.model.people.logout();
+            jqueryMap.$acct.text('Logouted!');
+            setTimeout(function() {
+                jqueryMap.$acct.text(SIGN_IN_WORD);
+            }, 5000);
+        }
+        return false;
+    };
+
+    onLogin = function(event, login_user) {
+        jqueryMap.$acct.text(login_user.name);
+    };
+
+    onLogout = function(event, logout_user) {
+        console.log(logout_user);
+        jqueryMap.$acct.text(logout_user.name);
+    };
     // -------------------------- END EVENT HANDLERS ---------------------------
 
     // -------------------------- BEGIN CALLBACKS ------------------------------
@@ -347,6 +388,14 @@ spa.shell = (function() {
             .bind('resize', onResize)
             .bind('hashchange', onHashchange)
             .trigger('hashchange');
+
+        $.gevent.subscribe($container, 'spa-login', onLogin);
+        $.gevent.subscribe($container, 'spa-logout', onLogout);
+
+        jqueryMap
+            .$acct
+            .text('Please sign-in')
+            .bind('utap', onTabAcct);
     };
     // End Public method /initModule/
     return { initModule: initModule };
