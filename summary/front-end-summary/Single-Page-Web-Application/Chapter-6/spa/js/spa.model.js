@@ -86,6 +86,8 @@ spa.model = (function() {
         stateMap.user.css_map   = user_map.css_map;
         stateMap.people_cid_map[user_map._id] = stateMap.user;
 
+        chat.join();
+
         // When wo add chat, we should join here
         $.gevent.publish('spa-login', [stateMap.user]);
     };
@@ -145,10 +147,13 @@ spa.model = (function() {
             });
         };
         logout = function() {
-            var is_removed, user = stateMap.user;
+            var user = stateMap.user;
+
+            chat._leave();
             // when we add chat, we should leave the chatroom here
             is_removed      = removePerson(user);
             stateMap.user   = stateMap.anon_user;
+            clearPeopleDb();
 
             $.gevent.publish('spa-logout', [user]);
             return is_removed;
@@ -179,7 +184,7 @@ spa.model = (function() {
     //        in the people list, the chat ee is set to null. If the
     //        person requested is already the chatee, it returns false.
     //        It publishes a 'spa-setchatee' global custom event.
-    //      * set_msg(<msg_text>) - send a message to the chatee.
+    //      * send_msg(<msg_text>) - send a message to the chatee.
     //        It publishes a 'spa-updatechat' global custom event.
     //        If the user is anonymous or the chatee is null, it
     //        aborts and returns false.
@@ -215,13 +220,19 @@ spa.model = (function() {
     //
     chat = (function() {
         var
-            _publish_listchange,
-            _update_list, _leave_chat, join_chat;
+            _publish_listchange, _publish_updatechat,
+            _update_list, _leave_chat, join_chat,
+
+            get_chatee, send_msg,
+            set_chatee, update_avatar,
+
+            chatee = null;
 
         // Begin internal mothods
         _update_list = function(arg_list) {
-            var i, person_map, make_person_map,
-                people_list = arg_list[0];
+            var i, person_map, make_person_map, person,
+                people_list = arg_list[0],
+                is_chatee_online = false;
 
             clearPeopleDb();
 
@@ -242,23 +253,47 @@ spa.model = (function() {
                     id      : person_map._id,
                     name    : person_map.name,
                 };
+                person = makePerson(make_person_map);
 
+                if (chatee && chatee.id === make_person_map.id) {
+                    is_chatee_online = true;
+                    chatee = person;
+                }
                 makePerson(make_person_map);
             }
             stateMap.people_db.sort('name');
+
+            // If chatee is no longer online, we unset the chatee
+            // which triggers the 'spa-setchatee' global event
+            if (chatee && !is_chatee_online) { set_chatee(''); }
         };
 
         _publish_listchange = function(arg_list) {
             _update_list(arg_list);
             $.gevent.publish('spa-listchange', [arg_list]);
         };
+
+        _publish_updatechat = function(arg_list) {
+            var msg_map = arg_list[0];
+
+            if (!chatee) { set_chatee(msg_map.sender_id); }
+            else if (
+                msg_map.sender_id !== stateMap.user.id
+                && msg_map.sender_id !== chatee.id
+            ) { set_chatee(msg_map.sender_id); }
+
+            $.gevent.publish('spa-updatechat', [msg_map]);
+        }
         // End internal methods
 
         _leave_chat = function() {
             var sio = isFakeData ? spa.fake.mockSio : spa.data.getSio();
+            chatee = null;
             stateMap.is_connected = false;
             if (sio) { sio.emit('leavechat'); }
         };
+
+        get_chatee = function() { return chatee; };
 
         join_chat = function() {
             var sio;
@@ -269,13 +304,70 @@ spa.model = (function() {
             }
             sio = isFakeData ? spa.fake.mockSio : spa.data.getSio();
             sio.on('listchange', _publish_listchange);
+            sio.on('updatechat', _publish_updatechat);
             stateMap.is_connected = true;
             return true;
         };
 
+        send_msg = function(msg_text) {
+            var msg_map,
+                sio = isFakeData ? spa.fake.mockSio : spa.data.getSio();
+            if (!sio) { return false; }
+            if (!(stateMap.user && chatee )) { return false; }
+
+            msg_map = {
+                dest_id     : chatee.id,
+                dest_name   : chatee.name,
+                sender_id   : stateMap.user.id,
+                msg_text    : msg_text,
+            };
+
+            // we published updatechat so we can show our outgoing messages
+            _publish_updatechat([msg_map]);
+            sio.emit('updatechat', msg_map);
+            return true;
+        };
+
+        set_chatee = function(person_id) {
+            var new_chatee;
+            new_chatee = stateMap.people_cid_map[person_id];
+            if (new_chatee) {
+                if (chatee && chatee.id === new_chatee.id) {
+                    return false;
+                }
+            }
+            else {
+                new_chatee = null;
+            }
+
+            $.gevent.publish('spa-setchatee',{
+                old_chatee: chatee, new_chatee: new_chatee
+            });
+
+            chatee = new_chatee;
+            return true;
+        };
+
+        // avatar_update_map should have the form:
+        // { person_id: <string>, css_map: {
+        //   top: <int>, left: <int>,
+        //   'background-color': <string>
+        // }};
+        //
+        update_avatar = function(avatar_update_map) {
+            var sio = isFakeData ? sap.fake.mockSio : spa.data.getSio();
+            if (sio) {
+                sio.emit('updateavatar', avatar_update_map);
+            }
+        };
+
         return {
-            _leave: _leave_chat,
-            join: join_chat,
+            _leave          : _leave_chat,
+            get_chatee      : get_chatee,
+            join            : join_chat,
+            send_msg        : send_msg,
+            set_chatee      : set_chatee,
+            update_avatar   : update_avatar,
         };
     }());
 
