@@ -276,7 +276,7 @@ spa.shell = (function() {
         var SIGN_IN_WORD = 'Please sign-in';
         var acct_text, user_name, user = spa.model.people.get_user();
         if (user.get_is_anon()) {
-            user_name = prompt(SIGN_IN_WORD).trim();
+            user_name = (prompt(SIGN_IN_WORD) || '').trim();
             if (user_name) {
                 spa.model.people.login(user_name);
                 jqueryMap.$acct.text('...processing...');
@@ -377,6 +377,12 @@ spa.shell = (function() {
             people_model    : spa.model.people
         });
         spa.chat.initModule(jqueryMap.$container);
+
+        spa.avtr.configModule({
+            chat_model: spa.model.chat,
+            people_model: spa.model.people
+        });
+        spa.avtr.initModule(jqueryMap.$nav);
 
         // Handle URI anchor change events.
         // This is done /after/ all feature modules are configured

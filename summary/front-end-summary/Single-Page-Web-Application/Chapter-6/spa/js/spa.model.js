@@ -147,7 +147,7 @@ spa.model = (function() {
             });
         };
         logout = function() {
-            var user = stateMap.user;
+            var is_removed, user = stateMap.user;
 
             chat._leave();
             // when we add chat, we should leave the chatroom here
@@ -253,11 +253,9 @@ spa.model = (function() {
                     id      : person_map._id,
                     name    : person_map.name,
                 };
-                person = makePerson(make_person_map);
 
                 if (chatee && chatee.id === make_person_map.id) {
                     is_chatee_online = true;
-                    chatee = person;
                 }
                 makePerson(make_person_map);
             }
@@ -355,7 +353,7 @@ spa.model = (function() {
         // }};
         //
         update_avatar = function(avatar_update_map) {
-            var sio = isFakeData ? sap.fake.mockSio : spa.data.getSio();
+            var sio = isFakeData ? spa.fake.mockSio : spa.data.getSio();
             if (sio) {
                 sio.emit('updateavatar', avatar_update_map);
             }

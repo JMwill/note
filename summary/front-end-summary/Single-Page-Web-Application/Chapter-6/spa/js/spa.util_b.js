@@ -39,7 +39,7 @@ spa.util_b = (function() {
     //
     encodeHtml = function(input_arg_str, exclude_amp) {
         var
-            input_str = '' + input_arg_str;
+            input_str = '' + input_arg_str,
             regex, lookup_map;
         if (exclude_amp) {
             lookup_map  = configMap.encode_noamp_map;

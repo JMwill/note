@@ -31,11 +31,6 @@ var
                             '</form>' +
                         '</div>' +
                     '</div>' +
-                    '<div class="spa-chat-msgs"></div>' +
-                    '<div class="spa-chat-box">' +
-                        '<input type="text">' +
-                        '<div>Send</div>' +
-                    '</div>' +
                 '</div>' +
             '</div>',
         settable_map: {
@@ -151,14 +146,14 @@ onSubmitMsg = function(event) {
     configMap.chat_model.send_msg(msg_text);
     jqueryMap.$input.focus();
     jqueryMap.$send.addClass('spa-x-select');
-    setTimetou(
+    setTimeout(
         function() { jqueryMap.$send.removeClass('spa-x-select'); },
         250
     );
     return false;
 }
 
-onTabList = function(event) {
+onTapList = function(event) {
     var $tapped = $(event.elem_target), chatee_id;
     if (!$tapped.hasClass('spa-chat-list-name')) { return false; }
     chatee_id = $tapped.attr('data-id');
@@ -199,7 +194,6 @@ onListchange = function(event) {
         list_html = '',
         people_db = configMap.people_model.get_db(),
         chatee = configMap.chat_model.get_chatee();
-
     people_db().each(function(person, idx) {
         var select_class = '';
         if (person.get_is_anon() || person.get_is_user()) {
@@ -210,7 +204,7 @@ onListchange = function(event) {
         }
         list_html
             += '<div class="spa-chat-list-name'
-            + select_class + '" data-id="' + person_id + '">'
+            + select_class + '" data-id="' + person.id + '">'
             + spa.util_b.encodeHtml(person.name) + '</div>';
     });
 
