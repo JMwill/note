@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Test Suite</title>
+        <style media="screen">
+            #results li.pass { color: green; }
+            #results li.fail { color: red; }
+        </style>
+    </head>
+    <body>
+        <ul id="results"></ul>
+        <script type="text/javascript">
+        function assert(value, desc) {
+            var li = document.createElement('li');
+            li.className = value ? 'pass' : 'fail';
+            li.appendChild(document.createTextNode(desc));
+            document.getElementById('results').appendChild(li);
+        }
+
+        function testCode() {
+            assert(true, 'some descriptive text');
+            assert(typeof outer === 'function', 'outer() is in scope');
+            assert(typeof inner === 'function', 'inner() is in scope');
+            assert(typeof a === 'number', 'a is in scope');
+            assert(typeof b === 'number', 'b is in scope');
+            assert(typeof c === 'number', 'c is in scope');
+        }
+
+        assert(true, '|----- BEFORE OUTER -----|');
+        testCode();
+
+        function outer() {
+            function testCode() {
+                assert(true, 'some descriptive text');
+                assert(typeof outer === 'function', 'outer() is in scope');
+                assert(typeof inner === 'function', 'inner() is in scope');
+                assert(typeof a === 'number', 'a is in scope');
+                assert(typeof b === 'number', 'b is in scope');
+                assert(typeof c === 'number', 'c is in scope');
+            }
+
+            assert(true, '|----- INSIDE OUTER, BEFORE a -----|');
+            testCode();
+
+            var a = 1;
+
+            assert(true, '|----- INSIDE OUTER, AFTER a -----|');
+            testCode();
+
+            function inner() {}
+            var b = 2;
+
+            assert(true, '|----- INSIDE OUTER, AFTER inner() AND b -----|');
+            testCode();
+
+            if (a == 1) {
+
+                var c = 3;
+
+                assert(true, '|----- INSIDE OUTER, INSIDE if -----|');
+                testCode();
+            }
+
+            assert(true, '|----- INSIDE OUTER, OUTSIDE if -----|');
+            testCode();
+        }
+
+        outer();
+
+        assert(true, '|----- AFTER OUTER -----|');
+        testCode();
+
+        </script>
+    </body>
+</html>
