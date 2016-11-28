@@ -29,7 +29,7 @@ console.log(mine instanceof Array); // false
 (function() {
     var initializing = false,
         superPattern = 
-            /xyz/.test(function() { xyz; }) ? /\b_super\b/ : /.*/;
+            /xyz/.test(function() { var xyz; }) ? /\b_super\b/ : /.*/;
     Object.subClass = function(properties) {
         var _super = this.prototype;
 
@@ -40,16 +40,16 @@ console.log(mine instanceof Array); // false
         for (var name in properties) {
             proto[name] = typeof properties[name] == 'function' &&
                           typeof _super[name] == 'function' &&
-                          superPattern.test(properties[name]) ?
+                          superPattern.test(properties[name]) ? // 这个判断的意思是：如果子类中有这个方法，父类中也有这个方法，同时子类的方法体内又调用了_super这个方法的话就执行下面的操作
                 (function(name, fn) {
                     return function() {
-                        var tmp = this._super;
-                        this._super = _super[name];
+                        var tmp = this._super; // 保存子类的_super对象
+                        this._super = _super[name]; // 修正_super为相应的_super方法
 
-                        var ret = fn.apply(this, arguments);
-                        this._super = tmp;
+                        var ret = fn.apply(this, arguments); // 调用这个方法
+                        this._super = tmp; // 复原_super为原对象
 
-                        return ret;
+                        return ret; // 返回调用值
                     };
                 })(name, properties[name])
                 : properties[name];
