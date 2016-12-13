@@ -54,6 +54,7 @@
 
 /* line 49, ../sass/style.scss */
 .x-force-full-screen {
+  display: none;
   position: absolute;
   top: 0;
   bottom: 0;
@@ -62,19 +63,19 @@
   overflow: hidden;
 }
 
-/* line 57, ../sass/style.scss */
-.x-img-watcher {
+/* line 58, ../sass/style.scss */
+.x-img-viewer {
   background-color: #000;
 }
 
-/* line 60, ../sass/style.scss */
-.x-img-watcher__list {
+/* line 61, ../sass/style.scss */
+.x-img-viewer__list {
   height: 100%;
   white-space: nowrap;
 }
 
-/* line 64, ../sass/style.scss */
-.x-img-watcher__item {
+/* line 65, ../sass/style.scss */
+.x-img-viewer__item {
   position: absolute;
   display: inline-block;
   height: 100%;
@@ -82,36 +83,36 @@
   font-size: 0;
 }
 
-/* line 71, ../sass/style.scss */
-.x-img-watcher__item.prev {
+/* line 72, ../sass/style.scss */
+.x-img-viewer__item.prev {
   left: -100%;
 }
 
-/* line 74, ../sass/style.scss */
-.x-img-watcher__item.cur {
+/* line 75, ../sass/style.scss */
+.x-img-viewer__item.cur {
   left: 0;
 }
 
-/* line 77, ../sass/style.scss */
-.x-img-watcher__item.next {
+/* line 78, ../sass/style.scss */
+.x-img-viewer__item.next {
   left: 100%;
 }
 
-/* line 80, ../sass/style.scss */
-.x-img-watcher__img-box {
+/* line 81, ../sass/style.scss */
+.x-img-viewer__img-box {
   width: 100%;
   height: 100%;
   overflow: hidden;
   text-align: center;
 }
-/* line 86, ../sass/style.scss */
-.x-img-watcher__img-box img {
+/* line 87, ../sass/style.scss */
+.x-img-viewer__img-box img {
   display: inline-block;
   max-width: 100%;
   max-height: 100%;
 }
-/* line 92, ../sass/style.scss */
-.x-img-watcher__img-box p {
+/* line 93, ../sass/style.scss */
+.x-img-viewer__img-box p {
   font-size: 16px;
   color: white;
   word-break: break-all;

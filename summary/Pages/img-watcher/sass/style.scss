@@ -47,6 +47,7 @@ $game-intr__pict-width: 159px;
 
 // 插件的样式
 .x-force-full-screen {
+	display: none;
 	position: absolute;
 	top: 0;
 	bottom: 0;
@@ -54,30 +55,30 @@ $game-intr__pict-width: 159px;
 	right: 0;
 	overflow: hidden;
 }
-.x-img-watcher  {
+.x-img-viewer  {
 	background-color: #000;
 }
-.x-img-watcher__list {
+.x-img-viewer__list {
 	height: 100%;
 	white-space: nowrap;
 }
-.x-img-watcher__item {
+.x-img-viewer__item {
 	position: absolute;
 	display: inline-block;
 	height: 100%;
 	width: 100%;
 	font-size: 0;
 }
-.x-img-watcher__item.prev {
+.x-img-viewer__item.prev {
 	left: -100%;
 }
-.x-img-watcher__item.cur {
+.x-img-viewer__item.cur {
 	left: 0;
 }
-.x-img-watcher__item.next {
+.x-img-viewer__item.next {
 	left: 100%;
 }
-.x-img-watcher__img-box {
+.x-img-viewer__img-box {
 	width: 100%;
 	height: 100%;
 	overflow: hidden;
