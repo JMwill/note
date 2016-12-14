@@ -194,3 +194,161 @@ mainTwo(function() {
     console.log('main two');
 });
 ```
+
+## Chapter.3 Promise测试
+
+一般的使用done回调函数的异步测试模式对于promise对象会有问题:
+
+```javascript
+var assert = require('assert');
+describe('Basic Test', function() {
+    context('When Callback(high-order function)', function() {
+        it('Should use `done` for test', function(done) {
+            setTimeout(function() {
+                assert(true);
+                done();
+            }, 0);
+        });
+    });
+    context('When promise object', function() {
+        it('should use `done` for test?', function(done) {
+            var promise = Promise.resolve(1);
+
+            promise.then(function(value) {
+                assert(value === 1); // 当assert正常时测试能够通过, 当assert出错时, 会导致测试超时
+                done();
+            });
+        });
+    });
+});
+```
+
+因此对于Promise的测试需要这样修改:
+
+```javascript
+context('When promise object', function() {
+    it('should use `done` for test?', function(done) {
+        var promise = Promise.resolve(1);
+
+        promise.then(function(value) {
+            assert(value !== 1);
+        }).then(done, done); // 需要额外添加一个then(done, done), 容易忘记
+    });
+});
+```
+
+因此在mocha中提供了对Promise的测试的支持:
+
+```javascript
+describe('Promise Test', function() {
+    it('Should return promise object', function() {
+        var promise = Promise.resolve(1);
+
+        // 通过返回一个Promise对象来实现测试.
+        return promise.then(function(value) {
+            assert(value === 1);
+        });
+    });
+});
+```
+
+### 意料之外(失败的)测试结果, onRejected时用的测试例子实现
+
+```javascript
+describe('Promise Test', function() {
+    function mayBeRejected() {
+        return Promise.reject(new Error('woo'));
+    }
+    it('is bad pattern', function() {
+        return mayBeRejected().catch(function(error) {
+            assert(error.message === 'woo');
+        });
+    });
+});
+```
+
+上面的测试会在onRejected是通过, 但是如果代码是onFulFilled的话, 测试也能通过, 不符合测试的要求. 因此需要添加一些处理
+
+```javascript
+/* ------------------- */
+function failTest() {
+    throw new Error('Excepted promise to be rejected but it was fulfilled');
+}
+/* ------------------- */
+
+function mayBeRejected() {
+    return Promise.reject(new Error('woo'));
+}
+it('can test', function() {
+    return mayBeRejected()
+        .then(failTest) // 添加一个then, 当mayBeRejected通过时, 触发自定义的failTest函数
+        .catch(function(error) {
+            assert(error.message === 'woo');
+        });
+});
+
+it('good way', function() {
+    return mayBeRejected()
+        .then(failTest, function() { // 这个时候也可以使用then(resolve, reject)的这种形式.
+            assert(error.message === 'woo');
+        });
+});
+```
+
+### 编写可控测试
+
+可控的测试需要:
+
+- 编写预期为Fulfilled状态的测试的话
+    - Rejected的时候要Fail
+    - assertion结果不一致的时候要Fail
+- 编写预期为Rejected状态的测试的话
+    - FulFilled的时候要Fail
+    - assertion结果不一致的时候要Fail
+
+因此为了编写有效的测试代码, 我们需要明确指定Promise的状态为FulFilled或Rejected两者之一, 但是then调用时可以省略参数, 因此有可能会忘记添加使测试失败的条件. 故可定义一个helper函数, 来明确Promise的状态
+
+```javascript
+// 对测试操作进行封装
+function shouldRejected(promise) {
+    return {
+        'catch': function(fn) {
+            return promise.then(function() {
+                throw new Error('Excepted promise to be rejected but it was fulfilled');
+            }, function(reason) {
+                fn.call(promise, reason);
+            });
+        }
+    };
+};
+
+
+var promise = Promise.reject(new Error('human error'));
+it('should be rejected', function() {
+    return shouldRejected(promise).catch(function(error) {
+        assert(error.message === 'human erro');
+    });
+});
+
+
+// 同样地可以封装一个期望结果为FulFilled的helper函数
+function shouldFulFilled(promise) {
+    return {
+        'then': function(fn) {
+            return promise.then(function(reason) {
+                fn.call(promise, reason);
+            }, function(reason) {
+                throw new Error(reason);
+            })
+        }
+    };
+}
+
+it('should be fulfilled', function() {
+    var promise = Promise.resolve('value');
+    return shouldFulFilled(promise).then(function(value) {
+        assert(value === 'value');
+    });
+});
+```
+
