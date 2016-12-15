@@ -326,7 +326,7 @@ function shouldRejected(promise) {
 var promise = Promise.reject(new Error('human error'));
 it('should be rejected', function() {
     return shouldRejected(promise).catch(function(error) {
-        assert(error.message === 'human erro');
+        assert(error.message === 'human error');
     });
 });
 
@@ -351,4 +351,250 @@ it('should be fulfilled', function() {
     });
 });
 ```
+
+## Chapter.4 Advanced
+
+### Promise.resolve 和 Thenable
+
+Promise.resolve可以将thenable对象转化为Promise对象
+
+### 将Web Notifications转换为thenable对象
+
+Web Notification一般模式的包装函数:
+
+```javascript
+function notifyMessage(message, options, callback) {
+    if (Notification && Notification.permission === 'granted') {
+        var notification = new Notification(message, options);
+        callback(null, notification);
+    } else if (Notification.requestPermission) {
+        Notification.requestPermission(function(status) {
+            if (Notification.permission !== status) {
+                Notification.permission = status;
+            }
+
+            if (status === 'granted') {
+                var notification = new Notification(message, options);
+                callback(null, notification);
+            } else {
+                callback(new Error('user denied'));
+            }
+        });
+    } else {
+        callback(new Error('doesn\'t support Notification API'));
+    }
+}
+
+notifyMessage('Hi!', {}, function(error, notification) {
+    if (error) {
+        return console.error(error);
+    }
+    console.log(notification);
+});
+```
+
+Web Notification Promise模式:
+
+```javascript
+function notifyMessageAsPromise(message, options) {
+    return new Promise(function (resolve, reject) {
+        // 以包装函数为前提
+        notifyMessage(message, options, function(error, notification) {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(notification);
+            }
+        });
+    });
+}
+
+notifyMessageAsPromise('Hi!').then(function(notification) {
+    console.log(notification);
+}).catch(function(error) {
+    console.error(error);
+});
+```
+
+Web Notification Thenable模式:
+
+```javascript
+function notifyMessageAsThenable(message, options) {
+    return {
+        'then': function(resolve, reject) {
+            notifyMessage(message, options, function(error, notification) {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(notification);
+                }
+            });
+        }
+    }
+}
+
+Promise.resolve(notifyMessageAsThenable('Hello Thenable!'))
+.then(function(notification) {
+    console.log(notification);
+})
+.catch(function(error) {
+    console.error(error);
+});
+```
+
+Thenable风格处于回调和Promise风格中间的一种状态, Thenable间接依赖于Promise, 因为在Promise之外没有使用Thenable的地方.
+
+Thenable最可能被使用的地方是在Promise类库之间进行相互转换. 如由ES6的Promise对象切换到Q(类库)的Promise对象:
+
+```javascript
+var Q = require('Q');
+
+var promise = new Promise(function (resolve) {
+    resolve(1);
+});
+
+// 切换Promise对象
+Q(promise).then(function(value) {
+    console.log(value);
+}).finally(function() {
+    console.log('finally');
+});
+```
+
+### 在Promise中使用reject而不是throw来反映错误
+
+使用reject而不是throw, 这样能够更加明确触发的是Promise错误, 从而跟其他的throw区分开来, 同时也避免调试时错误捕捉到Promise的throw的问题.
+
+有些情况需要在then中进行reject操作, 这个时候就可以通过返回一个已经reject的对象来实现这样的功能:
+
+```javascript
+var promise = Promise.resolve(1);
+
+promise.then(function(val) {
+    // 或者可以使用Promise.reject来进行reject; 不过下面的这种情况还是用构造函数会较为简单
+    return new Promise(function(resolve, reject) {
+        setTimeout(function() {
+            // 超时, 需要reject
+            reject(new Error('promise Rejected'));
+        }, 1000);
+    });
+    longTimeWork();
+}).catch(function(error) {
+    console.log(error);
+});
+```
+
+### Promise.prototype.done
+
+由于在使用Promise的过程中, 不一定所有调用链上都有进行catch, 因此, 在then中出现错误时, 错误就会被隐藏掉, 而无法被捕获. 因此, 一些类库会包含有done方法, 直接在发生错误时抛出错误到外面.
+
+```javascript
+function JSONPromise(value) {
+    return new Promise(function(resolve) {
+        resolve(JSON.parse(value));
+    });
+}
+
+// 正常捕获到错误
+var string = '非法json编码字符串';
+JSONPromise(string).then(function(object) {
+    console.log(object);
+}).catch(function(error) {
+    console.error(error);
+});
+
+// 消失的错误
+JSONPromise(string).then(function(object) {
+    console.log(object);
+});
+
+// 或者后续处理出错, 没有catch, 错误也会消失
+JSONPromise('{}').then(function(object) {
+    // 错误的console拼写
+    conosle.log(object);
+});
+
+
+// 由于这种种的原因, 因此一些类库会提供done方法, 让错误暴露到外界, 但是done会终结Promise链, 因此只能用在最后
+if (typeof Promise.prototype.done === 'undefined') {
+    Promise.prototype.done = function(onFulfilled, onRejected) {
+        this.then(onFulfilled, onRejected).catch(function(error) {
+            setTimeout(function() {
+                throw error;
+            }, 0);
+        });
+    };
+}
+```
+
+对Array对象进行Promise wrapper, 让其能够实现then方法, 同时普通方法的处理方式也变成了异步形式.
+
+```javascript
+function ArrayAsPromise(array) {
+    this.array = array;
+    this.promise = Promise.resolve();
+}
+
+ArrayAsPromise.prototype.then = function(onFulfilled, onRejected) {
+    this.promise = this.promise.then(onFulfilled, onRejected);
+    return this;
+};
+
+ArrayAsPromise.prototype['catch'] = function(onRejected) {
+    this.promise = this.promise.catch(onRejected);
+    return this;
+};
+
+Object.getOwnPropertyNames(Array.prototype).forEach(function(methodName) {
+    // 避免重写
+    if (typeof ArrayAsPromise[methodName] !== 'undefined') {
+        return;
+    }
+    var arrayMethod = Array.prototype[methodName];
+    if (typeof arrayMethod !== 'function') {
+        return;
+    }
+    ArrayAsPromise.prototype[methodName] = function() {
+        var that = this;
+        var args = arguments;
+        this.promise = this.promise.then(function() {
+            that.array = Array.prototype[methodName].apply(that.array, args);
+            return that.array;
+        });
+        return this;
+    };
+});
+
+module.exports = ArrayAsPromise;
+module.exports.array = function newArrayAsPromise(array) {
+    return new ArrayAsPromise(array);
+};
+```
+
+### 使用Promise进行顺序处理
+
+一般情况下通过使用Promise.all能够解决大部分问题. 但是, 某些时候也需要顺序执行处理函数. 通过结合数组的reduce方法, 可以很好地实现需求:
+
+```javascript
+// 接收的是会返回Promise对象的函数的数组
+function sequenceTasks(tasks) {
+    function recordValue(results, value) {
+        results.push(value);
+        return results;
+    }
+
+    var pushValue = recordValue.bind(null, []);
+
+    return tasks.reduce(function(promise, task) {
+        return promise.then(task).then(recordValue);
+    }, Promise.resolve());
+}
+```
+
+在Promise中, 可以选择多种方式来实现处理的按顺序执行.
+
+- 循环使用then调用的方法
+- 使用for循环的方法
+- 使用reduce的方法
+- 分离出循序处理函数的方法
 
