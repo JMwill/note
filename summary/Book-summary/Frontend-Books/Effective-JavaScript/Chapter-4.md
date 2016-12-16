@@ -90,3 +90,27 @@ function Chinese(world, name, sex, city) {
 
 Chinese.prototype = Object.create(Human.prototype);
 ```
+
+## 不要重用父类的属性名
+
+JavaScript中挂载在对象上的属性无法做到私有化, 因此如果在子类中重用父类的属性名, 则只能访问到子类的属性, 父类属性就被掩盖了.
+
+## 避免继承标准类
+
+由于EcmaScript对于标准类中创建的实例有一个不可见的内部属性`[[Class]]`, 在继承标准类的时候这些属性并不会一并继承到子类中, 因此会造成标准类中的一些方法在子类中无法使用. 特别是某些属性或者方法期望具有正确的`[[Class]]`属性或其他特殊的内部属性, 而子类却无法提供, 使得预期的继承效果失效.
+
+因此对于希望使用标准类提供的便利方法时, 可以通过使用属性委托的方式来实现.
+
+```javascript
+// 属性委托
+function Dir(path, entries) {
+    this.path = path;
+    this.entries = entries; // entries是一个数组
+}
+
+Dir.prototype.forEach = function(f, thisArg) {
+    if (typeof thisArg === 'undefined') { thisArg = this; }
+    this.entries.forEach(f, thisArg);
+}
+```
+
