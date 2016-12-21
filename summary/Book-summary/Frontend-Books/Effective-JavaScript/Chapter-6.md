@@ -55,6 +55,23 @@ var guard = {
     }
 };
 
+// 原型方法链
+guard.or = function (other) {
+    var result = Object.create(guard);
+
+    var self = this;
+    result.test = function(x) {
+        return self.test(x) || other.test(x);
+    };
+
+    var description = this + ' or ' + other;
+    result.toString = function() {
+        return description;
+    };
+
+    return result;
+};
+
 // 实现整数测试
 var uint32 = Object.create(guard);
 
@@ -70,4 +87,17 @@ uint32.toString = function() {
 function SomeFun(x) {
     uint32.or(arrayLike).guard(x);
 }
+
+// 实现arrayLike对象监视
+var arrayLike = Object.create(guard);
+arrayLike.test = function(x) {
+    return typeof x === 'Object' && x && uint32.test(x.length);
+};
+
+arrayLike.toString = function() {
+    return 'array-like Object';
+};
 ```
+
+- 避免强制转换和重载的混用
+- 考虑防御性地监视非预期的输入
