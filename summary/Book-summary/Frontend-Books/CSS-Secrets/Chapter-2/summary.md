@@ -119,3 +119,207 @@ elem.addEventListener('click', function() {
 
 - 只适用于双层"边框"的场景, 如果需要多重边框, 前面的方案就是唯一的选择(可以用多个元素模拟?)
 - 边框不一定会贴合`border-radius`属性产生的圆角, 因此如果元素是圆角的, 它的描边可能还是直角的. 
+
+## 灵活的背景定位
+
+### background-position的扩展语法方案
+
+通过`background-position`扩展的新语法, 允许在偏移量前指定关键字, 来使背景图能够在某个方位来偏移而不是CSS 2.1中的基于左上角偏移.
+
+```css
+.background-box {
+    background: url("img-url.png") no-repeat #58a;
+    background-position: right 20px bottom 10px;
+}
+
+/* 一般来说需要做一下回退方案, 这样就能在不支持position偏移的浏览器下仍能实现一般效果. */
+.background-box {
+    background: url("img-url.png")
+                no-repeat bottom right #58a;
+    background-position: right 20px bottom 10px;
+}
+```
+
+### background-origin方案
+
+当需要的背景图片的偏移距离跟内边距一样时, 使用`background-position`来实现偏移效果的话需要进行较多设置:
+
+```css
+.background-box {
+    padding: 10px;
+    background: url("img-url.png") no-repeat #58a;
+    background-position: right 10px bottom 10px;
+}
+```
+
+为求尽力遵循DRY原则, 可以使用`background-origin`来减少需要做的相同操作:
+
+```css
+.background-box {
+    padding: 10px;
+    background:
+        url("img-url.png")
+        top left / auto 100px
+        no-repeat
+        #ccc;
+    background-origin: content-box;
+}
+```
+
+### calc()方案
+
+如果以左上角的思路来考虑实现之前的右下角偏移背景图, 实际上就是`100% - 偏移量`这个计算值, 因此可以使用calc来实现这一效果.
+
+```css
+.background-box {
+    background: url("img-url.png") no-repeat;
+    background-position: calc(100% - 20px) calc(100% - 10px);
+}
+```
+
+## 边框内圆角
+
+当需要一个外部容器是直角, 内部元素是圆角的外观时, 一般最先想到的做法是使用两个元素:
+
+```html
+<div class="something-meaningful">
+    <div>I have a nice subtle inner rounding, don't I look pretty? (强行卖一波萌)</div>
+</div>
+
+<style>
+.something-meaningful {
+    background: #665;
+    padding: .8em;
+}
+.something-meaningful > div {
+    background: tan;
+    border-radius: .8em;
+    padding: 1em;
+}
+</style>
+```
+
+那么如果只用一个元素, 且边框是简单的实色效果的话, 可以通过`box-shadow`来达到效果:
+
+```css
+.something-meaningful {
+    background: tan;
+    border-radius: .8em;
+    padding: 1em;
+    box-shadow: 0 0 0 .6em #655; /* box-shadow制造的边框会跟随元素的圆角走, 但是展现效果也是圆角的 */
+    outline: .6em solid #655; /* 描边并不跟随圆角走(但是并不一定在之后也是这样), 用于实现矩形直角 */
+}
+```
+
+上述的方法如果在描边宽度比 r (圆角半径) 的 (&radic;2 - 1)r 小的话是不可能实现的
+
+## 条纹背景
+
+以前实现条纹背景的方案是使用位图重复来实现的, 但是在有了CSS线性渐变之后, 可以通过渐变来实现这样的条纹背景
+
+```css
+.linear-box {
+    background: linear-gradient(#fb3, #58a); /* 最简单的渐变使用方式 */
+    background: linear-gradient(#fb3 20%, #58a 80%); /* 调整色标位置 */
+    background: linear-gradient(#fb3 50%, #58a 50%); /* 重叠两个色标位置, 实现条纹背景 */
+
+    /* 因为渐变背景是用代码生成的图像, 因此可以将其当做一般图像来对待 */
+    background-size: 100% 30px;
+
+    /* 通过调整色标位置可以创建不等宽的条纹 */
+    background: linear-gradient(#fb3 30%, #58a 30%);
+
+    /*
+    借助CSS规范, 可以知道, 如果色标位置小于前面的所有色标的位置, 则会默认被重置为前一个色标的位置
+    于是可以只用修改第一个值便能实现任意比例的条纹背景
+    */
+    background: linear-gradient(#fb3 30%, #58a 0);
+
+    /* 当需要两种以上的条纹背景时, 也可以用渐变来实现 */
+    background: linear-gradient(
+                    #fb3 33.3%,
+                    #58a 0,
+                    #58a 66.6%,
+                    yellowgreen 0
+                );
+}
+```
+
+### 垂直条纹
+
+垂直条纹生成跟水平条纹是几乎一样的, 除了需要对方向进行限定:
+
+```css
+.linear-box {
+    background: linear-gradient(
+        to right, /* 90deg */
+        #fb3 50%, #58a 0
+    );
+    background-size: 30px 100%;
+}
+```
+
+### 斜向条纹
+
+直接使用斜向转角45度来实现斜纹并不能够达到预想的效果:
+
+```css
+.linear-box {
+    /* 单纯地将内部的条纹转向45度是无法实现斜纹的, 需要通过拼接方式来实现斜纹 */
+    background: linear-gradient(45deg #fb3 50%, #58a 0);
+}
+```
+
+斜向纹理的实现
+
+```css
+.linear-box {
+    background: linear-gradient(45deg,
+        #fb3 25%, #58a 0,   #58a 50%,
+        #fb3 0,   #fb3 75%, #58a 0
+    );
+
+    /* 背景宽度为: 边长平方后的两倍再开方, 会有锯齿出现 */
+    background-size: 42.426406871px 42.426406871px;
+    /* 或者 background-size: 42px 42px; */
+}
+```
+
+### 更好的斜向条纹
+
+上面的斜向条纹实现的是某种角度的条纹, 当角度修改时, 便要重新计算条纹用该具备的宽度, 实现起来不够方便. 更好的斜向条纹实现是使用`repeating-linear-gradient()`色标无限循环重复的效果来实现斜向条纹. 这种重复的特性能够完美实现条纹效果, 无论是什么方向.
+
+```css
+.linear-box {
+    /* 一般的使用方法 */
+    background: repeating-linear-gradient(45deg,
+        #fb3, #58a 30px;
+    );
+
+    /* 斜向条纹实现, 基本没有锯齿出现, 视觉效果最好 */
+    background: repeating-linear-gradient(45deg,
+        #fb3, #fb3 15px, #58a 0, #58a 30px
+    );
+
+    /* 通过两者结合实现斜向条纹, 效果并不好, 只是一种实现思路 */
+    background: repeating-linear-gradient(45deg,
+        #fb3 0, #fb3 25%, #58a 0, #58a 50%
+    );
+    background-size: 42.426406871px 42.426406871px;
+}
+```
+
+### 灵活的同色系条纹
+
+通过将最深的颜色指定为主色调, 并叠加半透明白色的条纹在背景上得到同色系的浅色条纹. 能够使得修改颜色的关系在代码中得以体现
+
+```css
+.linear-box {
+    background: #58a;
+    background-image: repeating-linear-gradient(30deg,
+        hsla(0, 0%, 100%, .1),
+        hsla(0, 0%, 100%, .1) 15px,
+        transparent 0, transparent 30px
+    );
+}
+```
