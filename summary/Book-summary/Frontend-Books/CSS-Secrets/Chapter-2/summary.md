@@ -323,3 +323,189 @@ elem.addEventListener('click', function() {
     );
 }
 ```
+
+## 复杂的背景图像
+
+### 网格
+
+组合多个渐变图案, 可以得到很多好看的效果: (桌布)
+
+```css
+.linear-box {
+    background: white;
+    background-image:
+        linear-gradient(90deg,
+            rgba(200, 0, 0, .5) 50%, transparent 0),
+        linear-gradient(
+            rgba(200, 0, 0, .5) 50%, transparent 0);
+    background-size: 30px 30px;
+
+}
+
+```
+
+当希望每个格子的大小可以调整, 而网格线条的粗细同时保持固定时, 可以使用长度而不是百分比来作为色的场景
+
+```css
+.linear-box {
+    background: #58a;
+    background-image:
+        linear-gradient(white 1px, transparent 0),
+        linear-gradient(90deg, white 1px, transparent 0);
+    background-size: 30px 30px;
+}
+
+```
+
+或者组合两幅不同线宽, 颜色的网格的图案来的到一个更加逼真的图案
+
+```css
+.linear-box {
+    background: #58a;
+    background-image:
+        linear-gradient(white 2px, transparent 0),
+        linear-gradient(90deg, white 2px, transparent 0),
+        linear-gradient(hsla(0, 0%, 100%, .3) 1px,
+            transparent 0),
+        linear-gradient(90deg, hsla(0, 0%, 100%, .3) 1px,
+            transparent 0);
+    background-size: 75px 75px, 75px 75px,
+                     15px 15px, 15px 15px;
+}
+```
+
+### 波点
+
+这里使用径向渐变来实现一些其他的背景图.
+
+圆点阵列实现:
+
+```css
+/* 一般的圆点阵列 */
+.radial-box {
+    background: #665;
+    background-image: radial-gradient(tan 30%, transparent 0);
+    background-size: 30px 30px;
+}
+
+/* 组合的原点阵列 */
+.radial-box {
+    background: #665;
+    background-image: radial-gradient(tan 30%, transparent 0),
+                      radial-gradient(tan 30%, transparent 0);
+    background-size: 30px 30px;
+    background-position: 0 0, 15px 15px;
+}
+```
+
+使用预处理器可以减少重复:
+
+```scss
+@mixin polka($size, $dot, $base, $accent) {
+    background: $base;
+    background-image: radial-gradient($accent $dot, transparent 0),
+                      radial-gradient($accent $dot, transparent 0);
+    background-size: $size $size;
+    background-position: 0 0, $size / 2 $size / 2;
+}
+
+/* 使用 */
+@include polka(30px, 30%, $65a, tan);
+```
+
+### 棋盘
+
+使用CSS来创建的平铺的方块周围是没有空隙的, 因此直接使用这种方式的话是无法创建出棋盘的效果的. 需要通过组合背景图来实现这个效果
+
+```css
+.linear-box {
+    /* 创建大四角方块的右上角的三角形 */
+    background: #eee;
+    background-image: linear-gradient(45deg, transparent 75%, #bbb 0);
+    background-size: 30px 30px;
+
+    /* 创建大四角方块的左下角的三角形 */
+    background: #eee;
+    background-image: linear-gradient(45deg, #bbb 25%, transparent 0);
+    background-size: 30px 30px;
+}
+```
+
+将两个角进行组合, 并将第二层渐变在水平和垂直方向均移动贴片长度的一半, 拼接成一个完整的方块:
+
+```css
+.linear-box {
+    background: #eee;
+    background-image:
+        linear-gradient(45deg, #bbb 25%, transparent 0),
+        linear-gradient(45deg, transparent 75%, #bbb 0);
+    background-position: 0 0, 15px 15px;
+    background-size: 30px 30px;
+
+    /* 真正组合出一个棋盘 */
+    background: #eee;
+    background-image:
+        linear-gradient(45deg, #bbb 25%, transparent 0),
+        linear-gradient(45deg, transparent 75%, #bbb 0),
+        linear-gradient(45deg, #bbb 25%, transparent 0),
+        linear-gradient(45deg, transparent 75%, #bbb 0);
+    background-position: 0 0, 15px 15px,
+                         15px 15px, 30px 30px;
+    background-size: 30px 30px;
+
+    /* 优化实现, 使代码更加的DRY */
+    background: #eee;
+    background-image:
+        linear-gradient(45deg,
+            rgba(0,0,0,.25) 25%, transparent 0,
+            transparent 75%, rgba(0,0,0,.25) 0),
+        linear-gradient(45deg,
+            rgba(0,0,0,.25) 25%, transparent 0,
+            transparent 75%, rgba(0,0,0,.25) 0);
+    background-position: 0 0, 15px 15px;
+    background-size: 30px 30px;
+}
+```
+
+上述的代码用起来还是比较不方便, 因此这里可以使用预处理器的mixin来实现, 以方便我们使用
+
+```scss
+@mixin checkerboard($size, $base, $accent: rgba(0,0,0,.25)) {
+    background: $base;
+    background-image:
+        linear-gradient(45deg,
+            $accent 25%, transparent 0,
+            transparent 75%, $accent 0),
+        linear-gradient(45deg,
+            $accent 25%, transparent 0,
+            transparent 75%, $accent 0);
+    background-position: 0 0, $size $size,
+    background-size: 2 * $size 2 * $size;
+}
+
+@include checkerboard(15px, #58a, tan);
+```
+
+或者使用SVG来实现:
+
+```svg
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="100" height="100" fill-opacity=".25" >
+    <rect x="50" width="50" height="50" />
+    <rect y="50" width="50" height="50" />
+</svg>
+```
+
+或者将SVG作为data URI来减少请求
+
+```css
+.checkerboard-box {
+    background: #eee url('data:image/svg+xml,\
+        <svg xmlns="http://www.w3.org/2000/svg" \
+            width="100" height="100" fill-opacity=".25" > \
+            <rect x="50" width="50" height="50" /> \
+            <rect y="50" width="50" height="50" /> \
+        </svg>');
+    background-size: 30px 30px;
+}
+```
