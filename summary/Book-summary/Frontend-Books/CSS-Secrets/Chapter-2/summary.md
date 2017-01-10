@@ -509,3 +509,42 @@ elem.addEventListener('click', function() {
     background-size: 30px 30px;
 }
 ```
+
+## 伪随机背景
+
+初始设置, 四种颜色的条纹图案:
+
+```css
+.four-line-bg {
+    background: linear-gradient(90deg,
+                    #fb3 15%, #665 0, #665 40%,
+                    #ab4 0, #ab4 65%, hsl(20, 40%, 90%) 0);
+    background-size: 80px 100%;
+}
+```
+
+将条纹从一个平面拆散成为多个图层: 一种颜色作为底色, 另外三种颜色作为条纹, 然后让条纹以不同的间隔进行重复平铺.
+
+```css
+.four-line-bg {
+    background: hsl(20, 40%, 90%);
+    background-image:
+        linear-gradient(90deg, #fb3 10px, transparent 0),
+        linear-gradient(90deg, #ab4 10px, transparent 0),
+        linear-gradient(90deg, #655 20px, transparent 0);
+    background-size: 80px 100%, 60px 100%, 40px 100%;
+}
+```
+
+背景的重复跟条纹的尺寸的最小公倍数有关, 因此为了达到最大化, 条纹宽度的选取最好是相对质数, 而得到的最小公倍数就是它们的乘积. 或者最简单地, 只选择质数, 因为质数跟任意其他数字都是相对质数.
+
+```css
+.four-line-bg {
+    background: hsl(20, 40%, 90%);
+    background-image:
+        linear-gradient(90deg, #fb3 11px, transparent 0),
+        linear-gradient(90deg, #ab4 23px, transparent 0),
+        linear-gradient(90deg, #665 41px, transparent 0);
+    background-size: 41px 100%, 61px 100%, 83px 100%;
+}
+```
