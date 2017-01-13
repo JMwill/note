@@ -548,3 +548,138 @@ elem.addEventListener('click', function() {
     background-size: 41px 100%, 61px 100%, 83px 100%;
 }
 ```
+
+"禅原则"可以用于涉及到有规律重复的情况. 如:
+
+- 在图片库中, 为每幅图片应用细微的伪随机旋转效果时, 可以使用多个`:nth-child(a)`选择符, 且让a是质数
+- 如果要生成一个动画, 且想让它看起来不是按照明显的规律循环时, 应用多个时长为质数的动画.
+
+## 连续的图像边框
+
+问题: 将一幅图案应用为边框, 而不是背景. 且在元素的尺寸扩大或者缩小时, 图片可以自动延伸并覆盖完整的边框区域.
+
+由于`border-image`用的是九宫格伸缩法, 因此就算针对特定的元素宽高和边框厚度找到了切割位置, 这个结果也无法适配尺寸稍有差异的其他元素. 当希望元素宽高和边框厚度变化而拐角处的边框图像也会变化时, 只使用`border-image`是不可能实现的.
+
+其中一个最简单的办法是使用两个HTML元素: 一个元素用来把图片设为背景, 一个用来存放内容, 并设置一个合适的背景覆盖前者.
+
+```html
+<div class="something-meaningful">
+    <div>
+    I have a nice stone art border,
+    don't I look pretty?
+    </div>
+</div>
+```
+
+```css
+.something=meaningful {
+    background: url(stone-art.jpg);
+    background-size: cover;
+    padding: 1em;
+}
+
+.something-meaningful > div {
+    background: white;
+    padding: 1em;
+}
+```
+
+只用一个元素的实现, 主要的思路是在背景图片上在叠加一层需要的内容背景颜色, 然后为不同的两层背景指定不同的`background-clip`值. 而在多重背景的最底层设置背景色, 可以通过一个纯色到纯色的CSS渐变来模拟出纯色背景的效果.
+
+```css
+.border-bg-box {
+    padding: 1em;
+    border: 1em solid transparent;
+    background: linear-gradient(white, white),
+                url(stone-art.jpg);
+    background-size: cover;
+    background-clip: padding-box border-box;
+}
+```
+
+上面的实现由于`background-origin`的默认值是`padding-box`, 因此图片显示尺寸取决于padding box的尺寸且放置在了padding box的原点上, 并以平铺的方式蔓延到border box区域. 要修正这个问题需要设置`background-origin`为`border-box`
+
+```css
+.border-bg-box {
+    padding: 1em;
+    border: 1em solid transparent;
+    background: linear-gradient(white, white),
+                url(stone-art.jpg);
+    background-size: cover;
+    background-clip: padding-box, border-box;
+    background-origin: border-box;
+}
+
+/* 融合新属性到background简写中 */
+.border-bg-box {
+    padding: 1em;
+    border: 1em solid transparent;
+    background:
+        linear-gradient(white, white) padding-box,
+        url(stone-art.jpg) border-box / 0 cover;
+}
+```
+
+在渐变图案上使用, 生成老式信封样式的边框:
+
+```css
+.border-bg-box {
+    padding: 1em;
+    border: 1em solid transparent;
+    background: linear-gradient(white, white) padding-box,
+                repeating-linear-gradient(-45deg,
+                    red 0, red 12.5%,
+                    transparent 0, transparent 25%,
+                    #56a 0, #58a 37.5%,
+                    transparent 0, transparent 50%)
+                    0 / 5em 5em;
+
+    /* 或者通过border-image实现 */
+    /* 存在的一些问题:
+            1. 每次改变border-image-slice时, 都需要同时修改border-width来相互匹配
+            2. border-image-slice中无法使用em单位, 只能把边框厚度指定为像素单位
+            3. 条纹宽度需要在色标的位置信息中写好, 改变条纹宽度时, 需要修改四处
+    */
+    padding: 1em;
+    border: 16px solid transparent;
+    border-image: 16 repeating-linear-gradient(-45deg,
+                        red 0, red 1em,
+                        transparent 0, transparent 2em,
+                        #58a 0, #58a 3em,
+                        transparent 0, transparent 4em);
+}
+```
+
+创建行军蚁效果:
+
+```css
+@keyframes ants { to { background-position: 100% } }
+.marching-ants {
+    padding: 1em;
+    border: 1px solid transparent;
+    background:
+        linear-gradient(white, white) padding-box,
+        repeating-linear-gradient(-45deg,
+            black 0, black 25%, white 0, white 50%
+        ) 0 / .6em .6em;
+    animation: ants 12s linear infinite;
+}
+```
+
+这种技巧可以创建出各种特殊样式的虚线框: 不管是为虚线线段指定不同的颜色, 还是自定义线段的长度和间隙的长度都可以实现.
+
+使用`border-image`来实现的话, 唯一的办法是指定一个GIF动画, 或者当浏览器开始支持渐变插值的时候, 使用渐变插值来实现, 但是比较繁琐
+
+`border-image`应用起来十分简便的地方: 传统注脚的实现
+
+```css
+.footnote-box {
+    border-top: .2em solid transparent;
+    border-image: 100% 0 0 linear-gradient(90deg,
+        currentColor 4em,
+        transparent 0);
+    padding-top: 1em;
+}
+```
+
+这个注脚还能根据父级的字体大小来相应调整自身.
