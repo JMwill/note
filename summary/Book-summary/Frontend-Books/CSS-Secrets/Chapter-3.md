@@ -54,3 +54,54 @@
 ```
 
 但是对于八分之一等等的形状, `border-radius`是无法实现的.
+
+## 平行四边形
+
+视觉设计中, 平行四边形可以传达出一种动感. 通过`skew()`这个变形属性来对矩形进行斜向拉伸
+
+```css
+.skew-box {
+    /* 只使用这个属性会导致内容也斜向拉伸 */
+    transform: skewX(-45deg);
+}
+```
+
+通过两个元素来实现, 内部元素反向拉伸
+
+```html
+<a href="#" class="button">
+    <div>Click me</div>
+</a>
+```
+
+```css
+.button { transform: skewX(-45deg); }
+.button > div { transform: skewX(45deg); }
+```
+
+### 纯CSS解决方案: 伪元素
+
+将所有样式应用到伪元素上, 在对伪元素进行变形
+
+```css
+.button {
+    position: relative;
+}
+.button::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+    z-index: -1;
+    background: #58a;
+    transform: skewX(45deg);
+}
+```
+
+这种方法适用于其他任何变形样式, 当想要变形一个元素而不改变内容时, 就可以用到它.
+
+还可以将这种方式应用到其他的场景中:
+
+- IE8下实现多重背景
+- "边框内圆角"效果实现
+- 为某一层"背景"单独设置类似`opacity`等的属性
+- 当无法使用"多层边框"的技巧时, 可以用这种方法来更加灵活地模拟多层边框. 如需要多层虚线边框, 或者需要在多重边框之间留有透明空隙等.
