@@ -105,3 +105,240 @@
 - "边框内圆角"效果实现
 - 为某一层"背景"单独设置类似`opacity`等的属性
 - 当无法使用"多层边框"的技巧时, 可以用这种方法来更加灵活地模拟多层边框. 如需要多层虚线边框, 或者需要在多重边框之间留有透明空隙等.
+
+## 菱形图片
+
+无须设计师参与的实现菱形的方法在目前有两种: 基于变形的方案, 裁切路径方案
+
+### 基于变形方案
+
+这里的实现是把图片用一个div包裹起来, 对其应用相反的`rotate()`:
+
+```html
+<div class="picture">
+    <img src="adam-catlace.jpg" alt="...">
+</div>
+
+<style>
+.picture {
+    width: 400px;
+    transform: rotate(45deg);
+    overflow: hidden;
+}
+.picture > img {
+    max-width: 100%;
+    transform: rotate(-45deg);
+}
+</style>
+```
+
+上面的实现由于图片的`max-width: 100%`, 因此图片会被截取成八角形, 因此需要将图片的大小进行一定的修改才能够实现**图片宽度与容器对角线相等**, 因此需要将`max-width`设置为对角线的长度乘以根号2, 也就是`100% * 根号2`, 在上述例子中也就是141.4213562%. 或者向上取整142%. 
+
+实际上使用`scale()`变形样式将图片放大会更加合理, 因为:
+
+- 图片尺寸仍然保持100%, 并在变形样式不受支持时仍然具有合理的布局.
+- 通过`scale()`来缩放图片时, 默认是以中心点进行缩放的. 而`width`则是以左上角为原点缩放, 需要用额外的负外边距来进行调整.
+
+最终结果:
+
+```css
+.picture {
+    width: 400px;
+    transform: rotate(45deg);
+    overflow: hidden;
+}
+
+.picture > img {
+    max-width: 100%;
+    transform: rotate(-45deg) scale(1.42);
+}
+```
+
+### 裁切路径方案
+
+上面的实现对于非正方形的图片就会遇到问题, 且需要额外的html标签也不够简洁. 因此下面使用`clip-path`属性来实现菱形效果.
+
+```css
+img {
+    clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+}
+```
+
+只用一行代码就可以实现效果, 还可以通过跟动画属性进行结合得到有趣的效果:
+
+```css
+img {
+    clip-path: polygon(50% 0, 100% 50%,
+                       50% 100%, 0 50%);
+    transition: 1s clip-path;
+}
+img:hover {
+    clip-path: polygon(0 0, 100% 0,
+                       100% 100%, 0 100%);
+}
+```
+
+## 切角效果
+
+旧有的切角方案是使用图片遮挡住元素来实现的, 但是相对而言会增加页面加载时间以及维护成本. 因此这里列举多个方案实现切角效果
+
+### 渐变实现切角
+
+由于渐变可以接受一个角度作为方向, 而且色标的位置也可以是绝对长度值, 不会受到容器尺寸的影响. 因此可以通过一个线性渐变来实现效果
+
+```css
+.corner-box {
+    background: #58a;
+    background: linear-gradient(-45deg, transparent 15px, #58a 0);
+}
+```
+
+由于渐变默认是覆盖整个元素的, 因此在需要实现两个角的切角时需要修改渐变的范围.
+
+```css
+.corner-box {
+    background: #58a;
+    background: linear-gradient(-45deg, transparent 15px, #58a 0) right,
+                linear-gradient(45deg, transparent 15px, #655 0) left;
+    background-size: 50% 100%;
+    /* 关闭重复避免覆盖 */
+    background-repeat: no-repeat;
+}
+```
+
+四角切角
+
+```css
+.corner-box {
+    background: #58a;
+    background:
+        linear-gradient(135deg, transparent 15px, #58a 0) top left,
+        linear-gradient(-135deg, transparent 15px, #58a 0) top right,
+        linear-gradient(-45deg, transparent 15px, #58a 0) bottom right,
+        linear-gradient(45deg, transparent 15px, #58a 0) bottom left;
+    background-size: 50% 50%;
+    background-repeat: no-repeat;
+}
+```
+
+使用scss避免多处修改.
+
+```scss
+@mixin beveled-corners($bg,
+        $tl: 0, $tr:$tl, $br:$tl, $bl:$tr) {
+    background: $bg;
+    background:
+        linear-gradient(135deg, transparent $tl, $bg 0) top left,
+        linear-gradient(-135deg, transparent $tr, $bg 0) top right,
+        linear-gradient(-45deg, transparent $br, $bg 0) bottom right,
+        linear-gradient(45deg, transparent $bl, $bg 0) bottom left;
+    background-size: 50% 50%;
+    background-repeat: no-repeat;
+}
+
+@include beveled-corners(#58a, 15px, 15px);
+```
+
+#### 弧形切角
+
+通过径向渐变实现弧形内凹切角:
+
+```css
+.corner-box {
+    background: #58a;
+    background:
+        radial-gradient(circle at top left,
+            transparent 15px, #58a 0) top left,
+        radial-gradient(circle at top right,
+            transparent 15px, #58a 0) top right,
+        radial-gradient(circle at bottom right,
+            transparent 15px, #58a 0) bottom right,
+        radial-gradient(circle at bottom left,
+            transparent 15px, #58a 0) bottom left;
+    background-size: 50% 50%;
+    background-repeat: no-repeat;
+}
+```
+
+### 内联SVG与`border-image`方案
+
+由于渐变的方案较为繁琐, 因此, 这里使用SVG加`border-image`的方案实现切角效果
+
+代码如下:
+
+```css
+.corner-box {
+    /* border: 15px solid transparent; */
+    border: 20px solid transparent; /* 由于边框宽度不是按照斜向度量的, 因此需要15 * 根号2 */
+    /* 如果想要对不支持border-image的浏览器作回退, 那么需要修改border的颜色 */
+    border: 20px solid #58a;
+    
+    border-image: 1 url('data:image/svg+xml,\
+        <svg xmlns="http://www.w3.org/2000/svg" width="3" height="3" fill="%2358a">\
+            <polygon points="0,1 1,0 2,0 3,1 3,2 2,3 1,3 0,2"/>\
+        </svg>');
+    
+    background: #58a; /* 添加背景色作回退, 但是需要对背景进行截取避免覆盖边距 */
+    background-clip: padding-box;
+}
+```
+
+### 裁切路径方案
+
+使用裁切路径将元素切出斜面切角的代码如下:
+
+```css
+.corner-box {
+    background: #58a;
+    clip-path: polygon(
+        20px 0, calc(100% - 20px) 0, 100% 20px,
+        100% calc(100% - 20px), calc(100% - 20px) 100%,
+        20px 100%, 0 calc(100% - 20px), 0 20px
+    );
+}
+```
+
+上述方法的最大好处在于可以使用任意类型的背景, 也可以对替换元素进行裁切. 但是具有的缺点是: 支持不完善, 当内边距不够宽时, 会裁切掉文本.
+
+## 梯形标签页
+
+梯形可以用3D旋转模拟出来.
+
+```css
+.trapezoid-box {
+    transform: perspective(.5em) rotateX(5deg);
+}
+```
+
+但是由于3D形变效果是不可逆的, 因此这里需要用伪元素来产生梯形, 避免对内容造成影响
+
+```css
+.trapezoid-box {
+    position: relative;
+    display: inline-block;
+    padding: .5em 1em .35em;
+    color: white;
+}
+
+.trapezoid-box::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+    z-index: -1;
+    background: #58a;
+    transform: perspective(.5em) rotateX(5deg);
+}
+```
+
+为了让变形效果更好掌控, 避免占据的空间, 高度等的多方面影响, 需要设置一下`transform-origin`:
+
+```css
+.trapezoid-box {
+    ...
+
+    transform: scaleY(1.3) perspective(.5em) rotateX(5deg); /* scaleY用于补足高度上减少的距离 */
+    transform-origin: bottom;
+}
+```
+
+使用这种方法实现后可以给梯形添加背景, 边框, 圆角, 投影等一系列样式. 且只需要设置`transform-origin`为不同的值就能得到左倾斜等效果. 但是对于元素内容长度不等时, 由于**斜边的角度依赖于元素的宽度**, 要得到斜度一致的梯形就很难实现.
