@@ -31,3 +31,27 @@ BEM(块, 元素, 修饰符)是一种基于组件的Web开发方法. 这个思想
 <div class="red-text"></div>
 ```
 
+- 块不应该影响到它的环境, 意味着你不应该设置外部的几何形状(margin)或者为块进行定位.
+- 当使用BEM时你也不应该用CSS标签或者ID选择.
+
+这确保复用块或者将它们从一个地方移动到另一个地方所必要的独立性.
+
+### 使用块指南
+
+嵌套
+
+- 块可以彼此嵌套
+- 你可以有任意数量的嵌套级别
+
+例子:
+
+```html
+<!-- `header` block -->
+<header class="header">
+    <!-- Nested `logo` block -->
+    <div class="logo"></div>
+
+    <!-- Nested `search-form` block -->
+    <form class="search-form"></form>
+</header>
+```
