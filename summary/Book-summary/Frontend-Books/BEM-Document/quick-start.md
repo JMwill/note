@@ -55,3 +55,155 @@ BEM(块, 元素, 修饰符)是一种基于组件的Web开发方法. 这个思想
     <form class="search-form"></form>
 </header>
 ```
+
+## 元素
+
+一个块的一个复合组成部分是不能将其分开来使用的。
+
+特性：
+
+- 元素的名称描述它的目的（"这是什么？"——`item`，`text`，等等），而不是它状态（"什么类型，或者它看起来是怎样？"——`red`，`big`，等等）
+- 一个元素的全称结构是`block-name__element-name`。元素名称跟块名称是用两个下划线分开的。
+
+例子
+
+```html
+<!-- `search-form` 块 -->
+<form class="search-form">
+	<!-- 在`search－form`块中的`input`元素 -->
+	<input class="search-form__input">
+
+	<!-- 在`search-form`块中的`button`元素 -->
+	<button class="search-form__button">Search</button>
+</form>
+```
+
+### 元素使用指导
+
+- [嵌套](#elements-nesting)
+* [成员](#elements-membership)
+* [可选性](#elements-optionality)
+
+<a name="elements-nesting">嵌套</a>
+
+- 元素可以在内部相互嵌套
+* 你可以有任意层级的嵌套
+* 一个元素总是一个块的一部分，而不是其他元素。这意味着元素名称不可以定义等级制度，如`block_elem1_elem2`。
+
+例子
+
+```html
+<!--
+	正确，一个元素的全称的结构按照以下模式：
+	`block-name__element-name`
+-->
+<form class="search-form">
+	<div class="search-form__content">
+		<input class="search-form__input">
+
+		<button class="search-form__button">Search</button>
+	</div>
+</form>
+
+<!--
+	错误， 元素的全称没有遵循下面的模式：
+	`block-name__element-name`
+-->
+<form class="search-form">
+	<div class="search-form__content">
+		<!-- 推荐`search-form__input`或者`search-form__content-input` -->
+		<input class="search-form__content__input">
+
+		<!-- 推荐：`search-form__button`或者`search-form__content-button` -->
+		<button class="search-form__content__button">Search</button>
+	</div>
+</form>
+```
+
+块名称定义了命名空间，这保证了这个元素是依赖于这个块（block__elem）。
+
+一个块可以有一个嵌套结构元素的DOM树：
+
+例子
+
+```html
+<div class="block">
+	<div class="block__elem1">
+		<div class="block__elem2">
+			<div class="block__elem3"></div>
+		</div>
+	</div>
+</div>
+```
+
+然而，这个块结构在BEM方法中总是表现为平坦的列表元素
+
+例子：
+
+```css
+.block {}
+.block__elem1 {}
+.block__elem2 {}
+.block__elem3 {}
+```
+
+这允许你去修改一个块的DOM结构而不用单独对每个元素做出修改：
+
+例子
+
+```html
+<div class="block">
+	<div class="block__elem1">
+		<div class="block__elem2"></div>
+	</div>
+	<div class="block__elem3"></div>
+</div>
+```
+
+块的结构改变了，但是对于元素应用的规则以及它们的名称依然是一样的。
+
+<a name="elements-membership">嵌套</a>
+
+一个元素总是一个块的一部分，而你不应该从一个块中拆分来使用它。
+
+例子
+
+```html
+<!-- 正确。元素处于`search-form`块当中 -->
+<!-- `search-form` 块-->
+<form class="search-form">
+	<!-- 在`search-form`块中的`input`元素 -->
+	<input class="search-form__input">
+
+	<!-- 在`search_form`块中的`button` -->
+	<button class="search-form__button">Search</button>
+</form>
+
+<!-- 不正确，元素处于`search-form`块内容的外面 -->
+<!-- `search-form`块 -->
+<form class="search-form">
+</form>
+
+<!-- `search-form`块的`input`元素 -->
+<input class="search-form__input">
+
+<!-- `search-form`块的`button`元素 -->
+<button class="search-form__button">Search</button>
+```
+
+<a name="elements-optionality">可选择性</a>
+
+一个元素是一个可选的块部件，不是所有的块都有元素的。
+
+例子
+
+```html
+<!-- `search-form`块 -->
+<div class="search-form">
+	<!-- `input`块 ->
+	<input class="input">
+
+	<!-- `button`块 -->
+	<button class="button">Search</button>
+</div>
+```
