@@ -200,10 +200,76 @@ BEM(块, 元素, 修饰符)是一种基于组件的Web开发方法. 这个思想
 ```html
 <!-- `search-form`块 -->
 <div class="search-form">
-	<!-- `input`块 ->
+	<!-- `input`块 -->
 	<input class="input">
 
 	<!-- `button`块 -->
 	<button class="button">Search</button>
 </div>
+```
+
+## 应该创建一个块还是一个元素
+
+1. 如果一个部分的代码可能会被复用而且它不取决于其他页面的部件的实现，那么你就应该创建一个块。
+2. 如果一个部分的代码不能在没有父级实体（块）的情况下拆分出来使用，通常就需要创建一个元素。
+
+其中一些例外的元素是必须划分成更小的部分——子元素——为了简化开发。在BEM方法中，你不能在一个元素里创建一个元素。遇到这种情况，你需要创建一个服务块而不是创建一个元素
+
+## 修饰符
+
+一个实体是一个定义了表现，状态，或者行为的块或者元素。
+
+特性：
+
+- 修饰符的名称描述了它的表现（"有多大？"或者"哪个主题？"等等——`size_s`或者`theme_islands`，它的状态（"它跟其他的如何不同跟？"——`disabled`，`focused`，等等）以及它的行为（"它如何表现？"或者"它是如何响应用户的？"——例如`directions_left-top`）。
+* 修饰符的名称是通过耽搁下划线跟块或者元素名称进行分隔的（`_`）。
+
+### 修饰符类型
+
+**布尔型**
+
+* 只有当出现或者不出现对于修饰符来说是重要的同时它的值是无关紧要的时候使用。例如，`disabled`。如果一个布尔修饰符存在，那么它的值假定为真。
+* 修饰符的全称结构遵循下面的模式：
+	* `block-name_modifier-name`
+	* `block-name__element-name_modifier-name`
+
+例子
+
+```html
+<!-- 具有`focused`布儿修饰符的`search-form`块 -->
+<form class="search-form search-form_focused">
+	<input class="search-form__input">
+
+	<!-- 具有`disabled`布尔修饰符的`button`元素 -->
+	<button class="search-form__button search-form__button_disabled">Search</button>
+</form>
+```
+
+**键 - 值**
+
+* 当修饰符的值是重要的时候使用。例如，"一个`islands`设计主题的菜单"：`menu_theme_islands`。
+* 修饰符全称结构遵循下面的模式：
+	* `block-name_modifier-name_modifier-value`
+	* `block-name__element-name_modifier-name_modifier-value`
+
+例子
+
+```html
+<!-- 具有`theme`修饰符且值为`islands`的`search-form`块 -->
+<form class="search-form search-form_theme_islands">
+	<input class="search-form__input">
+
+	<!-- 具有`size`修饰符且值为`m`的`button`元素 -->
+	<button class="search-form__button search-form__button_size_m">Search</button>
+</form>
+
+<!-- 你不能同时用两个具有不同值的相同的修饰符 -->
+<form class="search-form
+				search-form_theme_islands
+				search-form_theme_lite">
+	<input class="search-form__input">
+	<button class="search-form__button
+					search-form__button_size_s
+					search-form__button_size_m">Search</button>
+</form>
 ```
