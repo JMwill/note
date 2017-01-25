@@ -273,3 +273,27 @@ BEM(块, 元素, 修饰符)是一种基于组件的Web开发方法. 这个思想
 					search-form__button_size_m">Search</button>
 </form>
 ```
+
+### 使用修饰符的指导
+
+**一个修饰符不可以被单独使用**
+
+从BEM的角度来看，一个修饰符不可以跟修饰的块或者元素分开来使用。一个修饰符应该修改实体的表现，行为，或者状态，而不是替换它。
+
+例子
+
+```html
+<!-- 正确。`search-form`块具有值为`islands`的`theme`修饰符 -->
+<form class="search-form search-form_theme_islands">
+	<input class="search-form__input">
+	<button class="search-form__buttom">Search</button>
+</form>
+
+<!-- 不正确。修饰类`search-form`缺失了 -->
+<form class="search-form_theme_islands">
+	<input class="search-form__input">
+	<button class="search-form__button">Search</button>
+</form>
+```
+
+[为什么在修饰符以及元素的名称中中需要写块名称](https://en.bem.info/methodology/faq/#why-include-the-block-name-in-modifier-and-element-names)
