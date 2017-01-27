@@ -317,7 +317,7 @@ BEM(块, 元素, 修饰符)是一种基于组件的Web开发方法. 这个思想
 </div>
 ```
 
-在这个例子中，我们组合了`search-form`块跟`header`块的`search-form`元素的行为以及样式。这种方法允许我们在`header__search-form`中设置额外的geometry以及位置，而`search-form`块本身依然是唯一的。由此，我们可以在任何环境使用块，因为它没有指定指定任何的内边距。这就是为什么我们可以称它为独立的。
+在这个例子中，我们组合了`search-form`块跟`header`块的`search-form`元素的行为以及样式。这种方法允许我们在`header__search-form`中设置额外的几何形状以及位置，而`search-form`块本身依然是唯一的。由此，我们可以在任何环境使用块，因为它没有指定指定任何的内边距。这就是为什么我们可以称它为独立的。
 
 ## <a name="file-structure">文件结构</a>
 
