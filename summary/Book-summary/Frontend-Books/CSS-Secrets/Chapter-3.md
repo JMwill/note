@@ -342,3 +342,186 @@ img:hover {
 ```
 
 使用这种方法实现后可以给梯形添加背景, 边框, 圆角, 投影等一系列样式. 且只需要设置`transform-origin`为不同的值就能得到左倾斜等效果. 但是对于元素内容长度不等时, 由于**斜边的角度依赖于元素的宽度**, 要得到斜度一致的梯形就很难实现.
+
+## 简单的饼图
+
+**基于transform的解决方案**.
+
+```html
+<div class="pie"></div>
+```
+
+```css
+.pie {
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    background: yellowgreen;
+    background-image: linear-gradient(to right, transparent 50%, #655 0);
+}
+.pie::before {
+    content: '';
+    display: block;
+    margin-left: 50%;
+    height: 100%;
+    border-radius: 0 100% 100% 0 / 50%;
+    background-color: inherit;
+    transform-origin: left;
+    transform: rotate(.1turn);
+}
+
+/* 0 ~ 100%的动画 */
+@keyframes spin {
+    to { transform: rotate(.5turn); }
+}
+@keyframes bg {
+    50% { background: #655; }
+}
+
+.pie::before {
+    content: '';
+    display: block;
+    margin-left: 50%;
+    height: 100%;
+    border-radius: 0 100% 100% 0 / 50%;
+    background-color: inherit;
+    transform-origin: left;
+    animation: spin 3s linear infinite,
+                bg 6s step-end infinite;
+}
+```
+
+实现不同比率的饼图, 并使得代码具备封装抽象度, 可维护性以及可访问性.
+
+```html
+<div class="pie">20%</div>
+<div class="pie">60%</div>
+```
+
+```css
+.pie {
+    position: relative;
+    width: 100px; line-height: 100px;
+    border-radius: 50%;
+    background: yellowgreen;
+    background-image: linear-gradient(to right, transparent 50%, #655 0);
+}
+@keyframes spin {
+    to { transform: rotate(.5turn); }
+}
+
+@keyframes spin {
+    50% { background: #655; }
+}
+
+.pie::before {
+    /* 其余样式保持原样 */
+    content: '';
+    border-radius: 0 100% 100% 0 / 50%;
+    background-color: inherit;
+    transform-origin: left;
+    animation: spin 50s linear infinite,
+                bg 100s step-end infinite;
+    animation-play-state: paused;
+    animation-delay: inherit;
+  
+    /* 居中文字 */
+    width: 50%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 50%;
+}
+```
+
+```javascript
+$$('.pie').forEach(function(pie) {
+    var p = parseFloat(pie.textContent);
+    pie.style.animationDelay = '-' + p + 's';
+});
+```
+
+**SVG解决方案**
+
+```html
+<svg width="100" height="100">
+    <circle r="30" cx="50" cy="50"/>
+</svg>
+```
+
+```css
+circle {
+  fill: yellowgreen;
+  stroke: #655;
+  stroke-width: 50;
+  stroke-dasharray: 60 158;
+}
+
+svg {
+  transform: rotate(-90deg);
+  background: yellowgreen;
+  border-radius: 50%;
+}
+
+/* 添加动画 */
+@keyframes fillup {
+    to { stroke-dasharray: 158 158; }
+}
+
+circle {
+    /* 与上面一样 */
+    animation: fillup 5s linear infinite;
+}
+```
+
+改进
+
+```html
+<svg viewBox="0 0 32 32">
+    <circle r="16" cx="16" cy="16"/>
+    <!-- 16 是由 100 / 2 pi 得出的 -->
+</svg>
+```
+
+```css
+svg {
+    width: 100px; height: 100px;
+    transform: rotate(-90deg);
+    background: yellowgreen;
+    border-radius: 50%;
+}
+circle {
+    fill: yellowgreen;
+    stroke: #655;
+    stroke-width: 32;
+    stroke-dasharray: 38 100;
+}
+```
+
+svg配合脚本生成饼图:
+
+```html
+<div class="pie">20%</div>
+<div class="pie">60%</div>
+```
+
+```javascript
+$('.pie').forEach(function(pie) {
+    var p = parseFloat(pie.textContent);
+    var NS = 'http://www.w3.org/2000/svg';
+    var svg = document.createElementNS(NS, 'svg');
+    var circle = document.createElementNS(NS, 'circle');
+    var title = document.createElementNS(NS, 'title');
+    circle.setAttribute('r', 16);
+    circle.setAttribute('cx', 16);
+    circle.setAttribute('cy', 16);
+    circle.setAttribute('stroke-dasharray', p + ' 100');
+    svg.setAttribute('viewBox', '0 0 32 32');
+    title.textContent = pie.textContent;
+    pie.textContent = '';
+    svg.appendChild(title);
+    svg.appendChild(circle);
+    pie.appendChild(svg);
+});
+```
+
+css需要去掉`stroke-dasharray: 38 100;`
