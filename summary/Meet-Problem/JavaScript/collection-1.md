@@ -20,3 +20,17 @@
 ```
 
 这样的input就能够在保存了账号密码的情况下自动填充到相应的区域, 或者提供填充选项
+
+### webUploader中找不到对象的错误
+
+这样的原因是因为上传的对象被隐藏了而导致的, 因此在需要隐藏某个元素的时候, 不要使用`display: none`来隐藏. 而是:
+
+```css
+.element-invisible {
+    position: absolute;
+    clip: rect(1px 1px 1px 1px);
+    clip: rect(1px,1px,1px,1px);
+}
+```
+
+这样的话元素依然存在, 同时也可以实现隐藏.
