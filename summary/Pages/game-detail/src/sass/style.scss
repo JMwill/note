@@ -1,0 +1,221 @@
+@import "compass/utilities/general";
+@import "compass/css3";
+
+/************* 全局性样式 **************/
+* {
+	-webkit-overflow-scrolling: touch;
+}
+html, body {
+	height: 100%;
+	min-height: 100%;
+
+	background-color: #e4e4e4;
+}
+
+/************* 辅助性样式 **************/
+// hp是helper的意思
+.hp__inline-vertical-middle {
+	font-size: 0;
+}
+.hp__inline-vertical-middle::before {
+	content: '';
+	display: inline-block;
+	vertical-align: middle;
+	height: 100%;
+}
+
+// container样式
+.container {
+	position: absolute;
+	width: 100%;
+	top: 0;
+	bottom: 0;
+}
+
+/************* 页面各部分样式 **************/
+// game-profile变量
+$game-profile-height: 200px;
+$avatar-size: 77px;
+$profile-info-margin: 15px;
+$profile-cnt-padding-left: 19px;
+$profile-cnt-padding-bottom: $profile-cnt-padding-left;
+$profile-line-height: 1.77;
+
+// game-profile样式定义
+.game-profile {
+	position: relative;
+	height: $game-profile-height;
+
+	// 测试背景
+	background-color: gray;
+}
+.game-profile__container {
+	position: absolute;
+	left: $profile-cnt-padding-left;
+	bottom: $profile-cnt-padding-bottom;
+}
+.game-profile__avatar {
+	display: inline-block;
+	height: $avatar-size;
+	width: $avatar-size;
+
+	overflow: hidden;
+}
+.game-profile__avatar-img {
+	width: 100%;
+	vertical-align: middle;
+	max-height: $avatar-size;
+	max-width: $avatar-size;
+}
+.game-profile__info {
+	display: inline-block;
+	margin-left: $profile-info-margin;
+	overflow: auto;
+	line-height: $profile-line-height
+}
+.game-profile__name {
+	font-size: 16px;
+	color: #fff;
+}
+.game-profile__typeNsize,
+.game-profile__pitches {
+	font-size: 13px;
+	color: #d1d8eb;
+}
+
+// game-intr变量
+$game-intr__title-font-size: 13px;
+$game-intr__pict-height: 269px;
+$game-intr__pict-width: 159px;
+// game-intr样式
+.game-intr__title {
+	height: $game-intr__title-font-size * 2;
+	font-size: $game-intr__title-font-size;
+	text-indent: 13px;
+	color: #a8a8a8;
+	line-height: 2;
+}
+.game-intr__content {
+	background-color: #f6f6f6;
+	padding: 13px 0 0 13px;
+}
+.game-intr__gallery-wrapper {
+	height: $game-intr__pict-height;
+	overflow-x: auto;
+	overflow-y: hidden;
+	white-space: nowrap;
+}
+.game-intr__gallery {
+	text-align: center;
+	margin-bottom: 13px;
+	font-size: 0;
+}
+.game-intr__pict-box {
+	display: inline-block;
+	height: $game-intr__pict-height;
+	width: $game-intr__pict-width;
+	margin-right: 8px;
+
+	img {
+		width: 100%;
+		vertical-align: middle;
+		max-height: $game-intr__pict-height;
+		max-width: $game-intr__pict-width;
+	}
+}
+.game-intr__text {
+	font-size: 14px;
+	line-height: 1.5;
+	color: #8b8b8b;
+}
+
+// game-download样式
+$gameDownloadBtnHi: 44px;
+$gameDownloadBtnPadding: 13px;
+
+// scroll-wrapper样式, 因为需要用到game-download-btn的变量
+.scroll-wrapper {
+	position: absolute;
+	width: 100%;
+	top: 0;
+	bottom: $gameDownloadBtnHi + $gameDownloadBtnPadding * 2;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+.game-download {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	padding: $gameDownloadBtnPadding;
+}
+.game-download__btn {
+	position: relative;
+	display: inline-block;
+	height: $gameDownloadBtnHi;
+	width: 100%;
+
+	border-radius: 5px;
+
+	color: #ffffff;
+	font-size: 16px;
+	line-height: 44px;
+	text-decoration: none;
+	text-align: center;
+
+	background-color: #4276bf;
+	z-index: 0;
+}
+.game-download__btn:active {
+	background-color: #3f6fb2;
+}
+.downloading.game-download__progress-bar {
+	position: absolute;
+	height: 100%;
+	background-color: #3f6fb2;
+	border-radius: 5px;
+	z-index: -1;
+}
+
+/************* 插件样式 **************/
+.x-force-full-screen {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	overflow: hidden;
+}
+.x-img-watcher  {
+	background-color: #000;
+	z-index: 10;
+}
+.x-img-watcher__list {
+	height: 100%;
+	white-space: nowrap;
+}
+.x-img-watcher__item {
+	display: inline-block;
+	height: 100%;
+	font-size: 0;
+}
+.x-img-watcher__img-box {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	overflow: hidden;
+	text-align: center;
+
+	img {
+		display: inline-block;
+		max-width: 100%;
+		max-height: 100%;
+	}
+
+	p {
+		font-size: 16px;
+		color: white;
+		word-break: break-all;
+	}
+}

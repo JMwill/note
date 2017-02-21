@@ -1,0 +1,13 @@
+{
+    "js": [
+        "./src/javascripts/lib/vue.min.js",
+        "./src/javascripts/lib/alloy_finger.js",
+        "./src/javascripts/lib/alloy_finger.vue.js",
+        "./src/javascripts/lib/transform.min.js",
+        "./src/javascripts/img-watcher.js"
+    ],
+    "css": [
+        "./src/stylesheets/screen.css",
+        "./src/stylesheets/style.css"
+    ]
+}
