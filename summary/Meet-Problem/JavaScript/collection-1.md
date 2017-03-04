@@ -34,3 +34,33 @@
 ```
 
 这样的话元素依然存在, 同时也可以实现隐藏.
+
+### 如果需要在ajax请求回来之后才让页面关闭
+
+可以给ajax的`async`设置为`false`让浏览器等待请求的完成才关闭或者重载页面
+
+### 如何实现更好的ajax请求
+
+记住要实现超时的限制, 并进行一定次数的重试:
+
+```javascript
+$.ajax({
+    url: 'example.url',
+    ...,
+    tryCount: 0,
+    retryLimit: 3,
+    success: function(json) { ... },
+    error: function(xhr, textStatus, errorThrown) {
+        if (textStatus === 'timeout') {
+            this.tryCount += 1;
+            if (this.tryCount < this.retryLimit) {
+                $.ajax(this);
+                return;
+            }
+            return;
+        } else {
+            ...
+        }
+    }
+});
+```
