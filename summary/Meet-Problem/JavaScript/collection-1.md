@@ -64,3 +64,21 @@ $.ajax({
     }
 });
 ```
+
+### :hover等效果在iOS上不能实现
+
+这个问题的原因是iOS设备屏蔽掉了CSS的hover监听, 因为在移动设备上没有这个必要. 通过添加JavaScript点击事件能够触发这些监听从而让效果能够正常显示, 快速的且有效的方法是:
+
+```html
+<div onclick=""></div>
+<!-- 或者 -->
+<div onclick="void 0"></div>
+```
+
+上面这样做能够最快速地解决问题, 但是在iOS的机型上会出现点击正常的可点击元素那样的灰色背景一闪而过的情况, 这些通过添加CSS的额外样式可以解决, 或者通过:
+
+```javascript
+document.addEventListener('touchstart', function() {}, false);
+```
+
+这个方法能够使得触摸的hover效果更快响应, 并且灰色背景闪过的情况基本不会察觉.
