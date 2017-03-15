@@ -369,6 +369,16 @@ article {
 
 第三方环境对于开发者来说完全不可控。在第三方环境下的元素，为了保证元素不被其页面其他样式定义覆盖，需要采用此做法。
 
+### 2.7 JavaScript Hook(钩子)
+
+#### [建议] JavaScript Hook使用`.js-`前缀。
+
+避免在 CSS 和 Javascript 中綁定相同的类别。否則開發者在進行重构時容易出現問題，轻则浪费時間在相互对照寻找要修改的类别名称，严重则因為害怕破坏功能而不敢進行更改。因此推荐创建用于JavaScript中的类名时, 添加`.js-`前缀:
+
+```html
+<button class="btn btn-primary js-request-to-book">Request to Book</button>
+```
+
 ## 3 值与单位
 
 ### 3.1 文本
@@ -953,14 +963,40 @@ Class名称|命名|Class名称|命名
 子导航|sub-nav|顶部导航|top-nav
 菜单|menu|子菜单|sub-menu
 
-#### 9.3.5 一般元素命名
+#### 9.3.5 状态命名
+
+Class状态后缀名称|命名|Class状态后缀名称|命名
+:---------------|:---------------|:---------------|:---------------
+显示 | show | 隐藏 | hide
+当前状态 | current | 激活态 | active
+选中态 | checked | 已选中状态 | selected
+失效状态 | disabled | 完成状态 | done
+聚集状态 | focus | 失去焦点状态 | blur
+成功的 | success | 警告的 | warn
+高亮的 | highlight
+
+#### 9.3.6 缩写命名
+
+原单词 | 缩写 | 原单词 | 缩写
+:---------------|:---------------|:---------------|:---------------
+small | s | large | lg
+left | l | right | r
+top | t | bottom | b
+thumbnail | thumb | images | img
+navigation | nav | content | cnt
+header | hd | body | bd
+footer | ft | text | txt
+button | btn | multiple | multi
+infomation | info
+
+#### 9.3.7 一般元素命名
 
 Class名称|命名|Class名称|命名
 :---------------|:---------------|:---------------|:---------------
 二级|sub|面包屑|breadcrumb
-标志|logo|广告|bner(禁用banner或ad)
+标志|logo|广告|bner/banner/ad
 登陆|login|注册|register/reg
-搜索|search|加入|join
+搜索|search|加入|joinus
 状态|status|按钮|btn
 滚动|scroll|标签页|tab
 文章列表|list|短消息|msg/message
@@ -990,19 +1026,19 @@ Class名称|命名|Class名称|命名
 留言板|guestbook|用户|user
 确认|confirm|取消|cancel
 报错|error|登录条|loginbar
-标签|tags|加入|joinus
+标签|tags|||
 
-#### 9.3.6 全局皮肤样式
+#### 9.3.8 全局皮肤样式
 
-##### 9.3.6.1 文字颜色(命名空间: text-xxx)
+##### 9.3.8.1 文字颜色(命名空间: text-xxx)
 
 text-warn, text-alert......
 
-##### 9.3.6.2 背景颜色(命名空间: bg-xxx)
+##### 9.3.8.2 背景颜色(命名空间: bg-xxx)
 
 bg-warn, bg-alert......
 
-##### 9.3.6.3 边框颜色(命名空间: border-xxx)
+##### 9.3.8.3 边框颜色(命名空间: border-xxx)
 
 border-warn, border-alert......
 
