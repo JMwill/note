@@ -389,3 +389,184 @@ fn1.passRequest();
 ## 中介者模式
 
 中介者模式用于解除对象与对象之间的紧耦合的关系, 通过增加一个中介者对象来让相关对象通过中介者对象来通信, 避免对象间的相互引用, 对象的改变只需要通知中介者对象. 通过中介者对象能够使得对象间耦合松散, 并可以独立改变对象间的交互. 在我看来就是将原来分散开来的交互逻辑集中到中介者身上由中介者来管理. 
+
+中介者模式迎合**迪米特法则/最小知识原则**, 使得对象间耦合性降低, 每个对象只关注自己的功能, 尽可能少地与其他对象进行互动, 或者说, 通过中介者模式, 对象间的关系有彼此多对多变成多对一(多个对象, 每个对象只跟一个中介者对象进行通信), 不过由于对象之间的关系都转移到了中介者身上, 因此中介者本身会变得难以维护, 两者的取舍取决于是管理对象间的关系难, 还是管理中介者里面的关系难.
+
+```javascript
+function Player(name, teamColor) {
+    this.name = name;
+    this.teamColor = teamColor;
+    this.state = 'alive';
+}
+
+Player.prototype.win = function() {
+    console.log(this.name + ' won ');
+};
+
+Player.prototype.lose = function() {
+    console.log(this.name + ' lost');
+}
+
+Player.prototype.die = function() {
+    this.state = 'dead';
+
+    // 与中介者通信
+    playerDirector.ReceiveMessage('playerDead', this);
+};
+
+Player.prototype.remove = function() {
+    playerDirector.ReceiveMessage('removePlayer', this);
+};
+
+Player.prototype.changeTeam = function() {
+    playerDirector.ReceiveMessage('changeTeam', this, color);
+}
+
+// 中介者
+var playerDirector = (function() {
+    var player = {},
+        operations = {}; // 中介者会进行的操作集合
+    
+    // 所有player之间的交互, 不同队伍之间的关系, 现在全部
+    // 由playerDirector来进行处理.
+    operations.addPlayer = function(player) {
+        var teamColor = player.teamColor;
+        players[teamColor] = players[teamColor] || [];
+        players[teamColor].push(player);
+    };
+
+    operations.removePlayer = function() {};
+    operations.changeTeam = function() {};
+    operations.playerDead = function() {};
+
+    var ReceiveMessage = function() {
+        var message = Array.prototype.shift.call(arguments);
+        operations[message].apply(this, arguments);
+    }
+    return {
+        ReceiveMessage: ReceiveMessage
+    };
+}());
+```
+
+## 装饰者模式
+
+装饰者模式可以给对象动态添加一些额外的职责, 而不会影响从相同类中派生的其他对象. 装饰者模式跟代理模式之间的区别是两者间的意图和设计目的.
+
+代理模式目的: 当直接访问本体不方便或者不符合需要时, 为本体提供一个替代者. 本体定义关键功能, 代理提供或拒绝对本体的访问, 或者在访问本体前做一些额外的事情.
+
+装饰者模式目的: 为对象动态加入行为.
+
+代理模式强调一种关系, 这种关系可以静态表达, 也就是可以在一开始就被确定. 而装饰者模式用于一开始不能确定对象的全部功能. 代理模式一般只有一层, 而装饰者可以形成一条装饰链.
+
+```javascript
+Function.prototype.before = function(beforefn) {
+    var __self = this;
+    return function() {
+        beforefn.apply(this, arguments);
+        return __self.apply(this, arguments);
+    };
+};
+
+Function.prototype.after = function(afterfn) {
+    var __self = this;
+    return function() {
+        var ret = __self.apply(this, arguments);
+        afterfn.apply(this, arguments);
+        return ret;
+    };
+};
+
+// 或者避免污染原型链
+
+var before = function(fn, beforefn) {
+    return function() {
+        beforefn.apply(this, arguments);
+        return fn.apply(this, arguments);
+    };
+};
+
+var after = function(fn, afterfn) {
+    return function() {
+        var ret = fn.apply(this, arguments);
+        afterfn.apply(this, arguments);
+        return ret;
+    }
+};
+```
+
+## 状态模式
+
+状态模式的关键是区分事物内部的状态, 事物内部状态的改变会带来事物行为的改变. 一般的封装都是对对象的行为进行封装, 但是在状态模式这里则是需要封装对象的状态. 状态模式的关键是把事情的每种状态都封装成单独的类, 而跟对应状态有关的行为都被封装在这个类的内部. 只需要把请求委托给当前的状态对象, 对象就会负责渲染自身的行为.
+
+状态对象的定义: 允许一个对象在其内部状态改变时改变它的行为, 对象看起来似乎修改了它的类.
+
+- 状态模式能够定义状态与行为之间的关系, 并封装在一个类里. 通过新增的状态类, 方便地增加新的状态和转换
+- 能够避免Context无限膨胀, 状态切换的逻辑被分布在状态类中, 去掉过多条件分支
+- Context中的请求动作和状态类中封装的行为可以非常容易地独立变化而互不影响.
+
+```javascript
+// javascript版本的状态机, 无需在类中创建状态对象, 使用Function.prototype.call来进行委托就好
+var Light = function() {
+    this.currState = FSM.off; // 设置当前状态
+    this.button = null;
+};
+
+Light.prototype.init = function() {
+    var button = document.createElement('button'),
+        self = this;
+    button.innerHTML = '已关灯';
+    this.button = document.body.appendChild(button);
+
+    this.button.onclick = function() {
+        self.currState.buttonWasPressed.call(self); // 委托请求给FSM状态机
+    }
+};
+
+var FSM = {
+    off: {
+        buttonWasPressed: function() {
+            console.log('关灯');
+            this.button.innerHTML = '下一次是开灯';
+            this.currState = FSM.on;
+        }
+    },
+    on: {
+        buttonWasPressed: function() {
+            console.log('开灯');
+            this.button.innerHTML = '下一次是关灯';
+            this.currState = FSM.off;
+        }
+    }
+};
+
+var light = new Light();
+light.init();
+```
+
+## 适配器模式
+
+适配器模式能够解决两个软件实体接口不兼容的问题.
+
+```javascript
+var googleMap = {
+    show: function() {
+        console.log('开始渲染谷歌地图');
+    }
+};
+
+var baiduMap = {
+    display: function() {
+        console.log('开始渲染百度地图');
+    }
+};
+
+var baiduMapAdapter = {
+    show: function() {
+        return baiduMap.display();
+    }
+};
+
+renderMap(googleMap);
+renderMap(baiduMapAdapter);
+```
