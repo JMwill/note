@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>HTML</title>
+    </head>
+    <body>
+    <ul id="clone">
+        <li>Hi</li>
+        <li>there</li>
+    </ul>
+    <script>
+        var ulElementChildNodes = document.querySelector('ul').childNodes;
+        console.log(ulElementChildNodes);
+
+        Array.prototype.forEach.call(ulElementChildNodes, function(item) {
+            console.log(item);
+        });
+    </script>
+    </body>
+</html>

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>HTML</title>
+    </head>
+    <body>
+        <p>Hi</p>
+        <script>
+            var elementNode = document.createElement('strong');
+            var textNode = document.createTextNode('Dude');
+            document.querySelector('p').appendChild(elementNode);
+            document.querySelector('strong').appendChild(textNode);
+            console.log(document.body.innerHTML);
+        </script>
+    </body>
+</html>

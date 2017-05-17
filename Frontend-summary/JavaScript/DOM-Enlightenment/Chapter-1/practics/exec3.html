@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>HTML</title>
+    </head>
+    <body>
+        <a href="#">Hi</a>
+        <script>
+            console.log('================== Exercise Three ==================');
+            var nodeAnchor = document.querySelector('a');
+            var props = [];
+
+            for (var key in nodeAnchor) {
+                props.push(key);
+            }
+
+            console.log(props.sort());
+            console.log('==================================================');
+        </script>
+    </body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>HTML</title>
+    </head>
+    <body><ul><!-- comment -->
+    <li id="A"></li>
+    <li id="B"></li>
+    <!-- comment -->
+    </ul>
+    <script>
+        var ul = document.querySelector('ul');
+        console.log(ul.parentNode.nodeName);
+        console.log(ul.firstChild.nodeName);
+        console.log(ul.lastChild.nodeName);
+        console.log(ul.querySelector('#A').nextSibling.nodeName);
+        console.log(ul.querySelector('#B').previousSibling.nodeName);
+
+        console.log('==================> Bars <=====================')
+        console.log(ul.firstElementChild.nodeName);
+        console.log(ul.lastElementChild.nodeName);
+        console.log(ul.querySelector('#A').nextElementSibling.nodeName);
+        console.log(ul.querySelector('#B').previousElementSibling.nodeName);
+        console.log(ul.children);
+    </script>
+    </body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>HTML</title>
+    </head>
+    <body>
+        <!--Remove-->
+        <div id="A">Hi</div>
+        <div id="B">Dude</div>
+        <script>
+            var divA = document.getElementById('A');
+            divA.parentNode.removeChild(divA);
+
+            var divB = document.getElementById('B').firstChild;
+            divB.parentNode.removeChild(divB);
+
+            console.log(document.body.innerHTML);
+        </script>
+
+        <!--Replace-->
+        <div id="C">Hi</div>
+        <div id="D">Dude</div>
+        <script>
+            var divC = document.getElementById('C');
+            var newSpan = document.createElement('span');
+            newSpan.textContent = 'Howdy';
+            divC.parentNode.replaceChild(newSpan, divC);
+
+            var divD = document.getElementById('D').firstChild;
+            var newText = document.createTextNode('buddy');
+            divD.parentNode.replaceChild(newText, divD);
+
+            console.log(document.body.innerHTML);
+        </script>
+    </body>
+</html>
