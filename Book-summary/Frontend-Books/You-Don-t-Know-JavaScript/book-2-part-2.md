@@ -54,3 +54,19 @@ p.then(function fulfilled(msg) {
 ```
 
 上面的问题只要明确地记住因为Promise一旦被决议就无法改变其状态, 因此在p被决议为42的时候, 其实它的then就默认执行fulfilled, 但是由于在fulfilled上错出了. 这个错误会流入到下一个then, 或者后续的catch中.
+
+#### 可信任的Promise
+
+由于Promise对象具有then方法, 但是如果某些thenable对象无意中闯入我们的代码内, 那么这个then方法就是不可信的. 而对于这个问题Promise提供了一个`resolve`方法, 这个方法对于传入的值进行分析, 如果是Promise对象则直接返回, 如果是非Promise的thenable值, 则会展开对象直到提取出一个具体的值.
+
+```javascript
+foo(42) // 假设foo返回的至少是一个thenable的值
+.then(function(v) {
+    console.log(v);
+});
+
+Promise.resolve(foo(42))
+.then(function(v) {
+    console.log(v);
+})
+```
