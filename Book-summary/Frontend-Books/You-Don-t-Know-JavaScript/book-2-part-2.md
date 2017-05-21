@@ -70,3 +70,88 @@ Promise.resolve(foo(42))
     console.log(v);
 })
 ```
+
+## 生成器
+
+### 输入和输出
+
+#### 迭代消息传递
+
+使用生成器可以在步骤间进行消息传递:
+
+```javascript
+function *foo(x) {
+    var y = x * (yield);
+    return y;
+}
+
+var it = foo(6);
+
+// 启动foo...
+it.next();
+
+var res = it.next(7);
+res.value; // 42
+```
+
+需要记住的是, 第一个next都是用于启动迭代器运行, 直到遇到第一个`yield`, 而第二个next则是完成被暂停的`yield`表达式的结果.
+
+生成标准的迭代器接口需要返回具有done的Boolean属性以及返回值value的对象, 如果需要迭代器能够用在`for...of`循环中则要用到ES6的`Symbol.iterator`属性, 例子:
+
+```javascript
+var something = (function() {
+    var nextVal;
+    return {
+        // for...of循环需要用到
+        [Symbol.iterator]: function() { return this; }
+
+        // 标准迭代器接口方法
+        next: function() {
+            if (nextVal === undefined) {
+                nextVal = 1;
+            } else {
+                nextVal = (3 * nextVal) + 6;
+            }
+            return { done: false, value: nextVal };
+        }
+    }
+})
+```
+
+#### 停止生成器
+
+`for...of`循环具有一个隐藏的特性: "异常结束". 通常由break, return或者未捕获异常引起, 这种情况会向生成器的迭代器发起一个信号使其终止. 因此可以通过监听异常在生成器中定义某些处理:
+
+```javascript
+function *something() {
+    try {
+        var nextVal;
+        while (true) {
+            if (nextVal === undefined) {
+                nextVal = 1;
+            } else {
+                nextVal = (3 * nextVal) + 6;
+            }
+            yield nextVal;
+        }
+    }
+    finally {
+        // do something
+        console.log('Clean up!');
+    }
+}
+
+var it = something();
+for (var v of it) {
+    console.log(v);
+
+    if (v > 500) {
+        console.log(
+            // 通过外部调用生成器生成的迭代器的return方法手工终止迭代器实例
+            it.return('Hello World').value
+        );
+
+        // 无需break就可以退出
+    }
+}
+```
