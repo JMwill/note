@@ -155,3 +155,77 @@ for (var v of it) {
     }
 }
 ```
+
+#### 生成器中的Promise并发
+
+生成器中的`yield`只是一个暂停点, 因此, 对于需要并发运行的程序, 暂停点可以放在请求发出之后:
+
+```javascript
+// 性能不佳的做法
+function *foo() {
+    var r1 = yield request('url1');
+    var r2 = yield request('url2');
+
+    var r3 = yield request(
+        'url3' + r1 + r2
+    );
+    console.log(r3);
+}
+
+// 好的做法
+function *foo() {
+    var p1 = request('url1');
+    var p2 = request('url2');
+
+    var r1 = yield p1;
+    var r2 = yield p2;
+
+    var r3 = yield request(
+        'url3' + r1 + r2;
+    );
+    console.log(r3);
+}
+
+// 这种模式相当于:
+function *foo() {
+    var results = yield Promise.all([
+        request('url1'),
+        request('url2')
+    ]);
+    var [r1, r2] = results;
+    var r3 = yield request(
+        'url3' + r1 + r2;
+    );
+    console.log(r3);
+}
+```
+
+### 生成器委托
+
+JavaScript中, 在一个生成器里面调用另一个生成器可以使用一下的语法:
+
+```javascript
+function *foo() {
+    console.log('*foo starting');
+    yield 3;
+    yield 4;
+    console.log('*foo finished');
+}
+
+function *bar() {
+    yield 1;
+    yield 2;
+    yield *foo();
+    yield 5;
+}
+
+var it = bar();
+
+it.next().value; // 1
+it.next().value; // 2
+it.next().value; // *foo starting
+                 // 3
+it.next().value; // 4
+it.next().value; // *foo finished
+                 // 5
+```
