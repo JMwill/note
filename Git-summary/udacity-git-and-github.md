@@ -126,3 +126,19 @@ feat: 总结变动的内容，保持在50个字符内
 解决了问题：#123
 另见：#456, #789
 ```
+
+### remote
+
+使用`remote`命令, 可以添加代码库的远程提交路径, 来方便进行代码的远程提交. 添加的命令为: `git remote add <remote-name> <remote-repo-path>`, 如: `git add remote origin git@github.com:cbuckey-uda/reflections.git`.
+
+添加完成远程路径后, 通过`git push <remote-name> <branch-name>`来进行代码的提交, 如: `git push origin master`. 将远程路径中的代码改动同步到本地用的方式与`push`几乎一样, 只是需要将`push`换成是`pull`.
+
+### fetch
+
+在多人合作的开发中, 会出现多人同时修改同一份文件的问题. 为了能够在本地看到远程与本地的不同, 可以先使用`fetch`来更新远程版本库的本地版本, 然后将远程版本库的本地更新版与本地最新的需要合并的版本进行对比.
+
+`git fetch origin`会更新origin远程代码库的所有分支的本地副本.
+
+### Windows下路径长度限制
+
+由于Windows下会有路径最大长度的问题, 这问题可以通过运行git bash来设置: `git config --system core.longpaths true`.
