@@ -1,6 +1,6 @@
 # 记录
 
-## [HTMLDocument][]的属性以及方法(包括继承的)
+## [HTMLDocument][1]的属性以及方法(包括继承的)
 
 - doctype
 - documentElement

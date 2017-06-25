@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Exec 4</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+        <ul>
+        <li>Hello</li>
+        <li>world</li>
+        </ul>
+
+        <script>
+
+        //fails in modern browser must use browser prefix moz, webkit, o, and ms
+        console.log(document.querySelector('li').matchesSelector('li:first-child')); //logs false
+
+        //prefix moz
+        //console.log(document.querySelector('li').mozMatchesSelector('li:first-child'));
+
+        //prefix webkit
+        //console.log(document.querySelector('li').webkitMatchesSelector('li:first-child'));
+
+        //prefix o
+        //console.log(document.querySelector('li').oMatchesSelector('li:first-child'));
+
+        //prefix ms
+        //console.log(document.querySelector('li').msMatchesSelector('li:first-child'));
+
+        // rename
+        // console.log(document.querySelector('li').matches('li:first-child'));
+
+</script>
+    </body>
+</html>
