@@ -26,4 +26,16 @@ console.groupEnd();
 
 `console`中可以使用简单的格式说明符, 其中较为特殊的是`%O`: 将值格式化为可拓展的JavaScript对象, 通过它能够将DOM元素按照对象的形式打印出来. 而不是打印出DOM元素的HTML结构. 而`%c`: 将CSS样式规则应用到第二个参数指定的输出字符串, 可以对控制台输出的信息进行美化.
 
+### 记录时间
+
+使用`console.time('label')`以及`console.timeEnd('label')`来记录某个区间段的用时, 同时, 这个用时可以在`Timeline`面板上看到, 以黄色区间段进行标记, 名称就是填写的`label`. 而`console.timeStamp('label')`方法则是在某个`Timeline`记录正在进行的时候发挥作用, 以一个短黄色竖线标记记录点.
+
+### 统计输出记录次数
+
+通过`console.count('label')`, 使用后可以统计相同的`label`的输出次数. 方便查看记录的输出情况.
+
+### 错误跟踪
+
+每个错误对象都包含有`stack`变量用于存放错误的堆栈信息. console中的`trace()`方法可以打印当前的JavaScript调用堆栈. 用于排查调用过程中出现的问题. 使用`assert()`断言方法, 则可以对代码进行简单的测试, `window.onerror`方法被处罚时, 一般会获取三个参数, 分别是错误消息, 引发错误消息的文件地址, 错误触发所处文件的行号.
+
 [1]:        https://developers.google.com/web/tools/chrome-devtools/inspect-styles/shortcuts
