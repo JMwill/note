@@ -1,6 +1,6 @@
 # Chrome的开发者工具学习与记录
 
-打开开发者工具的快捷方式是`Ctrl+Shift+I`(Windows)或者`Cmd+Opt+I`(Mac). 更多的快捷键在[这里][1]
+打开开发者工具的快捷方式是`Ctrl+Shift+I`(Windows)或者`Cmd+Opt+I`(Mac). 更多的快捷键在[这里][1], 在打开控制台后可以使用`Ctrl+Shift+p`的形式调用出命令面板来执行各种命令.
 
 ## Dom面板
 
@@ -37,5 +37,23 @@ console.groupEnd();
 ### 错误跟踪
 
 每个错误对象都包含有`stack`变量用于存放错误的堆栈信息. console中的`trace()`方法可以打印当前的JavaScript调用堆栈. 用于排查调用过程中出现的问题. 使用`assert()`断言方法, 则可以对代码进行简单的测试, `window.onerror`方法被处罚时, 一般会获取三个参数, 分别是错误消息, 引发错误消息的文件地址, 错误触发所处文件的行号.
+
+### 选择元素
+
+控制台可以直接打印出元素, 但是当有时候需要选择某个不知道具体位置的元素时, 可以使用控制台内建的函数`inspect('dom node')`这样子就会直接到达元素面板, 同时选中对应元素. 控制台面板还提供了一些选择元素的快捷方法: `$()`: 选择单个匹配元素, `$$()`选择全部匹配的元素, `$x()`选择一个匹配对应XPath的元素, 同时, 控制台还提供了`$1~4`个变量来缓存最近使用过的5个变量.
+
+### 监控事件
+
+在控制台面板中使用`monitorEvents('DOM Node', ['event name', ] | 'event name')`则可以监听页面上的元素某种类型的事件的触发. 不传递事件名则监听所有的事件. 解除监听使用`unmonitorEvents('DOM Node')`, 还可以通过`getEventListeners('DOM Node')`方法获取DOM元素被绑定的事件.
+
+### Command Line API参考
+
+- `$_`符号在控制台面板中可以返回最近执行的表达式的值
+- `copy(Object)`可以将指定对象的字符串表示形式复制到剪切板上
+- `debug(function)`指定函数执行时进入调试状态, 使用`undebug(function)`来取消.
+- 快速获取对象的键与值, 可以直接使用`keys()`以及`values()`方法. 这两个方法作用与ES6对象上提供的一样, 但是只能在控制台上才能直接使用
+- `monitor(function)`用于监听函数的调用, 使用`unmonitor`来取消调用
+- `profile([name])`与`profileEnd([name])`组合使用能够得到一个JavaScript CPU分析会话, 用于分析程序性能.
+- `table()`与`console.table()`方法相同, 都能够将对象按照表格形式打印出来.
 
 [1]:        https://developers.google.com/web/tools/chrome-devtools/inspect-styles/shortcuts
