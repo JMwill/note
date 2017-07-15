@@ -52,23 +52,35 @@ class Notebook:
         '''Find the note with the given id and change its
         memo to the given value.'''
         # realization of book
-        # self._find_note(note_id).memo = memo;
+        # note = self._find_note(note_id)
+        # if note:
+        #     note.memo = memo
+        #     return True
+        # return False
 
-        # more safe
+        # another way
         note = self._find_note(note_id)
         if isinstance(note, Note):
             note.memo = memo
+            return True
+        return False
 
     def modify_tags(self, note_id, tags):
         '''Find the notes with the given id and change its
         tags to the given value.'''
         # realization of book
-        # self._find_note(note_id).tags = tags;
+        # note = self._find_note(note_id)
+        # if note:
+        #     note.tags = tags
+        #     return True
+        # return False
 
-        # more safe
+        # another way
         note = self._find_note(note_id)
         if isinstance(note, Note):
             note.tags = tags
+            return True
+        return False
 
     def search(self, filter):
         '''Find all notes that match the given filter
