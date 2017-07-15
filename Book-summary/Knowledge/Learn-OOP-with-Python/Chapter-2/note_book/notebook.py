@@ -43,10 +43,10 @@ class Notebook:
         '''Locate the note with the given id.'''
         # realization of book
         # for note in slef.notes:
-        #     if note.id == note_id:
+        #     if str(note.id) == str(note_id):
         #         return note
         # return None
-        return next((n for n in self.notes if n.id == note_id), None)
+        return next((n for n in self.notes if str(n.id) == str(note_id)), None)
 
     def modify_memo(self, note_id, memo):
         '''Find the note with the given id and change its
