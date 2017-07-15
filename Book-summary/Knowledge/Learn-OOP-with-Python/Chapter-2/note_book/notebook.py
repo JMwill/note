@@ -47,7 +47,9 @@ class Notebook:
         #     if note.id == note_id:
         #         note.memo = memo
         #         break
-        next(n for n in self.notes if n.id == note_id).memo = memo
+        note = next((n for n in self.notes if n.id == note_id), None)
+        if isinstance(note, Note):
+            note.memo = memo
 
     def modify_tags(self, note_id, tags):
         '''Find the notes with the given id and change its
@@ -57,7 +59,9 @@ class Notebook:
         #     if note.id == note_id:
         #         note.tags = tags
         #         break
-        next(n for n in self.notes if n.id == note_id).tags = tags
+        note = next((n for n in self.notes if n.id == note_id), None)
+        if isinstance(note, Note):
+            note.tags = tags
 
     def search(self, filter):
         '''Find all notes that match the given filter
