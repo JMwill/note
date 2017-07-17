@@ -14,10 +14,20 @@ class ContactList(list):
 class Contact:
     all_contacts = ContactList()
 
-    def __init__(self, name, email):
+    def __init__(self, name='', email='', **kwargs):
+        super().__init__(**kwargs)
         self.name = name
         self.email = email
         Contact.all_contacts.append(self)
+
+
+class AddressHolder:
+    def __init__(self, street='', city='', state='', code='', **kwargs):
+        super().__init__(**kwargs)
+        self.street = street
+        self.city = city
+        self.state = state
+        self.code = code
 
 
 class Supplier (Contact):
@@ -26,9 +36,9 @@ class Supplier (Contact):
               '{} order to {}'.format(order, self.name))
 
 
-class Friend (Contact):
-    def __init__(self, name, email, phone):
-        super().__init__(name, email)
+class Friend (Contact, AddressHolder):
+    def __init__(self, phone='', **kwargs):
+        super().__init__(**kwargs)
         self.phone = phone
 
 
@@ -42,7 +52,3 @@ class MailSender:
 class EmailableContact (Contact, MailSender):
     pass
 
-
-e = EmailableContact('John Smith', 'jsmith@email.net')
-print(Contact.all_contacts)
-e.send_mail('Hello, test e-mail here')
