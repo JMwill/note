@@ -30,3 +30,19 @@ class Friend (Contact):
     def __init__(self, name, email, phone):
         super().__init__(name, email)
         self.phone = phone
+
+
+# 实现多重继承材料
+class MailSender:
+    def send_mail(self, message):
+        print('Sending mail to ' + self.email)
+        # do something
+
+
+class EmailableContact (Contact, MailSender):
+    pass
+
+
+e = EmailableContact('John Smith', 'jsmith@email.net')
+print(Contact.all_contacts)
+e.send_mail('Hello, test e-mail here')
