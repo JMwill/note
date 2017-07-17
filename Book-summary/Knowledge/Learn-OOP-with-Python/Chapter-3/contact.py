@@ -25,7 +25,8 @@ class Supplier (Contact):
         print('If this were a real system we would send '
               '{} order to {}'.format(order, self.name))
 
-c1 = Contact('John A', 'johna@example.net')
-c2 = Contact('John B', 'johnb@example.net')
-c3 = Contact('Jenna C', 'jennac@example.net')
-print([c.name for c in Contact.all_contacts.search('John')])
+
+class Friend (Contact):
+    def __init__(self, name, email, phone):
+        super().__init__(name, email)
+        self.phone = phone
