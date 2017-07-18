@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# 一般使用类, 以及多重继承的演示代码
 class ContactList(list):
     def search(self, name):
         '''Return all contacts that contain the search value
