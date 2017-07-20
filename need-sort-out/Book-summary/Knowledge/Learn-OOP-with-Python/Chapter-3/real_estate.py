@@ -82,6 +82,7 @@ class House (Property):
         print('# of stories: {}'.format(self.num_stories))
         print('garages: {}'.format(self.garage))
         print('fenced yard: {}'.format(self.fenced))
+        print()
 
     @staticmethod
     def prompt_init():
@@ -147,3 +148,8 @@ class HouseRental (Rental, House):
         init.update(Rental.prompt_init())
         return init
     # prompt_init = staticmethod(prompt_init)
+
+if __name__ == '__main__':
+    init = HouseRental.prompt_init()
+    house = HouseRental(**init)
+    house.display()
