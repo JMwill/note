@@ -162,7 +162,7 @@ class ApartmentRental (Rental, Apartment):
         init = Apartment.prompt_init()
         init.update(Rental.prompt_init())
         return init
-    prompt_init = staticmethod(prompt_init)
+    # prompt_init = staticmethod(prompt_init)
 
 
 class ApartmentPurchase (Purchase, Apartment):
@@ -171,7 +171,16 @@ class ApartmentPurchase (Purchase, Apartment):
         init = Apartment.prompt_init()
         init.update(Purchase.prompt_init())
         return init
-    prompt_init = staticmethod(prompt_init)
+    # prompt_init = staticmethod(prompt_init)
+
+
+class HousePurchase (Purchase, House):
+    @staticmethod
+    def prompt_init():
+        init = House.prompt_init()
+        init.update(Purchase.prompt_init())
+        return init
+    # prompt_init = staticmethod(prompt_init)
 
 
 if __name__ == '__main__':
