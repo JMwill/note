@@ -9,6 +9,7 @@ def get_valid_input(input_string, valid_options):
         response = input(input_string)
     return response
 
+
 class Property:
 
     def __init__(self, square_feet='', beds='', baths='', **kwargs):
@@ -31,6 +32,7 @@ class Property:
                     beds=input('Enter number of bedroom: '),
                     baths=input('Enter number of baths: '))
     # prompt_init = staticmethod(prompt_init)
+
 
 class Apartment (Property):
     valid_laundries = ('coin', 'ensuite', 'none')
@@ -66,6 +68,7 @@ class Apartment (Property):
         return parent_init
     # prompt_init = staticmethod(prompt_init)
 
+
 class House (Property):
     valid_garage = ('attached', 'detached', 'none')
     valid_fenced = ('yes', 'no')
@@ -98,6 +101,7 @@ class House (Property):
         return parent_init
     # prompt_init = staticmethod(prompt_init)
 
+
 class Purchase:
     def __init__(self, price='', taxes='', **kwargs):
         super().__init__(**kwargs)
@@ -116,6 +120,7 @@ class Purchase:
             price=input('What is the selling price? '),
             taxes=input('What are the estimated taxes? '))
     # prompt_init = staticmethod(prompt_init)
+
 
 class Rental:
     def __init__(self, furnished='', utilities='', rent='', **kwargs):
@@ -141,6 +146,7 @@ class Rental:
                 ('yes', 'no')))
     # prompt_init = staticmethod(prompt_init)
 
+
 class HouseRental (Rental, House):
     @staticmethod
     def prompt_init():
@@ -149,6 +155,7 @@ class HouseRental (Rental, House):
         return init
     # prompt_init = staticmethod(prompt_init)
 
+
 class ApartmentRental (Rental, Apartment):
     @staticmethod
     def prompt_init():
@@ -156,6 +163,16 @@ class ApartmentRental (Rental, Apartment):
         init.update(Rental.prompt_init())
         return init
     prompt_init = staticmethod(prompt_init)
+
+
+class ApartmentPurchase (Purchase, Apartment):
+    @staticmethod
+    def prompt_init():
+        init = Apartment.prompt_init()
+        init.update(Purchase.prompt_init())
+        return init
+    prompt_init = staticmethod(prompt_init)
+
 
 if __name__ == '__main__':
     init = HouseRental.prompt_init()
