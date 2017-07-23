@@ -54,3 +54,23 @@ finally:
 
 异常类 `Exception` 的 `__init__` 方法被设计为接收任何参数并将其作为元组保存在 `args` 的属性里. 因此定义异常可以免于重写 `__init__` 方法.
 
+## 异常并不例外
+
+所有的异常情况都要使用异常, 即使是一些小的异常. 比如对超出索引范围的判定, 如果使用条件语句, 一般的做法是判定索引值是否小于或者大于列表的长度, 这样就会遗忘了 Python 中允许索引值为负数的情况, 因此又需要添加更多的判断逻辑. 而直接使用 `IndexError` 异常判定的话则方便且有效的多.
+
+```py
+def divide_with_exception(number, divisor):
+    try:
+        print("{} / {} = {}".format(
+            number, divisor, number / divisor * 1.0))
+    except ZeroDivisionError:
+        print("You can't divide by zero")
+
+def divide_with_if(number, divisor):
+    if divisor == 0:
+        print("You can't divide by zero")
+    else:
+        print("{} / {} = {}".format(
+            number, divisor, number / divisor * 1.0))
+```
+
