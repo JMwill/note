@@ -21,7 +21,7 @@ Python 中除了可以一次性对多种类型的异常做处理外, 还可以�
 
 可以通过直接调用使用 `raise` 来抛出所遇到的异常. 保证异常能够继续上报给有能力处理的地方.
 
-`except` 还可以搭配 `else` 以及 `finally` 一起使用, `else` 在异常没有触发的时候被调用到, 而 `finally` 则是像名字一样, 在任何情况下都会调用.
+`except` 还可以搭配 `else` 以及 `finally` 一起使用, `else` 在异常没有触发的时候被调用到, 而 `finally` 则是像名字一样, 在任何情况下都会调用. 并且还可以对异常使用 `as` 关键字起别名.
 
 ```py
 import random
@@ -43,3 +43,14 @@ else
 finally:
     print('This cleanup code is always called')
 ```
+
+## 异常层级
+
+而 `Exception` 类则扩展自 `BaseException` 类, 其中大部分的异常扩展自: `Exception` 类, 除了 `SystemExist` 类以及 `KeyboardInterrupt` 类. 一个是程序退出时会触发, 不管正常与否. 另一个则是在使用 `Ctrl+C` 组合键时会触发.
+
+使用 `except` 而没有指定异常类型时会自动捕捉所有 `BaseException` 类的子类. 如果真的想要捕捉, 最好进行显式声明: `except BaseException`.
+
+## 定义自己的异常
+
+异常类 `Exception` 的 `__init__` 方法被设计为接收任何参数并将其作为元组保存在 `args` 的属性里. 因此定义异常可以免于重写 `__init__` 方法.
+
