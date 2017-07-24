@@ -40,6 +40,14 @@ class PasswordTooShort(AuthException):
     pass
 
 
+class InvalidUsername(AuthException):
+    pass
+
+
+class InvalidPassword(AuthException):
+    pass
+
+
 class Authenticator:
     def __init__(self):
         '''Construct an authenticator to manage
