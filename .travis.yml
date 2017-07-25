@@ -1,11 +1,11 @@
-language: python
-python:
-  - '3.5'
+# language: python
+# python:
+  # - '3.5'
 
 install:
   # - pip3 install fabric3
   # - pip3 install ghp-import
-  - pip3 install simiki
+  # - pip3 install simiki
 
 # after_script:
 #   - cd output
@@ -17,20 +17,20 @@ install:
 #   - git push --force --quiet "https://${GH_Token}@${GH_REF}" master:gh-pages
 
 script:
-  - simiki g
+  # - simiki g
   # - fab deploy
 
 branches:
   only:
     - master
 
-deploy:
-  local_dir: output
-  provider: pages
-  skip_cleanup: true
-  github_token: $GHPToken # Set in travis-ci.org dashboard
-  on:
-    branch: master
+# deploy:
+  # local_dir: output
+  # provider: pages
+  # skip_cleanup: true
+  # github_token: $GHPToken # Set in travis-ci.org dashboard
+  # on:
+    # branch: master
 
 env:
   global:
