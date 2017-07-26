@@ -67,3 +67,38 @@ let spritesArr = [];
         });
     }
 }(spritesPath));
+
+/**
+ * scss:single 不依赖图片的合并
+ */
+gulp.task('scss:single', () => {
+    gulp.src(path.resolve(spritesPath, '../css/*.scss'))
+        .pipe(sass({
+            outputStyle: 'compressed',
+        }).on('error', sass.logError))
+        .pipe(gulp.dest(path.join(__dirname, 'static/css/')));
+});
+
+gulp.task('watch:scss', () => {
+    gulp.watch(path.resolve(__dirname, 'src/assets/css/*.scss', ['scss:single']));
+});
+
+gulp.task('scss', ['sprites'], () => {
+    gulp.src(path.resolve(spritesPath, '../css/*.scss'))
+        .pipe(scss({
+            outputStyle: 'compressed',
+        }).on('error', sass.logError))
+        .pipe(gulp.dest(path.join(__dirname, 'static/css/')));
+});
+
+gulp.task('img', () => {
+    gulp.src(path.join(__dirname, 'src/assets/img/*.png'))
+        .pipe(buffer())
+        .pipe(imagemin({
+            optimizationLevel: 7,
+            use: [pngquant()],
+        }))
+        .pipe(gulp.dest(path.join(__dirname, 'static/img/')));
+});
+
+gulp.task('default', ['sprites', 'scss', 'img']);
