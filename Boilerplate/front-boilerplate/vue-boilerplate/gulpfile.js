@@ -3,7 +3,7 @@ const path = require('path');
 const gulp = require('gulp');
 const sass = require('gulp-sass');
 const buffer = require('vinyl-buffer');
-const spritesmith = require('gulp-spritesmith');
+const spritesmith = require('gulp.spritesmith');
 const imagemin = require('gulp-imagemin');
 const pngquant = require('imagemin-pngquant');
 
@@ -85,7 +85,7 @@ gulp.task('watch:scss', () => {
 
 gulp.task('scss', ['sprites'], () => {
     gulp.src(path.resolve(spritesPath, '../css/*.scss'))
-        .pipe(scss({
+        .pipe(sass({
             outputStyle: 'compressed',
         }).on('error', sass.logError))
         .pipe(gulp.dest(path.join(__dirname, 'static/css/')));
