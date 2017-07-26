@@ -6,4 +6,4 @@ const prefix = debug ? '/api' : '';
 
 export const getSomething = () => xhr.commonGet(addUrlPrefix(prefix, '/get/url'), { query: { param: 'for-test' } });
 export const postSomething = reqObj => xhr.commonPost(addUrlPrefix(prefix, '/post/url'), reqObj);
-
+export const exampleGetSomething = () => xhr.commonGet(addUrlPrefix(prefix, '/get/url'), { query: { param: 'for-test' } });
