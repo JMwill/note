@@ -74,3 +74,4 @@ def divide_with_if(number, divisor):
             number, divisor, number / divisor * 1.0))
 ```
 
+异常常用于文件 I/O, 数学表达式, 列表索引(是否超出索引值), 字典(键值是否存在)等的使用上.
