@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import math
 
 # 函数版本的多边形周长计算实现
@@ -9,7 +11,7 @@ def perimeter(polygon):
     points = polygon + [polygon[0]]
     for i in range(len(polygon)):
         perimeter += distance(points[i], points[i+1])
-        return perimeter
+    return perimeter
 
 
 # 对象实现版本
@@ -39,3 +41,11 @@ class Polygon:
         for i in range(len(self.vertices)):
             perimeter += points[i].distance(points[i+1])
         return perimeter
+
+# 函数版本的使用
+square = [(1, 1), (1, 2), (2, 2), (2, 1)]
+print(perimeter(square))
+
+# 对象版本的使用
+polygon = Polygon([(1, 1), (1, 2), (2, 2), (2, 1)])
+print(polygon.perimeter())
