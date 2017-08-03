@@ -7,7 +7,7 @@ class Document:
 
     def insert(self, character):
         self.characters.insert(self.cursor.position, character)
-        self.cursor += 1
+        self.cursor.forward()
 
     def delete(self):
         del self.characters[self.cursor.position]
@@ -17,8 +17,6 @@ class Document:
         f.write(''.join(self.characters))
         f.close()
 
-    def forward(self):
-        self.cursor += 1
-
-    def back(self):
-        self.cursor -= 1
+    @property
+    def string(self):
+        return ''.join(self.characters)
