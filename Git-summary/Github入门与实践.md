@@ -61,3 +61,70 @@ git config --global color.ui auto
 想要以时间段来查看差别的话可以在仓库 URL 后添加 `/compare/branch-name@{7.day.ago}...branch-name` 的方式来查看7天内的差别. 还可以用 `week`, `month`, `year` 来规定区间.
 
 查看指定日期与现在的区别可以使用 `/compare/branch-name@{2013-01-01}...branch-name` 的方式来实现
+
+### Tasklist 语法
+
+在 issue 中使用 tasklist 语法能够直接对显示的复选列表进行直接勾选或者取消, 方便管理. 对应语法是:
+
+```md
+# 任务
+- [ ] 任务一
+- [x] 任务二
+- [ ] 任务三
+```
+
+同时还可以通过提交信息来操作 issue. 在每个 issue 标题下面都分配了一个编号如: `#10`, 在提交信息中加入这个编号就能够在 issue 中显示相关信息, 还可以在提交中以: `fix #10`, `fixes #10`, `fixed #10`, `close #10`, `closes #10`, `closed #10`, `resolve #10`, `resolves #10`, `resolved #10` 等语法标记 issue 的状态. 无需手动找寻.
+
+### pull request
+
+在收到 pull request 之后, 如果想要获取对应的 diff 文件或者 patch 文件, 可以在对应的 URL 后面添加 `.diff` 或者 `.patch`
+
+### Conversation
+
+在 Github 中, 如果想要在评论框里面引用别人的话, 可以鼠标选中后按 R 键就能够直接将话语填充到发表评论框中
+
+### Files Changed
+
+在 pull request 中的 Files changed 页通过在 URL 末尾添加 `?w=1` 可以不显示空格的差别. 减少阅读障碍.
+
+## 使用 Pull Request
+
+pull request 应该尽早发起, 即使功能尚未完成, 后续向发送过 Pull Request 的分支添加提交时, 该提交依然会自动添加至已发送的 Pull Request 中. 为了避免误操作合并未完成的 Pull Request, 可以在 Pull Request 的标题中添加前缀 `[WIP]`, 表示 `Work In Progress`.
+
+### Fork 或 Clone 后的仓库维护
+
+为了跟非自己的原仓库代码进行同步, 需要设置原仓库为对应的源: `git remote add upstream git://github.com/upstream/whatever.git`, 然后通过:
+
+```bash
+git fetch upstream
+git merge upstream/master
+```
+
+来同步最新代码, 让当前分支代码维持在最新状态
+
+## 采纳 Pull Request
+
+在收到 Pull Request 请求并希望合并到仓库时可以将请求者的仓库作为 "请求源" 来设置源信息:
+
+`git remote add PRWho git@github.com:PRWho/whatever.git` 并 `git fetch PRWho`
+
+然后创建一个分支来测试合并情况:
+
+`git checkout -b pr1` 并 `git merge PRWho/need-merge-branch`
+
+在检查无误后就可以删除分支: `git branch -D pr1`
+
+最后再在 Github 站点上点击 `Merge pull request` 按钮. 或者可以通过 CLI 操作进行合并:
+
+```bash
+git checkout your-need-merge-branch
+git merge PRWho/need-merge-branch
+
+# 检查下本地与远端的区别
+git diff origin/your-need-merge-branch
+
+# 提交到远程
+git push
+```
+
+提交后 Github 上的 Pull Request 就会自动变为完成状态.
