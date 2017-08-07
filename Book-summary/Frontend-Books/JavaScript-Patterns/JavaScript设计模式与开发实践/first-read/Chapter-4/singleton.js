@@ -1,7 +1,7 @@
 // 不够透明的单例模式一
 var Singleton = function (name) {
     this.name = name;
-    this.instance = null;
+    // this.instance = null; // 书籍错误, 不应该放在实例上. 没有起到作用
 };
 
 Singleton.prototype.getName = function () {
