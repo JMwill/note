@@ -137,3 +137,149 @@ SELECT cust_name
 FROM Customers
 WHERE cust_email IS NULL;
 ```
+
+## 第五章 高级数据过滤
+
+通过组合 `WHERE` 子句可以建立更强, 更高级的搜索条件.
+
+**操作符**: 用来联结或改变 `WHERE` 子句中的子句的关键词, 也称为逻辑操作符.
+
+SQL 中会优先处理 AND 操作符, 然后才到 OR 操作符. 所以最好使用圆括号进行明确分组. `WHERE` 子句中最好都使用圆括号.
+
+```sql
+-- 使用 AND 操作符, 满足所有条件才可
+SELECT prod_id, prod_price, prod_name
+FROM Products
+WHERE vend_id = 'DLL01' AND prod_price <= 4;
+
+-- 使用 OR 操作符, 满足任一条件即可
+SELECT prod_name, prod_price
+FROM Products
+WHERE vend_id = 'DLL01' OR vend_id = 'BRS01';
+
+-- 组合使用 AND 以及 OR, 并使用圆括号进行分组
+SELECT prod_name, prod_price
+FROM Products
+WHERE (vend_id = 'DLL01' OR vend_id = 'BRS01')
+      AND prod_price >= 10;
+```
+
+`IN` 操作符用来指定范围, 范围中的每个条件都可以进行匹配. 取一组由逗号分隔, 括在圆括号中的合法值. 用来指定要匹配值的清单的关键字, 功能与 OR 相当
+
+```sql
+SELECT prod_name, prod_price
+FROM Products
+WHERE vend_id IN ( 'DLL01', 'BRS01' )
+ORDER BY prod_name;
+```
+
+`NOT` 操作符, `WHERE` 子句中的 `NOT` 操作符有且只有一个功能: 否定其后所跟的任何条件. `NOT` 无法单独使用, 不仅可以用在要过滤的列之后, 还可以用在要过滤的列前.
+
+一般简单情况下使用 `<>` 或者 `!=` 就可以了, 但是在复杂的子句中, 或者需要与 `IN` 联合使用时, `NOT` 才能体现它的价值.
+
+```sql
+SELECT prod_name
+FROM Products
+WHERE NOT vend_id = 'DLL01'
+ORDER BY prod_name;
+```
+
+## 第六章 用通配符进行过滤
+
+**通配符**: 用来匹配值的一部分的特殊字符.
+
+**搜索模式**: 由字面值, 通配符或两者组合构成的搜索条件.
+
+通配符本身实际上是 SQL 中的 `WHERE` 子句中具有特殊含义的字符, 而为了在搜索子句中使用通配符, 必须使用 `LIKE` 操作符. `LIKE` 会告诉 DBMS, 后面的搜索模式利用通配符而不是简单的相等匹配进行比较. 同时需要记住, 通配符搜索只能用于**文本字段**, 非文本数据不能使用通配符搜索.
+
+### `%` 通配符
+
+`%` 表示任何字符出现任意次数, 根据 DBMS 的不同以及配置, 搜索可以是区分大小写的. 通配符可以在搜索模式中的任意位置使用.
+
+有某些 DBMS 会用空格填充字段的剩余不足部分, 这时, 使用通配符进行中间匹配的话, 就无法达到预期效果, 可以通过 SQL 中的函数去掉.
+
+只使用 `%` 不会匹配产品名称为 `NULL` 的行.
+
+```sql
+-- 检索任意以 Fish 起头的词
+SELECT prod_id, prod_name
+FROM Products
+WHERE prod_name LIKE 'Fish%';
+
+-- 检索任意位置上包含文本 bean bag 的值
+SELECT prod_id, prod_name
+FROM Products
+WHERE prod_name LIKE '%bean bag%';
+```
+
+### `_` 通配符
+
+`_` 通配符用于匹配单个字符.
+
+```sql
+SELECT prod_id, prod_name
+FROM Products
+WHERE prod_name LIKE '__ inch teddy bear';
+```
+
+### `[]` 通配符
+
+`[]` 通配符用于指定一个字符集, 必须匹配指定位置 (通配符位置) 的一个字符.
+
+但并不是所有的 DBMS 都支持创建集合, 只有微软的 Access 和 SQL Server 支持.
+
+```sql
+SELECT cust_contact
+FROM Customers
+WHERE cust_contact LIKE '[JM]%'
+ORDER BY cust_contact;
+```
+
+通配符搜索较慢, 如果能够使用其他模式达到效果就需要避免使用通配符, 同时, 使用时应将通配符置于搜索模式尽可能靠后的地方.
+
+## 第七章 创建计算字段
+
+**计算字段**: 是运行在 `SELECT` 语句内创建的. **字段**的意思基本上和列一样, 但数据库列一般称为列, 术语字段通常与计算字段一起使用.
+
+### 拼接字段
+
+**拼接**: 将值联结到一起 (一个值附加到另一个值) 构成单个值. 这个操作根据不同的数据库使用不同的方式, Access, SQL Server 中使用 `+` 号, DB2, Oracle, PostgreSQL, SQLite 使用 `||`, MySql 使用 `Concat` 函数.
+
+```sql
+-- MySql 拼接
+SELECT Concat(vend_name, ' (', vend_contry, ')')
+FROM Vendors
+ORDER BY vend_name;
+```
+
+如果计算字段的列内容用了空格来填充, 那么就需要使用 SQL 提供的 `RTRIM`, `LTRIM`, `TRIM` 函数来去掉空格.
+
+```sql
+SELECT Concat(RTRIM(vend_name), ' (', RTRIM(vend_country), ')')
+FROM Vendors
+ORDER BY vend_name;
+```
+
+#### 使用别名
+
+未命名的列不能用于客户端应用中, 使用别名能够让计算列可以被客户端引用.
+
+```sql
+SELECT Concat(RTRIM(vend_name), ' (', RTRIM(vend_country), ')')
+       AS vend_title
+FROM Vendors
+ORDER BY vend_name;
+```
+
+### 执行算术计算
+
+计算字段的另一个常见用途是对检索出来的数据进行算术运算.
+
+```sql
+SELECT prod_id,
+       quantity,
+       item_price,
+       quantity*item_price AS expanded_price
+FROM OrderItems
+WHERE order_num = 20008;
+```
