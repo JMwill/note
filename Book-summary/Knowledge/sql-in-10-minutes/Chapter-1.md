@@ -283,3 +283,78 @@ SELECT prod_id,
 FROM OrderItems
 WHERE order_num = 20008;
 ```
+
+## 第八章 使用函数处理数据
+
+SQL 可以使用函数来处理数据, 函数一般是在数据上执行的, 为数据的转换和处理提供了方便. 但是只有少数几个函数被所有主要的 DBMS 支持, 所有类型的函数一般都可以在每个 DBMS 中使用, 但各个函数的名称和语法有可能极其不同.
+
+使用函数会降低代码的可移植性, 因此需要做好注释, 表明 SQL 代码的含义.
+
+### 使用函数
+
+大多数 SQL 支持以下类型的函数:
+
+- 用于处理文本字符串的的文本函数
+- 用于在数值数据上进行算术操作的数值函数
+- 用于处理日期和时间并从这些值中提取特定成分的日期和时间函数
+- 返回 DBMS 正使用的特殊信息的系统函数
+
+#### 文本处理函数
+
+`UPPER` 函数
+
+```sql
+SELECT vend_name, UPPER(vend_name) AS vend_name_upcase
+FROM Vendors
+ORDER BY vend_name;
+```
+
+下面是一些常用的文本处理函数:
+
+|函数|说明|
+---|---
+LEFT() (或使用子字符串函数) | 返回字符串左边的字符
+LENGTH() (也使用DATALENGTH() 或 LEN()) | 返回字符串的长度
+LOWER() (Access 使用 LCASE()) | 将字符串转换为小写
+LTRIM() | 去掉字符串左边的空格
+RIGHT() (或使用子字符串函数) | 返回字符串右边的字符
+RTRIM() | 去掉字符串右边的空格
+SOUNDEX() | 返回字符串的 SOUNDEX 值
+UPPER() (Access 使用 UCASE()) | 将字符串转换为大写
+
+```sql
+-- SOUNDEX() 函数例子, 匹配所有发音类似于 Michael Green 的联系名
+SELECT cust_name, cust_contact
+FROM Customers
+WHERE SOUNDEX(cust_contact) = SOUNDEX('Michael Green');
+```
+
+#### 日期和时间处理函数
+
+日期和时间采用相应的数据类型存储在表中, 每种 DBMS 都有自己的特殊形式. 日期和时间值以特殊的格式存储, 以便能够快速和有效地进行排序或过滤.
+
+但是日期和时间函数在 SQL 中的可移植性最差.
+
+```sql
+-- MySql的版本, 其他的一些 DBMS 使用的是 DATEPART, 或者 几个函数的
+-- 组合来达到想对应的效果, 不同 DBMS 的日期-时间处理函数可能不同.
+SELECT order_num
+FROM Orders
+WHERE YEAR(order_date) = 2012;
+```
+
+#### 数值处理函数
+
+仅用于处理数值数据, 一般主要用于代数, 三角或几何运算. 使用频率不高.
+
+常用的数值处理函数有:
+
+函数 | 说明
+--- | ---
+ABS() | 返回一个数的绝对值
+COS() | 返回一个角度的余弦
+EXP() | 返回一个数的指数值
+PI() | 返回圆周率
+SIN() | 返回一个角度的正弦
+SQRT() | 返回一个数的平方根
+TAN() | 返回一个角度的正切
