@@ -478,3 +478,84 @@ SELECT COUNT(*) AS num_items,
        AVG(prod_price) AS price_avg
 FROM Products;
 ```
+
+## 第十章 分组数据
+
+分组数据涉及到两个新的 SELECT 语句子句: `GROUP BY` 和 `HAVING`.
+
+### 创建分组
+
+```sql
+-- 指示 DBMS 按照 vend_id 排序并分组数据, 会对每个 vend_id 计算 num_prods 一次
+SELECT vend_id, COUNT(*) AS num_prods
+FROM Products
+GROUP BY vend_id;
+```
+
+GROUP BY 子句可以包含任意数目的列, 因此可以对分组进行嵌套, 更细致地进行数据分组.
+
+- GROUP BY 子句可以包含任意数目的列, 因而可以对分组进行嵌套, 更细致地进行数据分组.
+- 如果在 GROUP BY 子句中嵌套了分组, 数据将在最后指定的分组上进行汇总, 也就是建立分组时, 指定的所有列都一起计算 (不能从个别的列取回数据).
+- GROUP BY 子句中列出的每一列都必须是检索列或有效的表达式 (不能是聚集函数). 如果在 SELECT 中使用表达式, 则必须在 GROUP BY 子句中指定相同的表达式. 不能使用别名.
+- 大多数 SQL 实现不允许 GROUP BY 列带有长度可变的数据类型 (文本或备注型字段)
+- 除聚集计算语句外, SELECT 语句中的每一列都必须在 GROUP BY 子句中给出.
+- 如果分组列中包含具有 NULL 值的行, 则 NULL 将作为一个分组返回
+- GROUP BY 子句必须出现在 WHERE 子句之后, ORDER BY 子句之前.
+
+### 过滤分组
+
+SQL 还可以进行过滤分组, 规定包括哪些分组, 排除哪些分组. 需要用到 HAVING 子句, HAVING 非常类似 WHERE, 差别是: WHERE 过滤行, HAVING 过滤分组.
+
+WHERE 在分组前进行过滤, HAVING 在分组后进行过滤.
+
+```sql
+-- 这里无法使用 WHERE, 因为这里的过滤是基于分组聚集值, 而不是特定行的值
+SELECT cust_id, COUNT(*) AS orders
+FROM Orders
+GROUP BY cust_id
+HAVING COUNT(*) >= 2;
+
+-- 这里如果没有 WHERE 就会检索出来多一行, 这是 WHERE 与 HAVING 应用时机不同导致的
+SELECT vend_id, COUNT(*) AS num_prods
+FROM Products
+WHERE prod_price >= 4
+GROUP BY vend_id
+HAVING COUNT(*) >= 2;
+```
+
+### 分组和排序
+
+ORDER BY | GROUP BY
+--- | ---
+对产生的输出排序 | 对行分组, 但输出可能不是分组的顺序
+任意列都可以使用(甚至非选择的列) | 只可能使用选择列或表达式列, 而且必须使用每个选择列表达式
+不一定需要 | 如果与聚集函数一起使用列(或表达式), 则必须使用
+
+使用 GROUP BY 子句时, 应该给出 ORDER BY 子句, 这是保证数据正确排序的唯一方法.
+
+```sql
+SELECT order_num, COUNT(*) AS items
+FROM OrderItems
+GROUP BY order_num
+HAVING COUNT(*) >= 3;
+
+-- 按照订购物品的数目排序输出, 需要添加 ORDER BY 子句
+SELECT order_num, COUNT(*) AS items
+FROM OrderItems
+GROUP BY order_num
+HAVING COUNT(*) >= 3
+ORDER BY items, order_num;
+```
+
+### SELECT 子句顺序
+
+SELECT 语句中的子句使用时必须要遵循一定的次序. 目前为止的子句有:
+
+子句 | 说明 | 是否必须使用
+--- | --- | ---
+SELECT | 要返回的列表达式 | 是
+FROM | 从中检索数据的表 | 仅在从表选择数据时使用
+WHERE | 行级过滤 | 否
+GROUP BY | 分组说明 | 仅在按组计算聚集时使用
+HAVING | 组级过滤 | 否
+ORDER BY | 输出排序顺序 | 否
