@@ -559,3 +559,54 @@ WHERE | 行级过滤 | 否
 GROUP BY | 分组说明 | 仅在按组计算聚集时使用
 HAVING | 组级过滤 | 否
 ORDER BY | 输出排序顺序 | 否
+
+## 第十一章 使用子查询
+
+任何 SQL 语句都是查询, 但此术语一般指 SELECT 语句. SQL 中允许创建子查询, 即嵌套在其他查询中的查询.
+
+### 利用子查询进行过滤
+
+假设需要列出订购物品 RGAN01 的所有顾客, 步骤是:
+
+- 检索包含物品 RGAN01 的所有订单编号
+- 检索具有前一步骤列出的订单编号的所有顾客的ID
+- 检索前一步骤返回的所有顾客ID的顾客信息
+
+上面的步骤都可以单独作为一个查询来执行, 可以把一条 SELECT 语句返回的结果用于另一条 SELECT 语句的 WHERE 子句. 也可以使用子查询来把3个查询组合成一条语句.
+
+在 SELECT 语句中, 子查询总是由内向外来执行处理的.
+
+作为子查询的 SELECT 语句只能查询**单个列**.
+
+```sql
+SELECT cust_name, cust_contact
+FROM Customers
+WHERE cust_id IN (SELECT cust_id
+                  FROM Orders
+                  WHERE order_num IN (SELECT order_num
+                                      FROM OrderItems
+                                      WHERE prod_id = 'RGAN01'));
+```
+
+### 作为计算字段使用子查询
+
+假设需要显示 Customers 表中每个顾客的订单总数. 订单与顾客的 ID 存储在 Orders 表中. 需要执行的步骤如下:
+
+- 从 Customers 表中检索顾客列表
+- 对于检索出的每个顾客, 统计其在 Orders 表中的订单数目
+
+```sql
+-- 对顾客 1000000001 的订单进行计数
+SELECT COUNT(*) AS orders
+FROM Orders
+WHERE cust_id = '1000000001';
+
+-- 将上面的作为子查询嵌入到计算字段中
+SELECT cust_name,
+       cust_state,
+       (SELECT COUNT(*)
+        FROM Orders
+        WHERE Orders.cust_id = Customers.cust_id) AS orders
+FROM Customers
+ORDER BY cust_name;
+```
