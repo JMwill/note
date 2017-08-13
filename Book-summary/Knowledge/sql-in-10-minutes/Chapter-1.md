@@ -358,3 +358,123 @@ PI() | 返回圆周率
 SIN() | 返回一个角度的正弦
 SQRT() | 返回一个数的平方根
 TAN() | 返回一个角度的正切
+
+## 第九章 汇总数据
+
+需要汇总数据而不实际检索出来时, 可以通过专门的函数来实现. 如:
+
+- 确定表中的行数 (满足某个条件或包含某个特定值的行数)
+- 获得表中某些行的和
+- 找出表列 (所有行或者某些特定行) 的最大值, 最小值, 平均值
+
+这些类型的检索只需要汇总表中的数据, 而不需要实际数据本身. 为了方便这种类型的检索, SQL 给出了5个聚集函数, 这种类型的函数在各种主要 SQL 实现中得到了相当一致的支持.
+
+**聚集函数**: 对某些行运行的函数, 计算并返回一个值.
+
+函数 | 说明
+--- | ---
+AVG() | 返回某列的平均值
+COUNT() | 返回某列的行数
+MAX() | 返回某列的最大值
+MIN() | 返回某列的最小值
+SUM() | 返回某列值之和
+
+### AVG() 函数
+
+对表中的行数计数并计算其列值之和, 求得列的平均值. 可用来返回所有列的平均值, 也可以用来返回特定列或行的平均值.
+
+函数只能用于单个列, 用于确定特定数值列的平均值, 列名必须作为函数参数给出, 要获取多个平均值, 必须使用多个 AVG() 函数.
+
+```sql
+-- 所有产品的平均价格
+SELECT AVG(prod_price) AS avg_price
+FROM Products;
+
+-- 返回特定供应商所提供的产品的平均价格
+SELECT AVG(prod_price) AS avg_price
+FROM Products
+WHERE vend_id = 'DLL01';
+```
+
+### COUNT() 函数
+
+用于确定表中行的数目或符合特定条件的行的数目.
+
+函数有两种使用方式:
+
+- 使用 `COUNT(*)` 对表中行的数目进行计数, 不管表列中包含的是空值(NULL) 还是非空值.
+- 使用 `COUNT(column)` 对特定列中具有值的行进行计数, 忽略 NULL 值
+
+```sql
+-- 对所有行进行计数
+SELECT COUNT(*) AS num_cust
+FROM Customers;
+
+-- 只对具有电子邮件的客户计数
+SELECT COUNT(cust_email) AS num_cust
+FROM Customers;
+```
+
+### MAX() 函数
+
+返回指定列中的最大值, `MAX()` 要求指定列名. 函数会忽略列值为 NULL 的行.
+
+`MAX()` 函数一般用于找出最大的数值或日期值, 有些 DBMS 也允许使用来返回任意列中的最大值, 包括返回文本列中的最大值. 对文本列作用时, 返回按照该列排序后返回的最后一行.
+
+```sql
+-- 返回 Products 表中最贵物品的价格.
+SELECT MAX(prod_price) AS max_price
+FROM Products;
+```
+
+### MIN() 函数
+
+与 MAX() 功能相反, 一样需要指定列名. 特性也跟 MAX 一样
+
+```sql
+SELECT MIN(prod_price) AS min_price
+FROM Products;
+```
+
+### SUM() 函数
+
+用来返回指定列值的和, SUM 函数会忽略列值为 NULL 的行.
+
+```sql
+-- 统计某个物品订单中的物品数量之和
+SELECT SUM(quantity) AS items_ordered
+FROM OrderItems
+WHERE order_num = 20005;
+
+-- 合计计算值, 得出总数
+SELECT SUM(item_price*quantity) AS total_price
+FROM OrderItems
+WHERE order_num = 20005;
+```
+
+### 聚集不同值
+
+上面的函数都可以:
+
+- 对所有行制定计算, 指定 ALL 参数或不指定参数 (ALL 是默认行为)
+- 只包含不同的值, 指定 DISTINCT 参数
+
+```sql
+-- DISTINCT 不能在 Access 中像下面那样使用, 需要用子查询返回数据到外部执行运算
+-- DISTINCT 不能用于 COUNT(*) 必须要指定列名才能使用
+SELECT AVG(DISTINCT prod_price) AS avg_price
+FROM Products
+WHERE vend_id = 'DLL01';
+```
+
+### 组合聚集函数
+
+SELECT 语句可根据需要包含多个聚集函数. 指定别名来包含某个聚集函数的结果时, 不应该使用表中实际的列名.
+
+```sql
+SELECT COUNT(*) AS num_items,
+       MIN(prod_price) AS price_min,
+       MAX(prod_price) AS price_max,
+       AVG(prod_price) AS price_avg
+FROM Products;
+```
