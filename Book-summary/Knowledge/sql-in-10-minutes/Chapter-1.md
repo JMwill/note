@@ -677,3 +677,102 @@ WHERE Customers.cust_id = Orders.cust_id
       AND Orders.order_num = OrderItems.order_num
       AND prod_id = 'RGAN01';
 ```
+
+## 第十三课 创建高级联结
+
+### 使用表别名
+
+SQL 允许对表起别名, 主要有两个理由:
+
+- 缩短 SQL 语句
+- 允许在同一条 SELECT 语句中多次使用相同的表.
+
+```sql
+SELECT cust_name, cust_contact
+FROM Customers AS C, Orders as O, OrderItems as OI
+WHERE C.cust_id = O.cust_id
+      AND OI.order_num = O.order_num
+      AND prod_id = 'RGAN01';
+```
+
+### 使用不同类型的联结
+
+#### 自联结
+
+查找出与 Jim Jones 同一公司的所有顾客
+
+- 先找出 Jim Jones 工作的公司
+- 找出在该公司工作的顾客
+
+```sql
+-- 子查询的方法
+SELECT cust_id, cust_name, cust_contact
+FROM Customers
+WHERE cust_name = (SELECT cust_name
+                   FROM Customers
+                   WHERE cust_contact = 'Jim Jones');
+
+-- 自联结
+SELECT c1.cust_id, c1.cust_name, c1.cust_contact
+FROM Customers AS c1, Customers AS c2
+WHERE c1.cust_name = c2.cust_name
+      AND c2.cust_contact = 'Jim Jones';
+
+-- 或者
+SELECT c1.cust_id, c1.cust_name, c1.cust_contact
+FROM Customers AS c1 INNER JOIN Customers AS c2
+ON c1.cust_name = c2.cust_name
+	AND c2.cust_contact = 'Jim Jones';
+```
+
+#### 自然联结
+
+自然联结排除多次出现, 使每一列只返回一次. 自然联结要求只能选择唯一的列, 且不由系统完成, 一般通过对一个表使用通配符, 而对其他表的列使用明确的子集来完成.
+
+```sql
+-- 通配符只对第一个表使用, 所有其他列明确列出, 因此没有重复的列被检索出来
+-- 一般的内联结都是自然联结, 几乎不会用到不是自然联结的內联结
+SELECT C.*, O.order_num, O.order_date,
+       OI.prod_id, OI.quantity, OI.item_price
+FROM Customers AS C, Orders AS O, OrderItems as OI
+WHERE C.cust_id = O.cust_id
+      AND OI.order_num = O.order_num
+      AND prod_id = 'RGAN01';
+```
+
+#### 外联结
+
+将一个表中的行与另一个表中的行相关联, 并包含没有关联的行, 如:
+
+- 对每个顾客下的订单进行计数, 包括至今尚未下订单的顾客
+- 列出所有产品以及订购数量, 包括没有人订的产品
+- 计算平均销售规模, 包括至今尚未下订单的顾客
+
+联结包含了在相关表中没有关联行的行, 这种联结称为**外联结**
+
+```sql
+-- 这里包含了左边的表: Customers 中的所有行, 包括没有关联的
+-- 如果需要包括右边的表: Orders 中的所有行, 可以使用: RIGHT OUTER JOIN
+SELECT Customers.cust_id, Orders.order_num
+FROM Customers LEFT OUTER JOIN Orders
+      ON Customers.cust_id = Orders.cust_id;
+```
+
+还有一种全外联结的 `FULL OUTER JOIN` 语法, 但是较多 DBMS 不支持, 这种语法会检索两个表中所有的行并关联可以关联的行.
+
+### 使用带聚集函数的联结
+
+聚集函数可以与联结一起使用. 如: 检索所有顾客以及每个顾客所下的订单数
+
+```sql
+SELECT Customers.cust_id, COUNT(Orders.order_num) AS num_ord
+FROM Customers INNER JOIN Orders
+      ON Customers.cust_id = Orders.cust_id
+GROUP BY Customers.cust_id;
+
+-- 与其他联结一起使用
+SELECT Customers.cust_id, COUNT(Orders.order_num) AS num_ord
+FROM Customers LEFT OUTER JOIN Orders
+      ON Customers.cust_id = Orders.cust_id
+GROUP BY Customers.cust_id;
+```
