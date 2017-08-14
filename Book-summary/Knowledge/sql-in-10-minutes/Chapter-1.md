@@ -610,3 +610,70 @@ SELECT cust_name,
 FROM Customers
 ORDER BY cust_name;
 ```
+
+## 第十二章 联结表
+
+关系数据库的可伸缩性比非关系型数据库要好. **可伸缩**: 能够适应不断增加的工作量而不失败. 设计良好的数据库或应用程序称为可伸缩性良好.
+
+当数据存储在多个表中, 需要使用一条 SELECT 语句来检索出数据时, 就需要使用联结. 联结是一种机制, 用来在一条 SELECT 语句中关联表, 使用特殊的语法, 可以联结多个表返回一组输出, 联结在运行时关联表中正确的行.
+
+创建联结只需要指定要联结的所有表以及关联它们的方式即可.
+
+```sql
+SELECT vend_name, prod_name, prod_price
+FROM Vendors, Products
+WHERE Vendors.vend_id = Products.vend_id;
+```
+
+在一条 SELECT 语句中联结几个表时, 相应的关系是运行中构造的, 数据库表的定义里没有指示 DBMS 如何对表进行联结的内容, 需要自行实现, 因此使用 WHERE 子句作为过滤条件能够只包含匹配给定条件(联结条件)的行, 而不会使得第一个表中的每一行都与第二个表中的每一行配对.
+
+没有指定联结条件的表关系返回的结果为笛卡尔积, 检索出的行的数目是第一个表中的行数乘以第二个表中的行数.
+
+```sql
+SELECT vend_name, prod_name, prod_price
+FROM Vendors, Products;
+```
+
+上面的 SQL 代码输出结果是无意义的, 组合相互之间没有关系的结果行出来, 因此需要保**证所有的联结**都有 WHERE 子句, 并保证子句的正确性.
+
+### 內联结
+
+上面使用的联结称为**等值联结**, 基于两个表之间的相等测试. 也称为**內联结**. 可以通过使用不同的语法, 明确指定联结类型得到相同的结果.
+
+```sql
+SELECT vend_name, prod_name, prod_price
+FROM Vendors INNER JOIN Products
+ON Vendors.vend_id = Products.vend_id;
+```
+
+### 联结多个表
+
+SQL 并不限制一条 SELECT 语句中联结的表的数目, 创建联结的规则一样, 列出所有的表, 然后定义表之间的关系.
+
+避免联结不必要的表, 联结的表越多性能下降得越厉害. SQL 本身不限制每个联结约束中表的数目, 但多数 DBMS 都有限制.
+
+```sql
+SELECT prod_name, vend_name, prod_price, quantity
+FROM OrderItems, Products, Vendors
+WHERE Products.vend_id = Vendors.vend_id
+      AND OrderItems.prod_id = Products.prod_id
+      AND order_num = 20007;
+```
+
+```sql
+-- 十一章中的例子:
+SELECT cust_name, cust_contact
+FROM Customers
+WHERE cust_id IN (SELECT cust_id
+                  FROM Orders
+                  WHERE order_num IN (SELECT order_num
+                                       FROM OrderItems
+                                       WHERE prod_id = 'RGAN01'));
+
+-- 使用联结实现相同查询
+SELECT cust_name, cust_contact
+FROM Customers, Orders, OrderItems
+WHERE Customers.cust_id = Orders.cust_id
+      AND Orders.order_num = OrderItems.order_num
+      AND prod_id = 'RGAN01';
+```
