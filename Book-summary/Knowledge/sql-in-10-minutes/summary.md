@@ -776,3 +776,80 @@ FROM Customers LEFT OUTER JOIN Orders
       ON Customers.cust_id = Orders.cust_id
 GROUP BY Customers.cust_id;
 ```
+
+## 第十四课 组合查询
+
+SQL 除了有从一个或多个表中返回数据的单条 SELECT 语句外, 还允许执行多个查询 (多条 SELECT 语句) 并将结果作为一个查询结果返回, 这种查询被称为并(union)或复合查询. 使用的情况主要有两种:
+
+- 在一个查询中从不同的表返回结构数据
+- 对一个表执行多个查询, 按照一个查询返回数据
+
+大多数情况下组合相同表的两个查询所完成的工作与具有多个 WHERE 子句条件的一个查询完成的工作相同. 也就是任何具有多个 WHERE 子句的 SEELCT 语句都可以作为一个组合查询.
+
+### 创建组合查询
+
+组合查询只需要在每条 SELECT 语句之间放上关键字 UNION 就能实现组合查询.
+
+```sql
+-- 单条语句实现
+SELECT cust_name, cust_contact, cust_email
+FROM Customers
+WHERE cust_state IN ('IL', 'IN', 'MI');
+
+-- 单条语句实现
+SELECT cust_name, cust_contact, cust_email
+FROM Customers
+WHERE cust_name = 'Fun4All';
+
+-- 组合两条语句
+SELECT cust_name, cust_contact, cust_email
+FROM Customers
+WHERE cust_state IN ('IL', 'IN', 'MI')
+UNION
+SELECT cust_name, cust_contact, cust_email
+FROM Customers
+WHERE cust_name = 'Fun4All';
+
+-- WHERE 的相同实现
+SELECT cust_name, cust_contact, cust_email
+FROM Customers
+WHERE cust_state IN ('IL', 'IN', 'MI')
+    OR cust_name = 'Fun4All';
+```
+
+简单例子中, UNION 会比 WHERE 复杂, 但在复杂过滤条件下, 或从多个表中检索数据时, 用 UNION 处理会更简单.
+
+#### UNION 规则
+
+- UNION 必须由两条或以上的 SELECT 语句组成, 语句之间用关键字分隔
+- UNION 每个查询必须包含相同的列, 表达式或聚集函数, 列的次序不重要
+- 列数据的类型必须要兼容: 类型不用完全相同, 但必须是 DBMS 可以隐含转换的类型
+
+#### 包含或取消重复的行
+
+UNION 默认行为与 WHERE 那样会去掉重复的行, 如果需要显示重复的行, 可以使用 `UNION ALL`, 这个功能 WHERE 子句无法实现
+
+```sql
+SELECT cust_name, cust_contact, cust_email
+FROM Customers
+WHERE cust_state IN ('IL', 'IN', 'MI')
+UNION ALL
+SELECT cust_name, cust_contact, cust_email
+FROM Customers
+WHERE cust_name = 'Fun4All';
+```
+
+#### 对组合查询结果排序
+
+在用 UNION 组合查询时, 只能使用一条 `ORDER BY` 子句, 所以需要位于最后一条 SELECT 语句之后, 不存在对一部分使用排序, 另一部分使用另一个排序的用法.
+
+```sql
+SELECT cust_name, cust_contact, cust_email
+FROM Customers
+WHERE cust_state IN ('IL', 'IN', 'MI')
+UNION
+SELECT cust_name, cust_contact, cust_email
+FROM Customers
+WHERE cust_name = 'Fun4All'
+ORDER BY cust_name, cust_contact;
+```
