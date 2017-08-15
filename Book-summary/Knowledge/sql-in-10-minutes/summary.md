@@ -853,3 +853,127 @@ FROM Customers
 WHERE cust_name = 'Fun4All'
 ORDER BY cust_name, cust_contact;
 ```
+
+## 第十五课 插入数据
+
+### 数据插入
+
+INSERT 用来将行插入 (或添加) 到数据库表. 方式有以下几种:
+
+- 插入完整的行
+- 插入行的一部分
+- 插入某些查询的结果
+
+#### 插入完整的行
+
+基本的 INSERT 语法要求指定表名和插入到新行中的值.
+
+```sql
+-- 使用这种简单的语法并不安全, 没法保证在下一次表结构发生变化时插入语句也对应修改了次序
+INSERT INTO Customers
+VALUES ('1000000006',
+        'Toy Land',
+        '123 Any Street',
+        'New York',
+        'NY',
+        '11111',
+        'USA',
+        NULL,
+        NULL);
+
+-- 所以最好的做法是提供插入的对应字段名称
+INSERT INTO Customers(cust_id,
+                      cust_name,
+                      cust_address,
+                      cust_city,
+                      cust_state,
+                      cust_zip,
+                      cust_country,
+                      cust_contact,
+                      cust_email)
+VALUES ('1000000006',
+        'Toy Land',
+        '123 Any Street',
+        'New York',
+        'NY',
+        '11111',
+        'USA',
+        NULL,
+        NULL);
+```
+
+#### 插入部分行
+
+使用列值还可以只给某些列提供值, 其他列不提供值. 省略的列需要满足条件为:
+
+- 列定义允许 NULL 值(无值或空值)
+- 表定义中设置了默认值
+
+```sql
+INSERT INTO Customers(cust_id,
+                      cust_name,
+                      cust_address,
+                      cust_city,
+                      cust_state,
+                      cust_zip,
+                      cust_country)
+VALUES ('1000000006',
+        'Toy Land',
+        '123 Any Street',
+        'New York',
+        'NY',
+        '11111',
+        'USA');
+```
+
+#### 插入检索出的数据
+
+INSERT 一般用于给表插入具有指定列值的行, INSERT 还可以通过 SELECT 语句的结果来插入新行, 也就是所谓的 `INSERT SELECT`.
+
+其中 SELECT 语句可以包含 WHERE 子句, 以过滤插入的数据.
+
+```sql
+-- 把另一表中的顾客列合并到 Customers 表中
+INSERT INTO Customers(cust_id,
+                      cust_contact,
+                      cust_email,
+                      cust_address,
+                      cust_city,
+                      cust_state,
+                      cust_zip,
+                      cust_country)
+SELECT cust_id,
+       cust_contact,
+       cust_email,
+       cust_name,
+       cust_address,
+       cust_city,
+       cust_state,
+       cust_zip,
+       cust_country
+FROM CustNew;
+```
+
+### 从一个表复制到另一个表
+
+要将一个表的数据内容复制到一个全新的表(运行中创建的表), 可以 `SELECT INTO` 语句, `INSERT SELECT` 与 `SELECT INTO` 的主要差别是: 前者导出数据, 后者导入数据.
+
+使用 `SELECT INTO` 时:
+
+- 任何 SELECT 选项和子句都可以使用, 包括 WHERE 和 GROUP BY
+- 可以利用联结从多个表插入数据
+- 不管从多少个表中检索数据, 数据都只能插入到一个表中
+
+进行新 SQL 语句试验前, 先复制对应的表, 在进行测试, 可以避免影响到原有数据.
+
+```sql
+SELECT *
+INTO CustCopy
+FROM Customers;
+
+-- MySql, Oracle 等的 DBMS 用法
+CREATE TABLE CustCopy AS
+SELECT * FROM Customers;
+```
+
+
