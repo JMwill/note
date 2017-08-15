@@ -1129,3 +1129,119 @@ DROP TABLE CustCopy;
 ### 重命名表
 
 每个 DBMS 对表重命名的支持有所不同, MySql 使用 RENAME. 但全部的重命名操作基本语法都要求指定旧表名和新表名
+
+## 第十八课 使用视图
+
+视图: 虚拟的表, 只包含使用时动态检索数据的查询. 但各方 DBMS 对视图的支持不一, 具体需要查看对应版本的手册.
+
+视图在我的理解中就是一个包含了预设 SQL 语句的函数, 使用视图时会执行函数, 并得到得到对应的 SQL 语句执行的结果. 且这个结果的行为像是一张表, 能够对其执行对表进行的操作. 如: SELECT 操作, 过滤, 排序, 将视图联结到其他视图或表, 添加或更新数据等.
+
+视图本身不包括数据, 它返回的数据为对应表中检索出来的数据, 因此当表数据更改时, 视图中的数据也会更改.
+
+使用视图的原因:
+
+- 重用 SQL 语句
+- 简化复杂的 SQL 操作. 在编写查询后,可以方便地重用它而不必知道其基本查询细节
+- 使用表的一部分而不是整个表
+- 保护数据. 可以授予用户访问表的特定部分的权限,而不是整个表的访问权限
+- 更改数据格式和表示. 视图可返回与底层表的表示和格式不同的数据
+
+视图创建和使用的一些最常见的规则和限制:
+
+- 与表一样, 视图必须唯一命名(不能给视图取与别的视图或表相同的名字).
+- 对于可以创建的视图数目没有限制.
+- 创建视图, 必须具有足够的访问权限. 这些权限通常由数据库管理人员授予
+- 视图可以嵌套, 即可以利用从其他视图中检索数据的查询来构造视图.所允许的嵌套层数在不同的 DBMS 中有所不同(嵌套视图可能会严重降低查询的性能, 因此在产品环境中使用之前, 应该对其进行全面测试).
+- 许多 DBMS 禁止在视图查询中使用ORDER BY子句.
+- 有些 DBMS 要求对返回的所有列进行命名, 如果列是计算字段, 则需要使用别名(关于列别名的更多信息, 请参阅第 7 课).
+- 视图不能索引, 也不能有关联的触发器或默认值.
+- 有些 DBMS 把视图作为只读的查询, 这表示可以从视图检索数据, 但不能将数据写回底层表. 详情请参阅具体的 DBMS 文档.
+- 有些 DBMS 允许创建这样的视图, 它不能进行导致行不再属于视图的插入或更新. 例如有一个视图, 只检索带有电子邮件地址的顾客. 如果更新某个顾客, 删除他的电子邮件地址, 将使该顾客不再属于视图. 这是默认行为, 而且是允许的,但有的 DBMS 可能会防止这种情况发生.
+
+### 创建视图
+
+创建视图语句为： `CREATE VIEW`, 只能用于创建不存在的视图. 如果需要重命名视图, 需要先删除: `DROP VIEW viewname;`. 然后再重新创建.
+
+#### 通过视图简化复杂联结
+
+视图常见的应用是隐藏复杂的 SQL, 通常也涉及联结.
+
+```sql
+CREATE VIEW ProductCustomers AS
+SELECT cust_name, cust_contact, prod_id
+FROM Customers, Orders, OrderItems
+WHERE Customers.cust_id = Orders.cust_id
+      AND OrderItems.order_num = Orders.order_num;
+
+-- 创建完成视图后可以当作表来使用
+-- 检索订购了产品 RGAN01 的顾客
+SELECT cust_name, cust_contact
+FROM ProductCustomers
+WHERE prod_id = 'RGAN01';
+```
+
+视图极大地简化了复杂 SQL 语句的使用, 可以利用视图, 一次性编写基础的 SQL, 在根据需要多次使用. 创建不绑定特定数据的视图, 扩展视图的范围能够使得视图更能被重用, 而无需创建多个和维护多个类似的试图. 就像编程里面进行函数抽象, 不绑定特定数据的函数能够更好地重用.
+
+#### 用视图重新格式化检索出的数据
+
+```sql
+SELECT RTRIM(vend_name) + ' (' + RTRIM(vend_country) + ')' AS vend_title
+FROM Vendors
+ORDER BY vend_name;
+
+-- MySql 实现
+SELECT CONCAT(RTRIM(vend_name), ' (', RTRIM(vend_country), ')') AS vend_title
+FROM Vendors
+ORDER BY vend_name;
+
+-- 假设经常需要相同格式的结果, 可以创建一个试图, 在需要时使用即可
+CREATE VIEW VendorLocations AS
+SELECT CONCAT(RTRIM(vend_name), ' (', RTRIM(vend_country), ')') AS vend_title
+FROM Vendors;
+
+-- 就可以正常使用
+SELECT *
+FROM VendorLocations;
+```
+
+#### 用视图过滤不想要的数据
+
+```sql
+CREATE VIEW CustomerEMailList AS
+SELECT cust_id, cust_name, cust_email
+FROM Customers
+WHERE cust_email IS NOT NULL;
+
+-- 将不具有邮件的用户过滤掉之后, 就能获取到有邮件的所有用户了
+SELECT *
+FROM CustomerEMailList;
+```
+
+#### 使用视图与计算字段
+
+使用第七课中的例子, 检索某个订单的物品, 计算每种物品的总价格.
+
+```sql
+SELECT prod_id,
+       quantity,
+       item_price,
+       quantity * item_price AS expanded_price
+FROM OrderItems
+WHERE order_num = 20008;
+
+-- 转换为视图
+CREATE VIEW OrderItemsExpanded AS
+SELECT order_num,
+       prod_id,
+       quantity,
+       item_price,
+       quantity * item_price AS expanded_price
+FROM OrderItems;
+
+-- 使用
+SELECT *
+FROM OrderItemsExpanded
+WHERE order_num = 20008;
+```
+
+视图为虚拟的表. 它们包含的不是数据而是根据需要检索数据的查询. 视图提供了一种封装SELECT语句的层次, 可用来简化数据处理, 重新格式化或保护基础数据.
