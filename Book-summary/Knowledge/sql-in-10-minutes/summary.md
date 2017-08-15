@@ -1029,3 +1029,103 @@ DELETE 后的 FROM 可选, 但是为了保持可移植性, 最好保留.
 - 在 UPDATE 或 DELETE 语句使用 WHERE 子句前,应该先用 SELECT 进行测试,保证它过滤的是正确的记录,以防编写的 WHERE 子句不正确。
 - 使用强制实施引用完整性的数据库, 这样 DBMS 将不允许删除其数据与其他表相关联的行。
 - 有的 DBMS 允许数据库管理员施加约束,防止执行不带 WHERE 子句的 UPDATE 或 DELETE 语句。如果所采用的 DBMS 支持这个特性,应该使用它。
+
+## 第十七课 创建和操纵表
+
+### 创建表
+
+要创建表格可以通过使用 SQL 语句 `CREATE TABLE` 语句来实现. 但有些 DBMS 的语法可能会不一样.
+
+#### 表创建基础
+
+使用 CREATE TABLE 创建表需要给出下列信息:
+
+- 新表名字, 在 CREATE TABLE 后给出
+- 表列的名字和定义, 用逗号分隔
+- 部分 DBMS 需要指定表的位置
+
+```sql
+CREATE TABLE Products
+(
+      prod_id     CHAR(10)          NOT NULL,
+      vend_id     CHAR(10)          NOT NULL,
+      prod_name   CHAR(254)         NOT NULL,
+      prod_price  DECIMAL(8, 2)     NOT NULL,
+
+      -- Oracle 用:
+      -- prod_desc      VARCHAR(1000)   NULL,
+      prod_desc   TEXT(1000)     NULL
+);
+
+-- 大部分 DBMS 不指定 NOT NULL 则 NULL 为默认值
+-- 具体信息还是需要参考 DBMS 文档
+CREATE TABLE Vendors
+(
+      vend_id           CHAR(10)    NOT NULL,
+      vend_name         CHAR(50)    NOT NULL,
+      vend_address      CHAR(50)    ,
+      vend_city         CHAR(50)    ,
+      vend_state        CHAR(5)     ,
+      vend_zip          CHAR(10)    ,
+      vend_country      CHAR(50)    ,
+);
+```
+
+在 DBMS 中通过关键字 `DEFAULT` 来指定默认值, 默认值常用于日期或时间戳列, 如通过引用系统日期的函数或变量, 将系统日期用作默认日期. MySql 中指定 `DEFAULT CURRENT_DATE()`. 各个系统获取日期的命令都不太一样, 需要时可参考对应的 DBMS 文档.
+
+```sql
+CREATE TABLE OrderItems
+(
+      order_name        INTEGER           NOT NULL,
+      order_item        INTEGER           NOT NULL,
+      prod_id           CHAR(10)          NOT NULL,
+      quantity          INTEGER           NOT NULL    DEFAULT 1,
+      item_price        DECIMAL(8, 2)     NOT NULL
+);
+```
+
+
+### 更新表
+
+更新表定义可以使用 `ALTER TABLE` 语句, 由于不同 DBMS 允许更新的内容差别很大, 所以需要考虑一下事情:
+
+- 理想情况下, 不要在表中包含数据时对其更新, 设计之初就要考虑好未来可能的需求, 避免后期对表的结构做大改动
+- 所有的 DBMS 都允许给现有的表增加列, 但对增加列的数据类型有所限制
+- 许多 DBMS 不允许删除或更改表中的列
+- 多数 DBMS 允许重新命名表中的列
+- 许多 DBMS 限制对已经填有数据的列进行更改, 对未填充有数据的列几乎没有限制
+
+为已有表增加列可能是所有 DBMS 都支持的唯一操作:
+
+```sql
+ALTER TABLE Vendors
+ADD vend_phone CHAR(20);
+
+-- 更改或删除列, 增加约束或增加键, 也使用类似的语法
+ALTER TABLE Vendors
+DROP COLLMN vend_phone;
+```
+
+复杂的表结构更改一般需要手动删除, 涉及到以下步骤:
+
+1. 用新的列布局创建一个新表
+2. 使用 INSERT SELECT 语句从旧表复制数据到新表, 有必要可以使用转换函数和计算字段
+3. 检验包含所需数据的新表
+4. 重命名旧表(如果确定,可以删除它);
+5. 用旧表原来的名字重命名新表;
+6. 根据需要, 重新创建触发器, 存储过程, 索引和外键。
+
+使用 `ALTER TABLE` 需要十分小心, 在改动前应做完整备份 (模式和数据的备份). 避免数据丢失.
+
+### 删除表
+
+
+删除表而不是里面的内容, 使用 `DROP TABLE` 语句即可, 表的删除没有确认, 不能撤销, 表会被永久删除. 可以通过关系规则防止意外删除表
+
+```sql
+DROP TABLE CustCopy;
+```
+
+### 重命名表
+
+每个 DBMS 对表重命名的支持有所不同, MySql 使用 RENAME. 但全部的重命名操作基本语法都要求指定旧表名和新表名
