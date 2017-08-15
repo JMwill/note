@@ -976,4 +976,56 @@ CREATE TABLE CustCopy AS
 SELECT * FROM Customers;
 ```
 
+## 第十六课 更新和删除数据
 
+### 更新数据
+
+更新表中的数据需要使用 UPDATE 语句, 有两种方式:
+
+- 更新表中的特定行
+- 更新表中的所有行
+
+使用 UPDATE 时不要省略 WHERE 子句, 否则会更新表中的所有行, 基本的 UPDATE 语句由三部分组成, 分别是:
+
+- 要更新的表
+- 列名和对应的新值
+- 确定要更新哪些行的过滤条件
+
+```sql
+-- 更新客户 1000000005 的电子邮件地址
+UPDATE Customers
+SET cust_email = 'kim@thetoystore.com'
+WHERE cust_id = '1000000005';
+
+-- 更新多个列
+UPDATE Customers
+SET cust_contact = 'Sam Roberts',
+    cust_email = 'sam@toyland.com'
+WHERE cust_id = '1000000006';
+```
+
+### 删除数据
+
+删除表中的数据需要使用 DELETE 语句, 有两种方式:
+
+- 从表中删除特定的行
+- 从表中删除所有行
+
+同样地, 使用 DELETE 时不要省略 WHERE 子句, 否则会删除表中所有的行:
+
+```sql
+DELETE FROM Customers
+WHERE cust_id = '1000000006';
+```
+
+DELETE 后的 FROM 可选, 但是为了保持可移植性, 最好保留.
+
+如果想要快速删除所有的行, 使用 `TRUNCATE TABLE`, 能完成 DELETE 删除全部行的工作, 且速度更快.
+
+### 更新和删除的指导原则
+
+- 除非确实打算更新和删除每一行,否则绝对不要使用不带 WHERE 子句的 UPDATE 或 DELETE 语句。
+- 保证每个表都有主键, 尽可能像 WHERE 子句那样使用它(可以指定各主键、多个值或值的范围)。
+- 在 UPDATE 或 DELETE 语句使用 WHERE 子句前,应该先用 SELECT 进行测试,保证它过滤的是正确的记录,以防编写的 WHERE 子句不正确。
+- 使用强制实施引用完整性的数据库, 这样 DBMS 将不允许删除其数据与其他表相关联的行。
+- 有的 DBMS 允许数据库管理员施加约束,防止执行不带 WHERE 子句的 UPDATE 或 DELETE 语句。如果所采用的 DBMS 支持这个特性,应该使用它。
