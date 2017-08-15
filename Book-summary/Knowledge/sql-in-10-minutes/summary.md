@@ -1245,3 +1245,154 @@ WHERE order_num = 20008;
 ```
 
 视图为虚拟的表. 它们包含的不是数据而是根据需要检索数据的查询. 视图提供了一种封装SELECT语句的层次, 可用来简化数据处理, 重新格式化或保护基础数据.
+
+## 第十九课 使用存储过程
+
+大多数 SQL 语句是针对一个或多个表的单条语句, 但有时有些复杂的操作需要多条语句才能完成, 如:
+
+- 处理订单时, 必须核对以保证库存中有相应的物品
+- 如果物品有库存, 需要预定, 不再出售给别人, 并减少物品数据以反映正确的库存量
+- 库存中没有的物品需要订购, 需要与供应商进行某种交互
+- 关于哪些物品入库(并可以立即发货)和哪些物品退订, 需要通知相应的顾客
+
+上面的处理需要针对许多表的多条 SQL 语句, 且执行的具体 SQL 语句以及其次序不是固定的. 可能会根据物品是否在库存中而变化.
+
+这个情况下可以创建存储过程, 而存储过程简单说就是**为以后使用而保存的一条或多条 SQL 语句**, 可以视为**批文件**, 但存储过程的作用不仅限于批处理.
+
+### 使用存储过程的理由
+
+- 通过把处理封装在一个易用的单元中, 可以简化复杂的操作(如前面例子所述)
+- 由于不要求反复建立一系列处理步骤, 因而保证了数据的一致性. 如果所有开发人员和应用程序都使用同一存储过程, 则所使用的代码都是相同的. <br>这一点的延伸就是防止错误. 需要执行的步骤越多, 出错的可能性就越大. 防止错误保证了数据的一致性.
+- 简化对变动的管理, 如果表名, 列名或业务逻辑(或别的内容)有变化, 那么只需要更改存储过程的代码. 使用它的人员甚至不需要知道这些变化. <br> 这一点的延伸就是安全性. 通过存储过程限制对基础数据的访问, 减少了数据讹误(无意识的或别的原因所导致的数据讹误)的机会.
+- 因为存储过程通常以编译过的形式存储, 所以 DBMS 处理命令的工作较少, 提高了性能.
+- 存在一些只能用在单个请求中的 SQL 元素和特性, 存储过程可以使用它们来编写功能更强更灵活的代码.
+
+换句话说, 存储过程有三个主要好处: 简单, 安全, 高性能.
+
+存储过程的一些缺点:
+
+- 可移植性差, 但存储过程的自我调用(名字以及数据如何传递)可以相对保持可移植. 因此, 如果需要移植到别的 DBMS, 至少客户端应用代码不需要变动.
+- 比编写基本 SQL 语句复杂, 需要更高的技能与更丰富的经验.
+
+### 执行存储过程
+
+执行存储过程的 SQL 语句为: `EXECUTE`, 语句接受存储过程名和需要传递给它的任何参数.
+
+```sql
+EXECUTE AddNewProduct('JTS01',
+                      'Stuffed Eiffel Tower',
+                      6.49,
+                      'Plush stuffed toy with the text La
+Tour Eiffel in red white and blue');
+```
+
+### 创建存储过程
+
+```sql
+-- 对邮件发送清单中具有邮件地址的顾客进行计数
+-- Oracle 版本
+CREATE PROCEDURE MailingListCount (
+      ListCount OUT INTERGE
+)
+IS
+v_rows INTEGER;
+BEGIN
+      SELECT COUNT(*) INTO v_rows
+      FROM Customers
+      WHERE NOT cust_email IS NULL;
+      ListCount := v_rows;
+END;
+
+-- Oracle 调用方式
+var ReturnValue NUMBER
+EXEC MailingListCount(:ReturnValue);
+SELECT ReturnValue;
+```
+
+## 第二十课 管理事务处理
+
+使用事务处理, 通过确保成批的 SQL 操作要么完全执行, 要么完全不执行, 来维护数据库的完整性.
+
+事务处理的几个术语:
+
+- 事务(transaction)指一组 SQL 语句
+- 回退(rollback)指撤销指定 SQL 语句的过程
+- 提交(commit)指将未存储的 SQL 语句结果写入数据库表
+- 保留点(savepoint)指事务处理中设置的临时占位符( placeholder ), 可以对它发布回退(与回退整个事务处理不同)
+
+事务处理用来管理INSERT、UPDATE和DELETE语句, 但无法回退 SELECT 语句, CREATE 或 DROP 操作. 不同的 DBMS 实现事务处理的语法有所不同, 使用时需要参阅文档.
+
+管理事务的关键在于将 SQL 语句组分解为逻辑块, 明确规定数据何时回退, 何时不应该回退.
+
+```sql
+-- SQL Server
+BEGIN TRANSACTION
+...
+COMMIT TRANSACTION
+
+-- MySql 用法
+START TRANSACTION
+...
+-- 没有规定结束, 事务一直存在, 直到被中断.
+```
+
+### 使用 ROLLBACK
+
+SQL 的 ROLLBACK 命令用来回退(撤销) SQL 语句
+
+```sql
+-- 这里没有什么用, 但可以说明 DELETE 与 INSERT, UPDATE 一样, 并不是最终的结果
+DELETE FROM Orders
+ROLLBACK;
+```
+
+### 使用 COMMIT
+
+一般的 SQL 语句是针对数据库表直接执行和编写的, 属于隐式提交, 提交操作是自动进行的. 而事务处理块中, 提交不会隐式进行. 进行明确的提交, 使用 COMMIT 语句.
+
+```sql
+BEGIN TRANSACTION
+DELETE OrderItems WHERE order_num = 12345
+DELETE Orders WHERE order_num 12345
+COMMIT TRANSACTION
+```
+
+### 使用保留点
+
+对简单的事务使用 ROLLBACK 和 COMMIT 就可以写入或撤销整个事务. 但对于复杂的事务可能需要部分提交或回退. 要支持部分回退, 需要在事务处理块中合适位置放置占位符. 在需要回退时, 回到某个占位符. SQL 中这些占位符称为保留点. 每个保留点都需要唯一识别的名字, 供回退时使用.
+
+```sql
+-- MySql, Oracle 等里面可以使用 `SAVEPOINT` 语句.
+SAVEPOINT delete1;
+
+-- SQL Server 版本
+SAVE TRANSACTION delete1;
+
+-- 回退
+ROLLBACK TRANSACTION delete1;
+
+-- MySql 中
+ROLLBACK TO delete1;
+```
+
+一个完整的 SQL Server 例子
+
+```sql
+BEGIN TRANSACTION
+INSERT INTO Customers(cust_id, cust_name)
+VALUES('1000000010', 'Toys Emporium');
+SAVE TRANSACTION StartOrder;
+INSERT INTO Orders(order_num, order_date, cust_id)
+VALUES(20100,'2001/12/1','1000000010');
+IF @@ERROR <> 0 ROLLBACK TRANSACTION StartOrder;
+INSERT INTO OrderItems(order_num, order_item, prod_id, quantity, item_price)
+VALUES(20100, 1, 'BR01', 100, 5.49);
+IF @@ERROR <> 0 ROLLBACK TRANSACTION StartOrder;
+INSERT INTO OrderItems(order_num, order_item, prod_id, quantity, item_price)
+VALUES(20100, 2, 'BR03', 100, 10.99);
+IF @@ERROR <> 0 ROLLBACK TRANSACTION StartOrder;
+COMMIT TRANSACTION
+```
+
+`@@ERROR` 作为 DBMS 中的一个特殊变量, 用其可查看是否有错误发生, 不同的 DBMS 获取错误信息的方式可能不一样.
+
