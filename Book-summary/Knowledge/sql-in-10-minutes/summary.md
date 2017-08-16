@@ -1396,3 +1396,69 @@ COMMIT TRANSACTION
 
 `@@ERROR` 作为 DBMS 中的一个特殊变量, 用其可查看是否有错误发生, 不同的 DBMS 获取错误信息的方式可能不一样.
 
+## 第二十一课 使用游标
+
+SQL 检索操作返回一组称为结果集(SQL 查询所检索出的结果)的行. 简单使用 SELECT 无法获取第一行, 下一行等数据. 而游标则是用于在检索出来的行中前进或后退一行或多行.
+
+游标是一个存储在 DBMS 服务器上的数据库查询, 是 SELECT 语句检索出来的结果集, 存储游标之后, 应用程序可以根据需要滚动或浏览其中的数据.
+
+不同 DBMS 支持不同游标选项和特性, 常见的有:
+
+- 能够标记游标为只读, 使数据能读取, 但不能更新和删除.
+- 能控制可以执行的定向操作(向前、向后、第一、最后、绝对位置、相对位置等).
+- 能标记某些列为可编辑的, 某些列为不可编辑的.
+- 规定范围, 使游标对创建它的特定请求(如存储过程)或对所有请求可访问.
+- 指示 DBMS 对检索出的数据(而不是指出表中活动数据)进行复制, 使数据在游标打开和访问期间不变化.
+
+游标主要用于交互式应用, 但是对于 Web 应用的用处不大, 因为应用服务器是数据库客户端而不是最终用户.
+
+### 使用游标
+
+使用游标涉及几个明确的步骤:
+
+- 在使用游标前,必须声明(定义)它. 这个过程实际上没有检索数据, 它只是定义要使用的SELECT语句和游标选项.
+- 一旦声明, 就必须打开游标以供使用. 这个过程用前面定义的SELECT语句把数据实际检索出来.
+- 对于填有数据的游标, 根据需要取出(检索)各行.
+- 在结束游标使用时, 必须关闭游标, 可能的话, 释放游标(有赖于具体的 DBMS).
+
+#### 创建游标
+
+创建游标使用 DECLARE 语句来创建游标(不同的 DBMS 具有不同的写法), 并定义相应的 SELECT 语句, 根据需要带 WHERE 和其他子句
+
+```sql
+-- 找出电子邮件地址空缺的记录行
+DECLARE CustCursor CURSOR
+FOR
+SELECT * FROM Customers
+WHERE cust_email IS NULL
+```
+
+#### 使用游标
+
+要使用游标需要用 `OPEN CURSOR` 语句来打开:
+
+```sql
+OPEN CURSOR CustCursor;
+```
+
+```sql
+-- Oracle 使用游标
+-- FETCH指出要检索哪些行, 从何处检索它们以及将它们放于何处(如变量名). 下面用 Oracle
+-- 语法从游标中检索一行(第一行)
+DECLARE TYPE CustCursor IS REF CURSOR
+      RETURN Customers%ROWTYPE;
+DECLARE CustRecord Customers%ROWTYPE
+BEGIN
+      OPEN CustCursor;
+      FETCH CustCursor INTO CustRecord;
+      CLOSE CustCursor;
+END;
+```
+
+#### 关闭游标
+
+一旦游标关闭, 如果不再次打开, 将不能使用. 第二次使用它时不需要再声明, 只需用OPEN打开它即可.
+
+```sql
+CLOSE CustCursor
+```
