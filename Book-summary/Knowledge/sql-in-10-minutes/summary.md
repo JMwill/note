@@ -1462,3 +1462,157 @@ END;
 ```sql
 CLOSE CustCursor
 ```
+
+## 第二十二课 高级 SQL 特性
+
+正确地进行关系数据库设计, 需要一种方法保证只在表中插入合法数据, 这里就需要用到**约束**, 约束: 管理如何插入或处理数据库数据的规则. DBMS 在数据库表上施加约束来实施引用完整性.
+
+### 约束
+
+#### 主键
+
+一种特殊的约束, 用于保证一列(或一组列)中的值是唯一的, 且永不改变. 也就是表中的一列(或多个列)的值唯一标识表中的每一行.
+
+满足以下条件就可以作为主键:
+
+- 任意两行主键值都不一样
+- 每行都具有一个主键值 (列中不允许 NULL 值)
+- 包含主键值的列从不修改或更新.
+- 主键值不能重用, 如果从表中删除某一行, 其主键值不分配给新行.
+
+```sql
+-- 定义时创建主键
+CREATE TABLE Vendors
+(
+      vend_id           CHAR(10)    NOT NULL    PRIMARY KEY,
+      vend_name         CHAR(50)    NOT NULL,
+      vend_address      CHAR(50)    NULL,
+      vend_city         CHAR(50)    NULL,
+      vend_state        CHAR(5)     NULL,
+      vend_zip          CHAR(10)    NULL,
+      vend_country      CHAR(50)    NULL
+);
+
+-- 或修改列为主键
+ALTER TABLE Vendors
+ADD CONSTRAINT PRIMARY KEY (vend_id);
+```
+
+#### 外键
+
+表中的一列, 必须在另一表的主键中. 外键是保证引用完整性极其重要的部分.
+
+```sql
+-- 创建时定义外键
+CREATE TABLE Orders
+(
+      order_num         INTEGER     NOT NULL PRIMARY KEY,
+      order_date        DATETIME    NOT NULL,
+      cust_id           CHAR(10)    NOT NULL REFERENCES Customers(cust_id)
+)
+
+-- 更改方式定义外键
+ALTER TABLE Orders
+ADD CONSTRAINT
+FOREIGN KEY (cust_id) REFERENCES Customers(cust_id)
+```
+
+#### 唯一约束
+
+唯一约束用于保证一列(或一组列)中的数据是唯一的. 类似主键, 但区别是:
+
+- 表可以有多个唯一约束, 但每个表只允许一个主键
+- 唯一约束列可包含 NULL 值
+- 唯一约束列可修改或更新
+- 唯一约束列的值可重复使用
+- 与主键不一样,唯一约束不能用来定义外键
+
+唯一约束的语法类似于其他约束的语法. 唯一约束既可以用UNIQUE关键字在表定义中定义, 也可以用单独的CONSTRAINT定义.
+
+#### 检查约束
+
+用来保证一列(或一组列)的数据满足一组指定条件, 常见用途有:
+
+- 检查最小或最大值, 如防止 0 个物品的订单
+- 指定范围, 如日期限定
+- 只允许特定值, 如性别只有 M/F 或 男/女
+
+```sql
+-- 创建时使用约束, 保证任何插入(更新)的行都会被检查, 保证quantity大于0
+CREATE TABLE OrderItems
+(
+      order_num         INTEGER     NOT NULL,
+      order_item        INTEGER     NOT NULL,
+      prod_id           CHAR(10)    NOT NULL,
+      quantity          INTEGER     NOT NULL CHECK (quantity > 0),
+      item_price        MONEY       NOT NULL
+);
+
+-- 更改列为需要检查插入值是否符合规则
+ADD CONSTRAINT CHECK (gender LIKE '[MF]')
+```
+
+### 索引
+
+索引是用来排序数据以加快搜索和排序操作的速度的. 让索引能发挥作用的因素是: 恰当的排序. 由于主键数据总是排序的, 因此按照主键检索特定行总是一种快速有效的操作. 对于其他的行, 想要能够快速搜索则需要使用索引.
+
+在一个或多个列上定义索引, 使 DBMS 保存其内容的一个排过序的列表.
+
+创建索引前应该要知道:
+
+- 索引改善检索操作的性能, 但降低了数据插入, 修改和删除的性能. 在执行这些操作时, DBMS 必须动态地更新索引.
+- 索引数据可能要占用大量的存储空间.
+- 并非所有数据都适合做索引. 取值不多的数据(如州)不如具有更多可能值的数据(如姓或名), 能通过索引得到那么多的好处.
+- 索引用于数据过滤和数据排序. 如果你经常以某种特定的顺序排序数据, 则该数据可能适合做索引.
+- 可以在索引中定义多个列(例如, 州加上城市). 这样的索引仅在以州加城市的顺序排序时有用. 如果想按城市排序, 则这种索引没有用处.
+
+```sql
+CREATE INDEX prod_name_ind
+ON Products (prod_name);
+```
+
+索引必须唯一命名. 索引名 `prod_name_ind` 在关键字 `CREATE INDEX` 之后定义. ON用来指定被索引的表, 而索引中包含的列在表名后的圆括号中给出.
+
+### 触发器
+
+触发器是特殊的存储过程, 在特定的数据库活动发生时自动执行. 可以与特定表上的 `INSERT`, `UPDATE` 和 `DELETE` 操作(或组合)相关联.
+
+触发器内代码具有以下数据的访问权:
+
+- INSERT 操作中的所有新数据
+- UPDATE 操作中的所有新数据和旧数据
+- DELETE 操作中删除的数据
+
+触发器的常见用途:
+
+- 保证数据一致。例如, 在INSERT或UPDATE操作中将所有州名转换为大写.
+- 基于某个表的变动在其他表上执行活动. 例如, 每当更新或删除一行时将审计跟踪记录写入某个日志表.
+- 进行额外的验证并根据需要回退数据. 例如, 保证某个顾客的可用资金不超限定, 如果已经超出, 则阻塞插入.
+- 计算计算列的值或更新时间戳.
+
+不同 DBMS 创建触发器的差异很大, 具体实现需要参阅文档.
+
+```sql
+CREATE TRIGGER customer_state
+ON Customers
+FOR INSERT, UPDATE
+AS
+UPDATE Customers
+SET cust_state = Upper(cust_state)
+WHERE Customers.cust_id = inserted.cust_id;
+```
+
+约束的处理比触发器更快, 因此在可能的情况下都尽量使用约束.
+
+### 数据库安全
+
+SQL 中的安全性使用 GRANT 和 REVOKE 语句来管理
+
+一般需要保护的操作有:
+
+- 对数据库管理功能(创建表、更改或删除已存在的表等)的访问;
+- 对特定数据库或表的访问;
+- 访问的类型(只读、对特定列的访问等);
+- 仅通过视图或存储过程对表进行访问;
+- 创建多层次的安全措施,从而允许多种基于登录的访问和控制;
+- 限制管理用户账号的能力
