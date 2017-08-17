@@ -1,6 +1,7 @@
-module.exports = function insertSort(seq) {
+const utils = require('../utils');
+
+module.exports = function selectSort(seq) {
     let bigestIndex,
-        temp,
         i,
         j;
     for (i = 0, il = seq.length; i < il; i++) {
@@ -10,9 +11,7 @@ module.exports = function insertSort(seq) {
                 bigestIndex = j;
             }
         }
-        temp = seq[i];
-        seq[i] = seq[bigestIndex];
-        seq[bigestIndex] = temp;
+        utils.exchange(seq, i, bigestIndex);
     }
     return seq;
 };
