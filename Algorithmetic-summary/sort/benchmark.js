@@ -41,11 +41,7 @@ module.exports = class Benchmark {
      */
     log() {
         for (let i = 0; i < this.opt.repeat; i++) {
-            let name = [
-                'Benchmark test',
-                this.opt.name || this.fun.name,
-                i,
-            ].join(' ');
+            let name = `Benchmark test ${this.opt.name || this.fun.name || 'Anonymous'} ${i}`
             console.time(name);
             for (let j = 0; j < this.opt.times; j++) {
                 this.fun();
@@ -73,14 +69,8 @@ module.exports = class Benchmark {
         }
 
         let totalTime = timeLog[0] * NS_PER_SEC + timeLog[1];
-        let averageTime = totalTime / this.opt.repeat / NS_PER_SEC;
-        console.log([
-            'Benchmark test',
-            this.opt.name || this.fun.name,
-            'average time is:',
-            averageTime,
-            'seconds',
-        ].join(' '));
+        let averageTime = totalTime / this.opt.repeat / this.opt.times / NS_PER_SEC;
+        console.log(`Benchmark test ${this.opt.name || this.fun.name} average time is: ${averageTime} seconds!`);
     };
 
     /**

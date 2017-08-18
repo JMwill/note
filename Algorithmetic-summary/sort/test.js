@@ -6,6 +6,7 @@ const data = require('./data');
 const bubbleSort = require('./bubble');
 const selectSort = require('./select');
 const insertSort = require('./insert');
+const shellSort = require('./shell');
 
 // 基准数据
 const randomWords = data.getRandomWords(1000);
@@ -13,8 +14,8 @@ const randomInts = data.getRandomInts(1000);
 
 // benchmark 配置
 const benchmarkOpt = {
-    repeat: 1,
-    times: 1,
+    repeat: 10,
+    times: 100,
     // logType: 'normal',
     logType: 'average',
 };
@@ -34,13 +35,20 @@ let selectBenchmark = new Benchmark(function select() {
 // Insert 排序的基准测试实例
 let insertBenchmark = new Benchmark(function insert() {
     insertSort(randomWords.slice());
-    console.log(insertSort(randomInts.slice()).join(', '));
+    insertSort(randomInts.slice());
+}, benchmarkOpt);
+
+// Shell 排序的基准测试实例
+let shellBenchmark = new Benchmark(function shell() {
+    shellSort(randomWords.slice());
+    shellSort(randomInts.slice());
 }, benchmarkOpt);
 
 function run() {
-    // bubbleBenchmark.run();
-    // selectBenchmark.run();
+    bubbleBenchmark.run();
+    selectBenchmark.run();
     insertBenchmark.run();
+    shellBenchmark.run();
 }
 
 run();
