@@ -16,8 +16,8 @@ const randomInts = data.getRandomInts(1000);
 
 // benchmark 配置
 const benchmarkOpt = {
-    repeat: 10,
-    times: 100,
+    repeat: 1,
+    times: 1,
     // logType: 'normal',
     logType: 'average',
 };
@@ -55,7 +55,8 @@ let mergeBenchmark = new Benchmark(function merge() {
 // Quick 排序的基准测试实例
 let quickBenchmark = new Benchmark(function quick() {
     quickSort(randomWords.slice());
-    quickSort(randomInts.slice());
+    // quickSort(randomInts.slice());
+    console.log(quickSort(randomInts.slice()).join(','));
 }, benchmarkOpt);
 
 function run() {
@@ -63,7 +64,7 @@ function run() {
     // selectBenchmark.run();
     // insertBenchmark.run();
     // shellBenchmark.run();
-    mergeBenchmark.run();
+    // mergeBenchmark.run();
     quickBenchmark.run();
 }
 
