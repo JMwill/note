@@ -7,6 +7,7 @@ const bubbleSort = require('./bubble');
 const selectSort = require('./select');
 const insertSort = require('./insert');
 const shellSort = require('./shell');
+const mergeSort = require('./merge');
 
 // 基准数据
 const randomWords = data.getRandomWords(1000);
@@ -44,11 +45,18 @@ let shellBenchmark = new Benchmark(function shell() {
     shellSort(randomInts.slice());
 }, benchmarkOpt);
 
+// Merge 排序的基准测试实例
+let mergeBenchmark = new Benchmark(function merge() {
+    mergeSort(randomWords.slice());
+    mergeSort(randomInts.slice());
+}, benchmarkOpt);
+
 function run() {
     bubbleBenchmark.run();
     selectBenchmark.run();
     insertBenchmark.run();
     shellBenchmark.run();
+    mergeBenchmark.run();
 }
 
 run();
