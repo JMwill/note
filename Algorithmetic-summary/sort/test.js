@@ -9,6 +9,7 @@ const insertSort = require('./insert');
 const shellSort = require('./shell');
 const mergeSort = require('./merge');
 const quickSort = require('./quick');
+const heapSort = require('./heap');
 
 // 基准数据
 const randomWords = data.getRandomWords(1000);
@@ -16,8 +17,8 @@ const randomInts = data.getRandomInts(1000);
 
 // benchmark 配置
 const benchmarkOpt = {
-    repeat: 1,
-    times: 1,
+    repeat: 100,
+    times: 1000,
     // logType: 'normal',
     logType: 'average',
 };
@@ -55,8 +56,14 @@ let mergeBenchmark = new Benchmark(function merge() {
 // Quick 排序的基准测试实例
 let quickBenchmark = new Benchmark(function quick() {
     quickSort(randomWords.slice());
-    // quickSort(randomInts.slice());
-    console.log(quickSort(randomInts.slice()).join(','));
+    quickSort(randomInts.slice());
+    // console.log(quickSort(randomInts.slice()).join(','));
+}, benchmarkOpt);
+
+// Heap 排序的基准测试实例
+let heapBenchmark = new Benchmark(function heap() {
+    heapSort(randomWords.slice());
+    heapSort(randomInts.slice());
 }, benchmarkOpt);
 
 function run() {
@@ -66,6 +73,7 @@ function run() {
     // shellBenchmark.run();
     // mergeBenchmark.run();
     quickBenchmark.run();
+    heapBenchmark.run();
 }
 
 run();
