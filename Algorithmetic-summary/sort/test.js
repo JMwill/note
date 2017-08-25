@@ -17,7 +17,7 @@ const randomInts = data.getRandomInts(1000);
 
 // benchmark 配置
 const benchmarkOpt = {
-    repeat: 100,
+    repeat: 10,
     times: 1000,
     // logType: 'normal',
     logType: 'average',
@@ -57,7 +57,6 @@ let mergeBenchmark = new Benchmark(function merge() {
 let quickBenchmark = new Benchmark(function quick() {
     quickSort(randomWords.slice());
     quickSort(randomInts.slice());
-    // console.log(quickSort(randomInts.slice()).join(','));
 }, benchmarkOpt);
 
 // Heap 排序的基准测试实例
