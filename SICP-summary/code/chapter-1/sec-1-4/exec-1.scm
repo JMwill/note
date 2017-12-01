@@ -84,3 +84,13 @@
 	(else (sum-of-squares x y))))
 (sum-of-squares-of-two-larger-num 1 2 3)
 
+;;; Exercise 1.5
+;;;
+(define (p) (p))
+
+(define (test x y)
+  (if (= x 0)
+      0
+      y))
+
+(test 0 (p))
