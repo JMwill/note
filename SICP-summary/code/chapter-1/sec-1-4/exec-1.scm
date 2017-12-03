@@ -93,4 +93,64 @@
       0
       y))
 
-(test 0 (p))
+;;; (test 0 (p))
+
+;;; 用牛顿法求平方根，也就是逐次逼近
+;;; 因此需要：
+;;; 一个判断猜测数是否足够好的函数
+;;; 一个改进猜测数的函数
+;;; 一个将上述两个过程不断执行直到得到足够好的结果的函数
+;;;
+(define (sqrt-iter guess x)
+  (if (good-enough? guess x)
+      guess
+      (sqrt-iter (improve guess x)
+		 x)))
+
+;;; 改进函数需要一个函数来计算出下一个改进数是什么
+;;;
+(define (improve guess x)
+  (average guess (/ x guess)))
+
+(define (average x y)
+  (/ (+ x y) 2))
+
+;;; 定义 good-enough?
+;;;
+(define (good-enough? guess x)
+  (< (abs (- (square guess) x)) 0.0001))
+
+;;; 定义调用函数
+;;;
+(define (sqrt x)
+  (sqrt-iter 1.0 x))
+
+(sqrt 9)
+
+;;; Exercise 1.6
+;;; 使用 new-if 来创建开方的计算过程
+;;; 这个 new-if 在进行一般的表达式判断时可以使用，
+;;; 但是在递归表达式的判断中，如果解析器执行时采取
+;;; 应用序来解析程序，因为 new-if 作为一个过程，会
+;;; 被先行解析，在第一次解析时，过程能够正确解析，
+;;; 而在递归的二次解析过程中需要用到的参数也是需要
+;;; 解析的过程，而这个时候，new-if 过程并没有结束
+;;；则本次 new-if 过程解析就会失败，而如果解析器
+;;; 采用的是一般序执行解析的话，则计算过程会在需要
+;;; 时再执行，那么应用程序实际上将能够正确执行。
+;;; 
+(define (new-if predicate then-clause else-clause)
+  (cond (predicate then-clause)
+	(else else-clause)))
+
+(define (sqrt-iter guess x)
+  (new-if (good-enough? guess x)
+	  guess
+	  (sqrt-iter (improve guess x)
+		     x)))
+
+
+;;; (sqrt-iter 10)
+
+;;; Exercise 1.7
+;;;
