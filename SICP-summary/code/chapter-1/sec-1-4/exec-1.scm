@@ -143,14 +143,43 @@
   (cond (predicate then-clause)
 	(else else-clause)))
 
-(define (sqrt-iter guess x)
-  (new-if (good-enough? guess x)
-	  guess
-	  (sqrt-iter (improve guess x)
-		     x)))
+;;; (define (sqrt-iter guess x)
+;;;  (new-if (good-enough? guess x)
+;;;	  guess
+;;;	  (sqrt-iter (improve guess x)
+;;;		     x)))
 
 
 ;;; (sqrt-iter 10)
 
 ;;; Exercise 1.7
 ;;;
+(define (good-enough? guess x)
+  (< (abs (- (square guess) x)) 0.000000000000001))
+
+(sqrt 2)
+
+;;; Exercise 1.8
+;;;
+(define (cube x)
+  (* x x x))
+
+(define (cube-iter cube-guess x)
+  (if (cube-x-good-enough? cube-guess x)
+      cube-guess
+      (cube-iter (improve-cube cube-guess x)
+		 x)))
+
+(define (improve-cube cube-guess x)
+  (/ (+ (/ x (square cube-guess))
+	(* 2 cube-guess))
+     3))
+
+(define (cube-x-good-enough? cube-guess x)
+  (< (abs (- (cube cube-guess) x)) 0.00001))
+
+(define (cube-root x)
+  (cube-iter 1 x))
+
+(cube-root 27)
+
