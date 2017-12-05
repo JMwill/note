@@ -153,9 +153,23 @@
 ;;; (sqrt-iter 10)
 
 ;;; Exercise 1.7
+;;; 对于过大或者过小的数据，good-enough? 过程并不能够
+;;; 进行有效的判断，这也是因为 improve 过程得到的结果
+;;; 无法提供给 good-enough? 可以判断的值，通过改进
+;;; good-enough? 可以判断较大或者较小的数
 ;;;
-(define (good-enough? guess x)
-  (< (abs (- (square guess) x)) 0.000000000000001))
+(define (good_enough? guess oldguess x)
+  (< (abs (- guess oldguess))
+     (* guess 0.001)))
+
+(define (sqrt-iter guess oldguess x)
+  (if (good-enough? guess oldguess)
+      guess
+      (sqrt-iter (improve guess x) guess
+		 x)))
+
+(define (sqrt x)
+  (sqrt-iter 1.0 2.0 x))
 
 (sqrt 2)
 
@@ -176,10 +190,10 @@
      3))
 
 (define (cube-x-good-enough? cube-guess x)
-  (< (abs (- (cube cube-guess) x)) 0.00001))
+  (< (abs (- (cube cube-guess) x)) 0.000000000000000001))
 
 (define (cube-root x)
-  (cube-iter 1 x))
+  (cube-iter 1.0 x))
 
-(cube-root 27)
+(cube-root 9)
 
