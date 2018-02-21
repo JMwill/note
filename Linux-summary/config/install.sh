@@ -70,6 +70,10 @@ else
     updaterc
 fi
 
+if ! [ -f $HOME/my_bash_config ]; then
+	wget -c https://raw.githubusercontent.com/JMwill/wiki/master/Linux-summary/config/my_bash_config $HOME/my_bash_config
+fi
+
 # install emacs.d
 if ! [ -f $HOME/.emacs.d/README.org ]; then
 	rm $HOME/.emacs.d/init.el
