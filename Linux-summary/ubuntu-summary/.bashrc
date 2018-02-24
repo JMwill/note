@@ -37,7 +37,7 @@ fi
 
 # set a fancy prompt (non-color, unless we know we "want" color)
 case "$TERM" in
-    xterm-color) color_prompt=yes;;
+    xterm-color|*-256color) color_prompt=yes;;
 esac
 
 # uncomment for a colored prompt, if the terminal has the capability; turned
@@ -84,6 +84,9 @@ if [ -x /usr/bin/dircolors ]; then
     alias egrep='egrep --color=auto'
 fi
 
+# colored GCC warnings and errors
+#export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+
 # some more ls aliases
 alias ll='ls -alF'
 alias la='ls -A'
@@ -113,28 +116,21 @@ if ! shopt -oq posix; then
   fi
 fi
 
-# will add
-alias wireshark='bash ~/myFile/software/wireshark-1.12.10/wireshark &'
-export QCLOUD_UBUNTU="119.29.180.98"
-alias sshubuntu="ssh ubuntu@$QCLOUD_UBUNTU"
-alias tmux='tmux -2'
-
 # display git branch
-function git_branch {
-  branch="`git branch 2>/dev/null | grep "^\*" | sed -e "s/^\*\ //"`"
-  if [ "${branch}" != "" ];then
-    if [ "${branch}" = "(no branch)" ];then
-      branch="(`git rev-parse --short HEAD`...)"
-    fi
-    echo "($branch)"
-  fi
-}
+#function git_branch {
+#  branch="`git branch 2>/dev/null | grep "^\*" | sed -e "s/^\*\ //"`"
+#  if [ "${branch}" != "" ];then
+#    if [ "${branch}" = "(no branch)" ];then
+#      branch="(`git rev-parse --short HEAD`...)"
+#    fi
+#    echo "($branch)"
+#  fi
+#}
+#
+#export PS1='\u@\h \[\033[01;36m\]\W\[\033[01;32m\]$(git_branch)\[\033[00m\] \$ '
 
-export PS1='\u@\h \[\033[01;36m\]\W\[\033[01;32m\]$(git_branch)\[\033[00m\] \$ '
 
-
-# add autojump
-[[ -s ~/.autojump/etc/profile.d/autojump.sh ]] && . ~/.autojump/etc/profile.d/autojump.sh
-
-export NVM_DIR="/home/duoyi/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
+# load my config file
+if [ -f ~/my_bash_config ]; then
+    . ~/my_bash_config
+fi
