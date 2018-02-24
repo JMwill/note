@@ -14,6 +14,7 @@ alias ....="cd ../../.."
 alias .....="cd ../../../.."
 alias ......="cd ../../../../.."
 alias _=sudo
+alias tmux="tmux -2"
 
 if hash python3 2>/dev/null; then
     alias python="python3"
@@ -52,6 +53,24 @@ function gqurl () {
     local commit_id=`git log --pretty=format:'%h %ad %s (%an)' --date=short|percol|sed -e"s/^\([a-z0-9]\+\)\s\+.*$/\1/"`
     gurl ${commit_id}
 }
+
+# Enable tab completion
+BASH_GIT_SETTING_PATH="$HOME/.bash_git_setting"
+[ -f $BASH_GIT_SETTING_PATH/git-completion.bash ] && source $BASH_GIT_SETTING_PATH/git-completion.bash
+
+# colors!
+green="\[\033[0;32m\]"
+blue="\[\033[0;34m\]"
+purple="\[\033[0;35m\]"
+reset="\[\033[0m\]"
+
+# Change command prompt
+[ -f $BASH_GIT_SETTING_PATH/git-prompt.sh ] && source $BASH_GIT_SETTING_PATH/git-prompt.sh
+export GIT_PS1_SHOWDIRTYSTATE=1
+# '\u' adds the name of the current user to the prompt
+# '\$(__git_ps1)' adds git-related stuff
+# '\W' adds the name of the current directory
+export PS1="$purple\u$green\$(__git_ps1)$blue \W $ $reset"
 # ================= End Git setting ================= #
 
 
@@ -130,5 +149,6 @@ fi
 
 # ================= Nvm setting ================= #
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" || echo "nvm.sh can't launch" # This loads nvm
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" || echo "nvm.sh can't launch" # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 # ================= End Nvm setting ================= #
