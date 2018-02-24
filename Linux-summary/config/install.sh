@@ -99,3 +99,20 @@ updaterc
 [ "$(type -t nvm)" = function ] || curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.8/install.sh | bash
 
 updaterc
+
+# download git bash setting
+BASH_GIT_SETTING_PATH="$HOME/.bash_git_setting"
+GIT_COMPLETION_BASHFILE="https://raw.githubusercontent.com/JMwill/wiki/master/Linux-summary/ubuntu-summary/bash-git-set/git-completion.bash"
+GIT_PROMPT_SHFILE="https://raw.githubusercontent.com/JMwill/wiki/master/Linux-summary/ubuntu-summary/bash-git-set/git-prompt.sh"
+
+if ! [ -d $BASH_GIT_SETTING_PATH ]; then
+    mkdir $BASH_GIT_SETTING_PATH
+fi
+if ! [ -f $BASH_GIT_SETTING_PATH/git-completion.bash ]; then
+    wget -c $GIT_COMPLETION_BASHFILE -O "$BASH_GIT_SETTING_PATH/git-completion.bash"
+fi
+if ! [ -f $BASH_GIT_SETTING_PATH/git-prompt.sh ]; then
+    wget -c $GIT_PROMPT_SHFILE -O "$BASH_GIT_SETTING_PATH/git-prompt.sh"
+fi
+
+updaterc
