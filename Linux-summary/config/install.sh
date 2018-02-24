@@ -72,6 +72,7 @@ fi
 
 if ! [ -f $HOME/my_bash_config ]; then
 	wget -c https://raw.githubusercontent.com/JMwill/wiki/master/Linux-summary/config/my_bash_config $HOME/my_bash_config
+    WGET_PID1=wget_pid1
 fi
 
 # install emacs.d
@@ -110,9 +111,12 @@ if ! [ -d $BASH_GIT_SETTING_PATH ]; then
 fi
 if ! [ -f $BASH_GIT_SETTING_PATH/git-completion.bash ]; then
     wget -c $GIT_COMPLETION_BASHFILE -O "$BASH_GIT_SETTING_PATH/git-completion.bash"
+    WGET_PID2=wget_pid2
 fi
 if ! [ -f $BASH_GIT_SETTING_PATH/git-prompt.sh ]; then
     wget -c $GIT_PROMPT_SHFILE -O "$BASH_GIT_SETTING_PATH/git-prompt.sh"
+    WGET_PID3=wget_pid3
 fi
 
+wait $WGET_PID1 $WGET_PID2 $WGET_PID3
 updaterc
