@@ -107,17 +107,25 @@ if ! [ -d $BASH_GIT_SETTING_PATH ]; then
 fi
 if ! [ -f $BASH_GIT_SETTING_PATH/git-completion.bash ]; then
     wget -c $GIT_COMPLETION_BASHFILE -O "$BASH_GIT_SETTING_PATH/git-completion.bash"
-    wait
+    WGET_PID2=$!
 fi
 if ! [ -f $BASH_GIT_SETTING_PATH/git-prompt.sh ]; then
     wget -c $GIT_PROMPT_SHFILE -O "$BASH_GIT_SETTING_PATH/git-prompt.sh"
-    wait
+    WGET_PID3=$!
 fi
+
 
 # download bash config file
 if ! [ -f $HOME/my_bash_config ]; then
 	wget -c https://raw.githubusercontent.com/JMwill/wiki/master/Linux-summary/config/my_bash_config $HOME/my_bash_config
-    wait
+    WGET_PID1=$!
 fi
 
+LINE="if [ -f ~/my_bash_config ]; then"
+FILE=".bashrc"
+grep -qF -- "$LINE" $FILE || echo "$LINE
+    . ~/my_bash_config
+fi" >> "$FILE"
+
+wait $WGET_PID1 $WGET_PID2 $WGET_PID3
 updaterc
