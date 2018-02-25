@@ -140,5 +140,9 @@ fi
 
 [ -d $HOME/.envs ] && export WORKON_HOME=$HOME/.envs || echo "Virtualenv storage folder does't exist" # 所有虚拟环境存储的目录
 [ -s /usr/local/bin/virtualenvwrapper.sh ] && source /usr/local/bin/virtualenvwrapper.sh || echo "virtualenvwrapper.sh file can't launch"
+
+
+[ -d $HOME/.envs/python2 ] || ([ -x "$(which python2)" ] && mkvirtualenv --python="$(which python2)" python2)
+[ -d $HOME/.envs/python3 ] || ([ -x "$(which python3)" ] && mkvirtualenv --python="$(which python3)" python3)
 # ================= End Virtualenv setting ================= #
 
