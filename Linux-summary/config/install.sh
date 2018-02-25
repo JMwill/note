@@ -46,6 +46,7 @@ else
 
     # install pip
     if ! [ -x "$(which pip)" ]; then
+        sudo apt-get install -y python3-venv
         curl https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py
         python /tmp/get-pip.py
         pip install -U pip
@@ -58,7 +59,7 @@ else
 	if ! [ -x "$(which emacs25)" ]; then
 		sudo add-apt-repository -y ppa:kelleyk/emacs
 		sudo apt-get update
-		sudo apt-get install emacs25
+		sudo apt-get install -y emacs25
 	fi
 
     # install git
