@@ -92,6 +92,7 @@ fi
 BASH_GIT_SETTING_PATH="$HOME/.bash_git_setting"
 GIT_COMPLETION_BASHFILE="https://raw.githubusercontent.com/JMwill/wiki/master/Linux-summary/ubuntu-summary/bash-git-set/git-completion.bash"
 GIT_PROMPT_SHFILE="https://raw.githubusercontent.com/JMwill/wiki/master/Linux-summary/ubuntu-summary/bash-git-set/git-prompt.sh"
+BASH_CONFIG_FILE="https://raw.githubusercontent.com/JMwill/wiki/master/Linux-summary/config/my_bash_config"
 
 if ! [ -d $BASH_GIT_SETTING_PATH ]; then
     mkdir $BASH_GIT_SETTING_PATH
@@ -107,7 +108,7 @@ fi
 
 # download bash config file
 if ! [ -f $HOME/my_bash_config ]; then
-	wget -c https://raw.githubusercontent.com/JMwill/wiki/master/Linux-summary/config/my_bash_config $HOME/my_bash_config
+    wget -c $BASH_CONFIG_FILE -O "$HOME/my_bash_config"
     WGET_PID1=$!
 fi
 
