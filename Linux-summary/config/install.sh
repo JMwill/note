@@ -46,10 +46,8 @@ else
 
     # install pip
     if ! [ -x "$(which pip)" ]; then
-        sudo apt-get install -y python3-venv
-        curl https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py
-        sudo python /tmp/get-pip.py
-        pip install -U pip
+        sudo apt-get install -y python3-venv python3-pip
+        pip3 install -U pip
     fi
 
     # install autojump
