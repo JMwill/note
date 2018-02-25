@@ -123,7 +123,9 @@ fi
 
 LINE="if [ -f ~/my_bash_config ]; then"
 FILE=".bashrc"
-grep -qF -- "$LINE" $FILE || echo "$LINE
+grep -qF -- "$LINE" $FILE || echo "
+# self bash config file
+$LINE
     . ~/my_bash_config
 fi" >> "$FILE"
 
