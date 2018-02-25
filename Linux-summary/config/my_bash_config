@@ -132,14 +132,10 @@ fi
 
 
 # ================= End Virtualenv setting ================= #
-if [ -x /usr/bin/python3.5 ]; then
-    VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3.5
-elif [ -x /usr/local/bin/python3.5 ]; then
-    VIRTUALENVWRAPPER_PYTHON=/usr/local/bin/python3.5
-elif [ -x /usr/bin/python2.7 ]; then
-    VIRTUALENVWRAPPER_PYTHON=/usr/bin/python2.7
+if [ -x $(which python3) ]; then
+    VIRTUALENVWRAPPER_PYTHON=$(which python3)
 else
-    VIRTUALENVWRAPPER_PYTHON=/usr/local/bin/python2.7
+    VIRTUALENVWRAPPER_PYTHON=$(which python2)
 fi
 
 [ -d $HOME/.envs ] && export WORKON_HOME=$HOME/.envs || echo "Virtualenv storage folder does't exist" # 所有虚拟环境存储的目录
