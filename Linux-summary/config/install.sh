@@ -37,6 +37,9 @@ if [ $OS_NAME == Darwin ]; then
     # install git
     [ -x "$(which git)" ] || brew install git
 
+    # install git flow
+    [ -x "$(which git-flow)" ] || brew install git-flow
+
     updaterc
 else
     sudo apt-get -y update
@@ -62,6 +65,9 @@ else
 
     # install git
     [ -x "$(which git)" ] || sudo apt-get install -y git
+
+    # install git flow
+    [ -x "$(which git-flow)" ] || sudo apt-get install -y git-flow
 
     # install xsel
     [ -x "$(which xsel)" ] || sudo apt-get install -y xsel;
