@@ -73,6 +73,7 @@ else
     [ -x "$(which xsel)" ] || sudo apt-get install -y xsel;
 
     updaterc
+    alias sudo='sudo -H env PATH=$PATH'
 fi
 
 # install emacs.d
@@ -84,11 +85,11 @@ if ! [ -f $HOME/.emacs.d/README.org ]; then
 fi
 
 # install percol
-[ -x "$(which percol)" ] || sudo -H pip install percol
+[ -x "$(which percol)" ] || sudo pip install percol
 
 # install virtualenv
-[ -x "$(which virtualenv)" ] || sudo -H pip install virtualenv
-[ "$(type -t mkvirtualenv)" = function ] || sudo -H pip install virtualenvwrapper
+[ -x "$(which virtualenv)" ] || sudo pip install virtualenv
+[ "$(type -t mkvirtualenv)" = function ] || sudo pip install virtualenvwrapper
 [ -d $HOME/.envs ] || mkdir $HOME/.envs
 
 # install nvm
