@@ -55,3 +55,6 @@ au BufRead *.py map <buffer> <F5> :w<CR>:!/usr/bin/env python % <CR>
 
 " Custom Key Map
 imap kj <Esc>
+
+" Custom Plugin Setting
+let NERDTreeShowHidden=1
