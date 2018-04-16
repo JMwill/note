@@ -47,3 +47,73 @@
 - 对于布尔值修饰符值并不用包含在名称中
 
 以上是一般的 BEM 命名规则，对于 MVVM 等框架而言，因为已有模块的概念，所以可以将命名方式调整为：`BlockName-ElemName-modName-modVal`
+
+## CSS
+
+需不需要 wrapper？CSS 中，wrapper 的作用通常是用来定位 HTML 元素之间的位置或者是定位区域中多个元素的位置。而这些情况再 BEM 中可以通过 `mixes` 的方法或者是一个额外的 BEM 元素来解决，并不需要使用一个额外的抽象无意义 wrapper
+
+对于与其他元素进行位置确定的一般使用 `mixes` 的方式，而定位多个元素的话则新建立一个 BEM 元素
+
+### 选择器
+
+BEM 中，使用的都是 `class` 选择器。其中：
+
+- 不推荐，严格点来说不允许将 `tag` 与 `class` 一起使用：`button.button`。
+- 可以使用嵌套的类选择器，但是要克制，避免过多的嵌套。只在两者有必要嵌套的时候再进行使用：`.button_hovered .button__text`。
+- 多个类叠加加强限定的方式也是不允许的 `.button.button_theme_islands {}`
+
+### Mixes
+
+Mixes 允许我们：
+
+- 在多个实体中组合行为以及样式而不用产生重复的代码
+- 在不同的 HTML 元素中应用相同的样式
+
+适合使用 Mixes 的情况有：
+
+#### 需要设置外部的几何形状以及位置时
+
+例子：
+
+```html
+<!-- header block -->
+<header class="header">
+  <button class="button header__button">...</button>
+</header>
+```
+
+设置 Header 块的按钮样式
+
+```css
+.button {
+  font-family: Arial;
+  text-align: center;
+  border: 1px solid black;
+}
+
+.header__button {
+  margin: 30px;
+  position: relative;
+}
+```
+
+而因为跟 button 定位相关的样式都以 header 内的一个元素 `.header__button` 的方式来定义，因此 button 这个块可以应用到其他的地方而不会有别的影响
+
+```html
+<!-- footer block -->
+<footer class="footer">
+  <button class="button">...</button>
+</footer>
+```
+
+#### 块的样式组
+
+在需要应用相同的样式到多个不同的 HTML 样式中时就可以使用 **组选择器**：`article， .footer div`。但是组选择器会使得 CSS 代码的耦合度变高。因此这里可以使用 Mixes 创建一个额外的块（Block）来达到共享相同样式的目的。
+
+#### 单一职责原则
+
+跟面向对象编程一样，BEM 对 CSS 而言也应该要符合单一职责原则，单个块的 CSS 所负责的也应该是单一的目的，不要既进行结构的构造，又定义几何位置。
+
+#### 开放/封闭原则
+
+这个原则说的是元素对于 **修饰符** 应该是开放的，但是对于直接的修改应该是封闭的，比如当需要重新定义某个按钮的字体、行高的时候，可以通过添加一个 **修饰符** 来实现，而不是利用上下文来进行修改：`.context .button`，这样的方式。
