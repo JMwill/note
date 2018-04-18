@@ -58,3 +58,5 @@ imap kj <Esc>
 
 " Custom Plugin Setting
 let NERDTreeShowHidden=1
+set cul
+set cuc
