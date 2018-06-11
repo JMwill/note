@@ -1,0 +1,164 @@
+.pepe-table-wrap {
+  background-color: $white;
+  border-radius: 4px;
+
+  .pepe-table {
+    th,
+    td {
+      background-color: transparent;
+      line-height: 1;
+    }
+  }
+}
+
+$pepe-table-extra-bg: rgba(35, 195, 52, .08);
+
+.pepe-table {
+  width: 100%;
+  max-width: 100%;
+  table-layout: fixed;
+
+  &.solo {
+    margin-top: 12px;
+
+    thead {
+      td {
+        border-bottom: 2px solid $n1-1;
+      }
+    }
+
+    td {
+      border: 0;
+    }
+
+    .extra {
+      background-color: $pepe-table-extra-bg;
+      padding: 12px 16px;
+
+      p {
+        margin: 0 0 8px;
+        font-size: 12px;
+        line-height: 1.5;
+
+        &:last-child {
+          margin: 0;
+        }
+      }
+
+      .memo-text {
+        margin-right: 32px;
+      }
+    }
+  }
+
+  th {
+    background-color: $white;
+    padding: 18px 0;
+    line-height: 1;
+    font-weight: normal;
+
+    &.first {
+      padding-left: 16px;
+
+      input {
+        display: inline-block;
+        margin: 0 16px 0 0;
+      }
+    }
+  }
+
+  td {
+    background-color: $white;
+    padding: 20px 0;
+    border-top: 2px solid $n1-1;
+    word-wrap: break-word;
+    line-height: 1;
+
+    &.first {
+      padding-left: 16px;
+
+      input {
+        display: inline-block;
+        margin-right: 16px;
+      }
+    }
+  }
+}
+
+.img {
+  img {
+    width: 60px;
+  }
+}
+
+.order-table {
+  h3 {
+    margin: 0;
+    padding: 0;
+    font-size: $h4;
+    line-height: 1.5;
+    font-weight: normal;
+    width: 180px;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    margin-top: 8px;
+
+    &.pepe-list {
+      margin-top: 0;
+    }
+  }
+
+  label {
+    margin: 0;
+    padding: 0;
+  }
+
+  .spec-item {
+    width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.order-table__heading {
+  td {
+    padding: 12px 0;
+    color: $n3-3;
+  }
+}
+
+.pepe-list {
+  li {
+    line-height: 1;
+    margin-bottom: 10px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.table-action-group {
+  .btn {
+    width: 62px;
+    height: 28px;
+    line-height: 28px;
+    text-align: center;
+    padding: 0;
+  }
+
+  p {
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.text-item {
+  margin-right: 32px;
+}

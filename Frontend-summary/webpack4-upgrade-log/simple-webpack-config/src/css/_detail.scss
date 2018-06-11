@@ -1,0 +1,98 @@
+.detail {
+  table {
+    margin-top: 28px;
+
+    td {
+      padding: 0 32px 16px 0;
+      vertical-align: top;
+      line-height: 1;
+    }
+  }
+
+  label {
+    margin: 0;
+    color: $n3-2;
+  }
+
+  .pepe-table {
+    width: 100%;
+    border: $border;
+    margin-top: 16px;
+
+    th {
+      padding: 20px 16px;
+      vertical-align: middle;
+      line-height: 1;
+    }
+
+    td {
+      border-top: $border;
+      padding: 20px 16px;
+      vertical-align: middle;
+      line-height: 1;
+    }
+
+    .img {
+      width: 80px;
+      border-right: 0;
+
+      img {
+        margin: 0;
+      }
+    }
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+.detail__hd {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.detail__band {
+  background-color: $white;
+  padding: 28px;
+  margin-top: 24px;
+  border-radius: 4px;
+
+  & > p {
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.detail__band-title {
+  font-size: 16px;
+  margin: 0;
+  padding: 0;
+  line-height: 1;
+  font-weight: normal;
+}
+
+.detail__band-status {
+  margin-top: 16px;
+  line-height: 1;
+}
+
+.detail__alert {
+  font-size: 12px;
+  background-color: $bg1-1;
+  padding: 10px 20px;
+  margin-bottom: 28px;
+}
+
+.detail__info {
+  margin: 36px 0 0;
+
+  & > p {
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
