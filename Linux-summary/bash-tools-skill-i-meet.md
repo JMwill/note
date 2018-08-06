@@ -10,3 +10,8 @@ $ grep -B 3 -A 4 "hello" file1 file2 # 查找到对应行后, 上面保留3行, 
 ```
 
 `grep`中, 如果需要使用正则表达式, 由于默认支持的是基本正则, 对于一些像`\d`等的匹配模式无法使用, 可以通过添加`-P`参数来使用Perl模式的正则表达式
+
+## ssh
+
+要保持连接不断开，可以在客户端的 `/etc/ssh/sshd_config` 里面设置：`ServerAliveInterval: 100` 保持连接 100
+秒，或者在服务器端的 `/etc/ssh/sshd_config` 设置 `ClientAliveInterval: 100` 保持连接 100 秒。
