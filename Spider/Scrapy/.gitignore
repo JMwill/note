@@ -1,6 +1,0 @@
-.ftpconfig
-meizi/meizi/db.cfg
-__pycache__/*
-*.pyc
-_config.json
-*.log

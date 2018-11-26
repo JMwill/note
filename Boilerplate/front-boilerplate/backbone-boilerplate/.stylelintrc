@@ -1,6 +1,0 @@
-{
-    "indentation": [ 4, {
-        "message": "Please use 4 spaces for indentation. Tabs make The Architect grumpy.",
-        "severity": "warning"
-    } ]
-}
