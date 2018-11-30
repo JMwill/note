@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>HTML</title>
+    </head>
+    <body>
+        <div id="A"></div>
+        <span id="B"></span>
+        <div id="C"></div>
+        <div id="D"></div>
+        <div id="E"></div>
+
+        <script>
+            console.log('================== Exercise Four ==================');
+            document.getElementById('A').innerHTML = '<strong>Hi</strong>';
+            document.getElementById('B').outerHTML = '<div id="B" class="new">Whats Shaking</div>';
+            document.getElementById('C').textContent = 'dude';
+
+            // 非标准扩展
+            document.getElementById('D').innerText = 'Keep it';
+            document.getElementById('E').outerText = 'real';
+
+            console.log(document.body.innerHTML);
+            console.log('==================================================');
+        </script>
+    </body>
+</html>

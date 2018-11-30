@@ -1,0 +1,26 @@
+@mixin cell-layout($align: top) {
+  display: table-cell;
+  vertical-align: $align;
+  word-wrap: break-word;
+  word-break: break-all;
+}
+
+@mixin clearfix {
+  display: table;
+  line-height: 0;
+  content: '';
+  clear: both;
+}
+
+@mixin ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  word-wrap: normal;
+}
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

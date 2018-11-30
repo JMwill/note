@@ -1,0 +1,29 @@
+{
+  "nextBillStatus": {
+    "pending_release": {
+      "next": "pending_approval",
+      "name": "发布",
+      "confirmMsg": "供应商账单一经发布，将不能修改。请确认账单信息准确。"
+    },
+    "pending_approval": {
+      "next": "pending_invoice",
+      "name": "",
+      "confirmMsg": ""
+    },
+    "pending_invoice": {
+      "next": "pending_payment",
+      "name": "确认发票",
+      "confirmMsg": "发票信息一经确认，将立即生效。请确认发票信息准确。"
+    },
+    "pending_payment": {
+      "next": "pending_receipt",
+      "name": "打款",
+      "confirmMsg": ""
+    },
+    "pending_receipt": {
+      "next": "paid",
+      "name": "",
+      "confirmMsg": ""
+    }
+  }
+}

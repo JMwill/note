@@ -1,0 +1,83 @@
+@-webkit-keyframes 'outer-roll' {
+    0% {
+        transform: rotate(0deg);
+        border-radius: 0%;
+    }
+    10% {
+        transform: rotate(720deg);
+    }
+    20% {
+        left: 300px;
+        background-color: blue;
+    }
+    50%: {
+        left: 1200px;
+        background-color: yellow;
+    }
+    70%: {
+        left: 100px;
+        background-color: green;
+    }
+    100%: {
+        left: 50;
+        background-color: pink;
+        border-radius: 50%;
+    }
+}
+
+@-webkit-keyframes 'inner-roll' {
+    100% {
+        transform: rotate(0deg);
+        border-radius: 50%;
+    }
+    10% {
+        background-color: pink;
+    }
+    20% {
+        left: 300px;
+        background-color: green;
+    }
+    50%: {
+        left: 1200px;
+        background-color: blue;
+    }
+    70%: {
+        left: 100px;
+        background-color: yellow;
+    }
+    100%: {
+        transform: rotate(720deg);
+        left: 50;
+        border-radius: 0%;
+    }
+
+}
+
+.container {
+    position: absolute;
+    top: 50%;
+    left: 25%;
+    width: 100px;
+    height: 100px;
+    margin: -50px;
+}
+.run-block {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    left: 0;
+    background-color: lightblue;
+    -webkit-animation: 'outer-roll' 5s ease-in-out 2s infinite alternate;
+}
+
+.run-inner-block {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -25px;
+    margin-top: -25px;
+    width: 50px;
+    height: 50px;
+    background-color: lightgreen;
+    -webkit-animation: 'inner-roll' 5s ease-in-out 2s infinite alternate;
+}

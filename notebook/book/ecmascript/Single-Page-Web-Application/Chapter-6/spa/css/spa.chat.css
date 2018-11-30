@@ -1,0 +1,210 @@
+/**
+ * spa.chat.css
+ * Chat feature styles
+ */
+.spa-chat {
+    position        : absolute;
+    bottom          : 0;
+    right           : 0;
+    width           : 32rem;
+    height          : 2rem;
+    background      : #fff;
+    border-radius   : .5rem 0 0;
+    border-style    : solid;
+    border-width    : thin 0 0 thin;
+    border-color    : #888;
+    box-shadow      : 0 0 0.75rem 0 #888;
+    z-index         : 1;
+}
+.spa-chat-head, .spa-chat-closer {
+    position        : absolute;
+    top             : 0;
+    height          : 2rem;
+    line-height     : 1.8rem;
+    border-bottom   : thin solid #888;
+    cursor          : pointer;
+    background      : #888;
+    color           : #fff;
+    font-family     : arial, helvetica, sans-serif;
+    font-weight     : 800;
+    text-align      : center;
+}
+.spa-chat-head {
+    left            : 0;
+    right           : 2rem;
+    border-radius   : .3rem 0 0 0;
+}
+.spa-chat-closer {
+    right   : 0;
+    width   : 2rem;
+}
+    .spa-chat-closer:hover {
+        background: #800;
+    }
+.spa-chat-head-toggle {
+    position        : absolute;
+    top             : 0;
+    left            : 0;
+    width           : 2rem;
+    bottom          : 0;
+    border-radius   : .3rem 0 0 0;
+}
+.spa-chat-head-title {
+    position    : absolute;
+    left        : 50%;
+    width       : 16rem;
+    margin-left : -8rem;
+}
+.spa-chat-sizer {
+    position    : absolute;
+    top         : 2rem;
+    left        : 0;
+    right       : 0;
+}
+.spa-chat-list {
+    position: absolute;
+    top     : 0;
+    left    : 0;
+    bottom  : 0;
+    width   : 10rem;
+}
+.spa-chat-msg {
+    position: absolute;
+    top     : 0;
+    left    : 10rem;
+    bottom  : 0;
+    right   : 0;
+}
+.spa-chat-msg-log,
+.spa-chat-list-box {
+    position    : absolute;
+    top         : 1rem;
+    overflow-x  : hidden;
+}
+.spa-chat-msg-log {
+    left        : 0;
+    right       : 1rem;
+    bottom      : 4rem;
+    padding     : 0.5rem;
+    border      : thin solid #888;
+    overflow-y  : scroll;
+}
+.spa-chat-msg-log-msg {
+    background-color: #eee;
+}
+.spa-chat-msg-log-me {
+    font-weight : 800;
+    color       : #484;
+}
+.spa-chat-msg-log-alert {
+    font-style  : italic;
+    background  : #a88;
+    color       : #fff;
+}
+.spa-chat-list-box {
+    left            : 1rem;
+    right           : 1rem;
+    bottom          : 1rem;
+    overflow-y      : auto;
+    border-width    : thin 0 thin thin;
+    border-style    : solid;
+    border-color    : #888;
+    background-color: #888;
+    color           : #ddd;
+    border-radius   : 0.5rem 0 0 0;
+}
+.spa-chat-list-name, .spa-chat-list-note {
+    width   : 100%;
+    padding : .1rem .5rem;
+}
+.spa-chat-list-name {
+    cursor: pointer;
+}
+    .spa-chat-list-name:hover {
+        background-color: #aaa;
+        color           : #888;
+    }
+    .spa-chat-list-name.spa-x-select {
+        background-color: #fff;
+        color           : #444;
+    }
+
+.spa-chat-msg-in {
+    position: absolute;
+    height  : 2rem;
+    left    : 0;
+    right   : 1rem;
+    bottom  : 1rem;
+    border  : thin solid #888;
+    background: #888;
+}
+.spa-chat-msg-in input[type=text] {
+    position    : absolute;
+    width       : 75%;
+    height      : 100%;
+    line-height : 100%;
+    padding     : 0 .5rem;
+    border      : 0;
+    background  : #ddd;
+    color       : #666;
+}
+    .spa-chat-msg-in input[type=text]:focus {
+        background  : #ff8;
+        color       : #222;
+    }
+.spa-chat-msg-send {
+    position: absolute;
+    top     : 0;
+    right   : 0;
+    width   : 25%;
+    height  : 100%;
+    line-height : 1.9rem;
+    text-align  : center;;
+    color       : #fff;
+    font-weight : 800;
+    cursor      : pointer;
+}
+    .spa-chat-msg-send:hover,
+    .spa-chat-msg-send.spa-x-select {
+        background  : #444;
+        color       : #ff0;
+    }
+.spa-chat-box {
+    position    : absolute;
+    height      : 2rem;
+    left        : 1rem;
+    right       : 1rem;
+    bottom      : 1rem;
+    border      : thin solid #888;
+    background  : #888;
+}
+.spa-chat-box  input[type=text] {
+    float       : left;
+    width       : 75%;
+    height      : 100%;
+    padding     : .5rem;
+    border      : 0;
+    background  : #ddd;
+    color       : #404040;
+}
+    .spa-chat-box input[type=text]:focus {
+        background: #fff;
+    }
+.spa-chat-box div {
+    float       : left;
+    width       : 25%;
+    height      : 2rem;
+    line-height : 1.9rem;
+    text-align  : center;
+    color       : #fff;
+    font-weight : 800;
+    cursor      : pointer;
+}
+    .spa-chat-box div:hover {
+        background-color: #444;
+        color           : #ff0;
+    }
+
+.spa-chat-head:hover .spa-chat-head-toggle {
+    background: #aaa;
+}

@@ -1,0 +1,83 @@
+/* image block style */
+.transition-block {
+    position: relative;
+    min-height: 100px;
+    width: 100px;
+    padding: 10px;
+    border: solid black 2px;
+}
+.img-block {
+    width: 100px;
+    height: 100px;
+    transition: all .5s ease-in-out;
+    position: absolute;
+}
+
+.img-block.block-1 {
+    opacity: 1;
+    transform: scale(1, 1);
+    background-color: yellow;
+}
+
+.img-block.block-2 {
+    opacity: 0;
+    transform: scale(0, 0);
+    background-color: blue;
+}
+
+.transition-block:hover .block-1 {
+    opacity: 0;
+    transform: scale(0, 0);
+    transform-origin: bottom left;
+}
+
+.transition-block:hover .block-2 {
+    transform: scale(1, 1);
+    opacity: 1;
+    transform-origin: top right;
+}
+
+/* speed block style */
+.transition-speed {
+    height: 794px;
+    width: 1000px;
+    border: solid #ccc 2px;
+    margin: 10px 0;
+}
+
+.speed-block {
+    position: relative;
+    left: 0;
+    width: 100px;
+    height: 100px;
+    border: solid #ccc 1px;
+    text-align: center;
+    line-height: 100px;
+    margin: 10px;
+
+    transition-property: all;
+    transition-duration: 5s;
+}
+
+.block-ease {
+    transition-timing-function: ease;
+}
+.block-ease-in {
+    transition-timing-function: ease-in;
+}
+.block-ease-out {
+    transition-timing-function: ease-out;
+}
+.block-linear {
+    transition-timing-function: linear;
+}
+.block-custom {
+    transition-timing-function: cubic-bezier(0, .5, .5, 0)
+}
+.block-custom-2 {
+    transition-timing-function: cubic-bezier(0, 0.9, 0.9, 1)
+}
+.transition-speed:hover .speed-block {
+    left: 880px;
+    border-radius: 50px;
+}

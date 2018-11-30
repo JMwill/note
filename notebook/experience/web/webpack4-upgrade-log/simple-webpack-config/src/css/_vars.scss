@@ -1,0 +1,178 @@
+// fonts
+$font-default: 'Helvetica Neue For Number', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
+// colors
+$black: #2e3a48;
+$lightblack: #56616d;
+$white: #fff;
+$gray: #e3e3e3;
+$darkgray: #969696;
+$lightgray: #f3f3f3;
+$secondgray: #777;
+$verylightgray: #f0f0f0;
+$red: #ff4100;
+$blue: #008ee0;
+$description-color: rgba(0, 0, 0, .85);
+
+// misc
+$h1: 24px;
+$h2: 18px;
+$h3: 16px;
+$h4: 14px;
+$h5: 12px;
+$layout-width: 1200px;
+$shadow: 0 1px 4px rgba(0, 0, 0, .4);
+$z1: 100000;
+$z2: 99999;
+$z3: 99998;
+$z4: 99997;
+$z5: 99996;
+
+// 品牌色
+$b1-1: #23c334;
+$b1-2: #65d471;
+$b1-3: #13ac39;
+
+// 中立色-背景
+$n1-1: #f6f9fc;
+$n1-2: #f7f7f7;
+$n1-3: #eff4f9;
+
+// 中立色-线
+$n2-1: #dce2eb;
+$n2-2: #c6cdd3;
+$n2-3: #dbe2ea;
+
+// 中立色-文字
+$n3-1: #14174b;
+$n3-2: #67738d;
+$n3-3: #9ba4b0;
+$n3-4: #52536b;
+$n3-5: #9ba3bd;
+
+// 功能色
+$f1-1: #51536b;
+$f1-2: #8f8a9d;
+$f1-3: #c5c6d3;
+$f1-4: #7e52f9;
+$f1-5: #13a1f9;
+$f1-6: #ee4d6b;
+
+// 功能色-icon
+$f2-1: #23c334;
+$f2-2: #90a0b4;
+$f2-3: #8f9fb4;
+$f2-4: #d8d8d8;
+
+$border: 1px solid $n2-1;
+
+$bg1-1: rgba(35, 195, 52, .08);
+
+$z-popout: 400;
+$z-mask: 300;
+$z-nav: 200;
+$z-content: 100;
+
+.muted {
+  color: $n3-3;
+}
+
+a {
+  &.muted {
+    color: $n3-3 !important;
+
+    i {
+      &::before {
+        color: $n3-3;
+      }
+    }
+  }
+}
+
+.small {
+  font-size: 12px;
+}
+
+.bdr-r {
+  border-right: $border !important;
+}
+
+.pl-10 {
+  padding-left: 10px !important;
+}
+
+.pt-10 {
+  padding-top: 10px !important;
+}
+
+.mt-10 {
+  margin-top: 10px !important;
+}
+
+.mt-15 {
+  margin-top: 15px !important;
+}
+
+.mr-15 {
+  margin-right: 15px !important;
+}
+
+.mr-12 {
+  margin-right: 12px !important;
+}
+
+.mt-0 {
+  margin-top: 0 !important;
+}
+
+.mb-0 {
+  margin-bottom: 0 !important;
+}
+
+.mb-1 {
+  margin-bottom: 1px !important;
+}
+
+.p0 {
+  padding: 0 !important;
+}
+
+.p35 {
+  padding: 35px !important;
+}
+
+.m0 {
+  margin: 0 !important;
+}
+
+.pb-0 {
+  padding-bottom: 0 !important;
+}
+
+.mw-100 {
+  min-width: 100px;
+}
+
+.relative {
+  position: relative !important;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.danger {
+  color: $f1-6;
+}
+
+.ignore {
+  color: $n3-3;
+}
+
+.brand {
+  color: $b1-1;
+}
+
+.muted-link {
+  color: $f1-2 !important;
+}

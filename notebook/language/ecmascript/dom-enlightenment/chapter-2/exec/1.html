@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+    <body>
+        <script>
+            console.log(Object.keys(document).sort());
+
+            var documentPropertiesIncludeInherited = [];
+            for (var p in document) {
+                documentPropertiesIncludeInherited.push(p);
+            }
+            console.log(documentPropertiesIncludeInherited.sort());
+
+            var documentPropertiesOnlyInherited = [];
+            for (var p in document) {
+                if (!document.hasOwnProperty(p)) { documentPropertiesOnlyInherited.push(p); }
+            }
+            console.log(documentPropertiesOnlyInherited.sort());
+        </script>
+    </body>
+</html>

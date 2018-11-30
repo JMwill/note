@@ -1,0 +1,59 @@
+{
+    "del": {
+        "all": [ "./dist" ]
+    },
+    "sass": {
+        "preTask": [ "del:css" ],
+        "inPath": "./src/scss/**/*.scss",
+        "outPath": "./src/css",
+        "isCompress": false
+    },
+    "uglify": {
+        "inPath": "./src/scripts/**/*.js",
+        "outPath": "./src/min-scripts"
+    },
+    "concat": {
+        "js": {
+            "inPath": [],
+            "outPath": "./src/min-scripts",
+            "concatName": "all.min.js"
+        },
+        "css": {
+            "inPath": [],
+            "outPath": "./src/css",
+            "concatName": "all.min.css"
+        }
+    },
+    "move": {
+        "html": {
+            "inPath": "./src/**/*.html",
+            "outPath": "./dist"
+        },
+        "js": {
+            "inPath": "./src/min-scripts/**/*.js",
+            "outPath": "./dist/scripts"
+        },
+        "css": {
+            "inPath": "./src/css/**/*.css",
+            "outPath": "./dist/css"
+        },
+        "backup": {
+            "inPath": ["./src/**/*.html", "./src/scripts/**/*.js", "./src/scss/**/*.scss"],
+            "outPath": "./backup"
+        }
+    },
+    "watch": {
+        "html": {
+            "path": "./src/**/*.html",
+            "tasks": ["move:html"]
+        },
+        "js": {
+            "path": "./src/scripts/**/*.js",
+            "tasks": ["uglify", "concat:js", "move:js"]
+        },
+        "css": {
+            "path": "./src/scss/**/*.scss",
+            "tasks": ["sass", "concat:css", "move:css"]
+        }
+    }
+}

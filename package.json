@@ -1,0 +1,8 @@
+{
+  "name": "note",
+  "version": "0.0.0",
+  "description": "notebook project, use to store public note",
+  "main": "build/index.js",
+  "repository": "git@github.com:JMwill/note.git",
+  "license": "MIT"
+}

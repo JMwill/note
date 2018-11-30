@@ -1,0 +1,1 @@
+# 《Python测试驱动开发》记录## 有用的TDD概念[章节地址](http://chimera.labs.oreilly.com/books/1234000000754/ch02.html)（用到的工具：python的[unittest](https://docs.python.org/3/library/unittest.html)）***用户场景：    从用户的角度出发描述应用将会如何工作/展示给用户。利用这些场景来构造功能测试。可预期失败：    让测试失败在预期会失败的地方

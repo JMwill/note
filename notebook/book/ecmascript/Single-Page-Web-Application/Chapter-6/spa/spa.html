@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<!--
+    spa.html
+    spa browser document
+-->
+<html>
+    <head>
+        <!-- ie9+ rendering support for latest standards -->
+        <meta http-equiv="Content-type" content="text/html; charset=ISO-8895-1">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta charset="utf-8">
+        <title>SPA Chapter 5-6</title>
+
+        <!-- third-party stylesheets -->
+
+        <!-- self stylesheets -->
+        <link rel="stylesheet" href="./css/spa.css" type="text/css"/>
+        <link rel="stylesheet" href="./css/spa.shell.css" type="text/css"/>
+        <link rel="stylesheet" href="./css/spa.chat.css" type="text/css">
+        <link rel="stylesheet" href="./css/spa.avtr.css" type="text/css">
+
+        <!-- third-party javascript -->
+        <script type="text/javascript" src="./js/jq/taffy.js"></script>
+        <script type="text/javascript" src="./js/others/socket.io.js"></script>
+        <script type="text/javascript" src="./js/jq/jquery-1.9.0.js"></script>
+        <script type="text/javascript" src="./js/jq/jquery.uriAnchor.js"></script>
+        <script type="text/javascript" src="./js/jq/jquery.event.gevent.js"></script>
+        <script type="text/javascript" src="./js/jq/jquery.event.ue.js"></script>
+
+        <!-- self javascript -->
+        <script type="text/javascript" src="./js/spa.js"></script>
+        <script type="text/javascript" src="./js/spa.util.js"></script>
+        <script type="text/javascript" src="./js/spa.data.js"></script>
+        <script type="text/javascript" src="./js/spa.fake.js"></script>
+        <script type="text/javascript" src="./js/spa.model.js"></script>
+        <script type="text/javascript" src="./js/spa.util_b.js"></script>
+        <script type="text/javascript" src="./js/spa.shell.js"></script>
+        <script type="text/javascript" src="./js/spa.chat.js"></script>
+        <script type="text/javascript" src="./js/spa.avtr.js"></script>
+        <script type="text/javascript">
+            // Start spa once DOM is ready
+            $(function () { spa.initModule(jQuery('#spa')); });
+        </script>
+    </head>
+    <body>
+        <div id="spa"></div>
+    </body>
+</html>
