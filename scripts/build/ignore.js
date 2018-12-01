@@ -1,7 +1,7 @@
 const ignore = require('ignore')
 const fs = require('fs-extra')
 
-const config = require('./config')
+const config = require('../config')
 
 let singleton
 

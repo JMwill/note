@@ -2,8 +2,8 @@ const fs = require('fs-extra')
 const path = require('path')
 const os = require('os')
 
-const {log} = require('./utils')
-const config = require('./config')
+const {log} = require('../utils')
+const config = require('../config')
 const {findAllReadmeSrc, createTargetReadme} = require('./readme')
 const format = require('./format')
 

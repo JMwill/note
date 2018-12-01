@@ -1,9 +1,9 @@
 const fs = require('fs-extra')
 const path = require('path')
 
-const config = require('./config')
+const config = require('../config')
 const ignore = require('./ignore')
-const {log} = require('./utils')
+const {log} = require('../utils')
 
 module.exports = {
   findAllReadmeSrc,

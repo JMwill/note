@@ -9,7 +9,9 @@
     "node": "^8.11.3"
   },
   "scripts": {
-    "build": "node build",
+    "clean-input": "node scripts/clean input",
+    "clean-output": "node scripts/clean output",
+    "build": "node scripts/build",
     "serve": "readme ."
   },
   "devDependencies": {
