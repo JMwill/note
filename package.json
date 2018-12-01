@@ -2,7 +2,36 @@
   "name": "note",
   "version": "0.0.0",
   "description": "notebook project, use to store public note",
-  "main": "build/index.js",
+  "main": "scripts/index.js",
   "repository": "git@github.com:JMwill/note.git",
-  "license": "MIT"
+  "license": "MIT",
+  "engines": {
+    "node": "^8.11.3"
+  },
+  "scripts": {
+    "build": "node build",
+    "serve": "readme ."
+  },
+  "devDependencies": {
+    "eslint": "5.9.0",
+    "eslint-config-standard": "12.0.0",
+    "eslint-plugin-import": "2.14.0",
+    "eslint-plugin-node": "8.0.0",
+    "eslint-plugin-promise": "4.0.1",
+    "eslint-plugin-standard": "4.0.0",
+    "fs-extra": "7.0.1",
+    "husky": "1.2.0",
+    "ignore": "5.0.4",
+    "lint-staged": "8.1.0",
+    "markserv": "1.15.0",
+    "prettier": "1.15.3"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.md": ["npm run build && prettier --write --parser markdown", "git add"]
+  }
 }
