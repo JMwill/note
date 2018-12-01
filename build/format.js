@@ -26,11 +26,9 @@ function createCollapsibleCatelog(content, summary = '目录') {
 async function createCatelog(src) {
   const srcContainer = path.dirname(src)
   const dirs = await fs.readdir(srcContainer)
-  const rootContainer = path.dirname(config.rootdir)
   const linkList =
   dirs
     .filter(i => i != config.readme.input && i != config.readme.output)
-    .map(i => path.relative(rootContainer, path.resolve(srcContainer, i)))
     .map(i => `- [${path.basename(i)}](${i})`)
   return linkList.join(os.EOL)
 }

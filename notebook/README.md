@@ -1,15 +1,15 @@
 <details>
 <summary>目录</summary>
 
-- [book](notebook/book)
-- [brainmap](notebook/brainmap)
-- [experience](notebook/experience)
-- [framework](notebook/framework)
-- [language](notebook/language)
-- [problem](notebook/problem)
-- [scaffold](notebook/scaffold)
-- [system](notebook/system)
-- [tool](notebook/tool)
-- [work](notebook/work)
+- [book](book)
+- [brainmap](brainmap)
+- [experience](experience)
+- [framework](framework)
+- [language](language)
+- [problem](problem)
+- [scaffold](scaffold)
+- [system](system)
+- [tool](tool)
+- [work](work)
 
 </details>
