@@ -6,8 +6,7 @@ const {findAllReadmeSrc} = require('./build/readme')
 
 async function main() {
   const type = process.argv[2]
-  log(type)
-  log('cleaning...')
+  log('!!!!!! cleaning... !!!!!!')
   const srcPathList = await findAllReadmeSrc(config.rootdir)
   const createPromiseList = srcPathList.map(async src => {
     const target = path.resolve(path.dirname(src), config.readme[type])
