@@ -32,6 +32,6 @@
     }
   },
   "lint-staged": {
-    "*.md": ["npm run build && prettier --write --parser markdown", "git add"]
+    "*.md": ["prettier --write --parser markdown", "git add"]
   }
 }
