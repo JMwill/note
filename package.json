@@ -9,6 +9,7 @@
     "node": "^8.11.3"
   },
   "scripts": {
+    "clean": "node scripts/clean",
     "clean-input": "node scripts/clean input",
     "clean-output": "node scripts/clean output",
     "build": "node scripts/build",
