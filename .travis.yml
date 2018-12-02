@@ -1,0 +1,35 @@
+language: node_js
+node_js: stable
+
+sudo: false
+
+# Travis-CI Caching
+cache:
+  directories:
+    - node_modules
+
+
+# S: Build Lifecycle
+install:
+  - npm install
+
+script:
+  - npm run build
+  - npm run clean-input
+
+after_script:
+  - git init
+  - git config user.name "travis@travis-ci.org"
+  - git config user.email "Travis CI"
+  - git add .
+  - git commit -m "Update Note"
+  - git push --force --quiet "https://${GH_Token}@${GH_REF}" master:master
+# E: Build LifeCycle
+
+branches:
+  only:
+    - develop
+env:
+ global:
+   - GH_REF: github.com/JMwill/note.git
+   - secure: "nRzzCvidNQXViVWp8sjj8fLBDKLil7KiRa7/xa55Agt2iVwB+X96WHAZsXLnOcPCipjZXaTGB5lTCAAgImaug8qCVYAFVf6fW/QlbCrelqambc8+m2/jfrRYp5h8c1tsVuTRo72djxRnc3FaJhd+phKpULbcYrCctTBtc7IpHenfDPQ3cZEvUeMoQK6s5FUemwzojcnUuqrLTZSmPbrH+RVQbbLOBQygnF+iKb1BNfAT80EYBS9tI3I8/+B4LhOxPyYZXShOLMgHd6H3pz1E+CVmIREhdEDl3t4+gFOo6GEjxLOL22RqU3lAMFvn1gqEs5MrzneADKKQGgtGAs8Pw2HkyzpvxrllVBXOxNmy2R55WI2kCiUZ7oD24LTx11hRqF2E+zSfxVzlqnLEL2Q2/5JyHg6PH9ZyIhFfx2o5gKPHApUNeY29YX3p3hyCvOMMXT35wIrAFrB9u1xMLAHEbbwv4fwuHlJyfnmVSpZlydQFnO1rp6VmMQ+qloh25wDzYDB3BDHAOWE10EeQqR758mQKfkHCYdwM4HbutLT+k3QfieYWdJV1KSWJyB5yEbwsnSZT9SimO412q9lLNbY7YNvJUTKEpwz0342p2LSFVC/YfbzJNYWSKNrTsVK/pX5phlbG+ucPrqb8cdFJ6/9d0Tk4FmfSLqwGY3mFV42SEbs="
