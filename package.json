@@ -35,6 +35,9 @@
     }
   },
   "lint-staged": {
-    "*.md": ["prettier --write --parser markdown", "git add"]
+    "*.md": [
+      "prettier --write --parser markdown",
+      "git add"
+    ]
   }
 }
