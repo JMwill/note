@@ -52,3 +52,6 @@ dist
 # Optional Python compile file
 *.pyc
 
+# Vscode setting folder
+.vscode
+
