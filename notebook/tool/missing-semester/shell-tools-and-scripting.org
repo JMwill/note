@@ -1,0 +1,149 @@
+#+TITLE: 《Shell 工具和脚本》记录
+
+* Shell 工具和脚本
+
+** Shell 脚本
+
+常用变量：
+
+- =$0= 表示脚本名称
+- =$1 ~ $9= 表示传入的参数
+- =@$= 表示所有参数
+- =$#= 表示参数个数
+- =$?= 表示前一个执行的命令的返回值
+- =$$= 当前脚本的执行 ID
+- =!!= 代指上一个命令, 一般用法: =sudo !!=
+- =$_= 上一条命令最后一个参数
+
+常用的与或操作跟一般的编程语言相相似: =||= 以及 =&&=
+
+一般情况下常用 =$()= 来在语句中获取命令执行的结果作为参数传入另一个命令, 同样地, 通过组合重定向和括号会得到 =<()= 进程替换功能, 当希望传入值是文件时很有用, 进程替换功能能够将命令执行结果以临时文件来替换, 比如 =diff <(ls foo) <(ls bar)= 则是会将 foo 文件夹信息与 bar 文件夹信息当作文件内容来进行比较
+
+通过一个 Shell 脚本来演示多个变量的作用:
+
+#+begin_src sh
+#!/bin/bash
+echo "执行的命令是: $(date)" # date 命令的执行结果会替换到输出中
+echo "命令: $0 以 $# 个输入参数来执行, 它的进程 ID 是: $$"
+
+for file in $@; do
+    grep foobar $file > /dev/null 2> /dev/null
+    # grep 的输出信息在目前的程序中并不关心, 所以, 这里将标准输出流和标准错误流重定向到 null
+    # 我认为这里的 > 其实是 1> 的简写
+
+    if [[ $? -ne 0 ]]; then # 前一个命令的返回值不是 0 时, 则添加 foobar 到文件中
+       echo "文件 $file 没有包含任何的 foobar, 添加一个进去"
+       echo "# foobar" >> "$file"
+    fi
+done
+#+end_src
+
+*** =[​[ ]]= 内部的比较
+
+- 字符串
+  - ">" "[​[ a > b ]]" 验证 b 字符是否在 a 字符之后
+  - "<" "[​[ az < za ]]" 验证 az 是否在 za 之后
+  - "=​=" "[​[ a =​= a ]]" 验证字符串是否相等
+  - "!=" "[​[ a != a ]]" 验证字符串是否不相等
+- 整型
+  - "-gt" 是否大于
+  - "-lt" 是否小于
+  - "-ge" 是否大于等于
+  - "-le" 是否小于等于
+  - "-eq" 是否等于
+  - "-ne" 是否不等于
+- 条件判断
+  - "&&" 与判断
+  - "||" 或判断
+- 等式组 "(...)" ~[​[ $var = img* && ($var = *.png || $var = *.jpg) ]]~
+- 模式匹配 "= 或者 ~==~" ~[​[ $name = a* ]]] || echo "name does not start with an 'a': $name"~
+- 正则匹配 "=~" ~[​[ $(date) =~ ^Fri\ ...\ 13 ]] && echo "It's Friday the 13th!"~
+
+*** Shell 中的统配模式
+
+Shell 常用的通配符是 =*=, 它表示匹配多个字符, 而另一个常用的通配符是 =?= 这表示匹配任意一个字符
+
+另一个模式是使用花括号 ={}=, 当一系列指令包含一段公共子串时, 可以通过花括号自动展开命令:
+
+#+begin_src sh
+# 多个参数名称相同时
+convert image.{png,jpg}
+# 展开后就变成
+convert image.png image.jpg
+
+# 另一个多参数例子
+cp /path/to/project/{foo,bar,baz}.file /newpath
+
+# 配合通配符使用
+mv *{.py,.sh} folder
+
+# 分别在多个文件夹中做相同的事情
+touch {foo,bar}/{a..h}
+touch foo/x bar/y
+diff <(ls foo) <(ls bar) # 验证效果
+#+end_src
+
+*** shebang 好的实践
+
+一般情况下使用的 shebang 是: =#!/usr/local/bin/python= 这种类型的, 但是最好的做法是让系统自己寻找合适位置的程序执行, 所以一般使用 env 来执行:
+
+=#!/usr/bin/env python= 这种方式来设置 shebang
+
+** Shell 工具
+
+查看工具使用方法的方式一般通过 =--help= =man= 等方式, 但社区中目前推出了比较有意思的工具 =tldr= 可以作为替代品通过案例了解工具使用方法
+
+*** 用 find 查找文件或目录
+
+find 命令会递归地搜索符合条件的文件, 通过例子演示学习:
+
+#+begin_src sh
+# 查找所有名称为 src 的文件夹
+find . -name src -type d
+
+# 查找所有文件夹路径中含有 test 的 python 文件
+find . -path '**/test/**/*.py' -type f
+
+# 查找前一天修改的所有文件
+find . -mtime -1 # 数字 1
+
+# 查找所有大小在 500k 至 10M 的 tar.gz 文件
+find . -size +500k -size -10M -name '*.tar.gz'
+#+end_src
+
+通过对列出的文件进行操作能够极大简化单调的任务
+
+#+begin_src sh
+# 删除所有以 .tmp 为扩展名的文件
+find . -name '*.tmp' -exec rm {} \;
+
+# 找到所有的 png 文件并转化为 jpg
+find . -name '*.png' -exec convert {} {}.jpg \;
+#+end_src
+
+因为 find 的语法较为复杂, 可以使用 find 的替代方案: fd. 其使用更加简单且输出更为友好
+
+*** 查找代码
+
+除了查找文件外, 查找文件内容也是常见的场景. 最常用的工具是: grep, 其用法可以使用 tldr 查看, 它也具有对应的替代品 ripgrep(rg). rg 工具的速度特别快, 且用法符合直觉, 例子如下:
+
+#+begin_src sh
+# 查找所有使用了 requests 库的文件
+rg -t py 'import requests'
+
+# 查找所有没写 shebang 的文件(包含隐藏文件)
+rg -u --files-without-match "^#!"
+
+# 查找所有的 foo 字符串, 并连同结果行之后的 5 行一起打印出来查看
+rg foo -A 5
+
+# 打印匹配的统计信息(匹配的行和文件的数量)
+rg -stats PATTERN
+#+end_src
+
+输入命令时, 如果在命令开头具有空格, 则相关命令不会记录在 shell 的 history 记录中
+
+*** 文件夹导航
+
+用于在文件夹之间转跳的工具有很多如: autojump, [[https://github.com/clvv/fasd][fasd]]. 而如果想要查看文件夹目录则需要 [[https://linux.die.net/man/1/tree][tree]], [[https://github.com/Canop/broot][broot]] 等, 如果需要更加完整的文件管理器可以使用: [[https://github.com/jarun/nnn][nnn]], [[https://github.com/ranger/ranger][ranger]] 等
+
