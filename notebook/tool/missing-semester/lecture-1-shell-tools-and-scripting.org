@@ -1,4 +1,4 @@
-#+TITLE: 《Shell 工具和脚本》记录
+#+TITLE: [[https://missing-semester-cn.github.io/2020/shell-tools/][《Shell 工具和脚本》记录]]
 
 * Shell 工具和脚本
 

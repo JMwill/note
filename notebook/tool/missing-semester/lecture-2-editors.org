@@ -1,4 +1,4 @@
-#+TITLE: 编辑器
+#+TITLE: [[https://missing-semester-cn.github.io/2020/editors/][编辑器]]
 
 * 编辑器 Vim
 
