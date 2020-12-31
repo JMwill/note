@@ -1,0 +1,29 @@
+#+TITLE: 版本控制
+
+* 版本控制
+
+可以粗略地得出 Git 仓库的定义: =对象=, =引用=. 其余就是对对象以及引用通过提交树进行组织, 因此 Git 的提交是不可改变的, 所谓的修改提交记录仅仅是引用指向了不同的对象而已, 原有的对象还存储在 Git 中, 直到被回收处理掉
+
+
+** 编写良好的 Git 提交信息
+
+1. 用一个空行把主题和正文隔离开, 空一行后再进行详细描述
+2. 主题限制在 50 个字符以内来概括所做的改动, 虽然不是强制的, 但最好不要超过 72 个字符
+3. 主题行大写开头(针对英文提交来说)
+4. 主题不需要以句号等结尾
+5. 在主题中使用祈使句(说起来或写起来像是在发号施令)
+   - 为了避免混淆, 撰写主题的格式可以遵循句式: if applied, this commit will 【主题行的内容】
+6. 正文在 72 个字符处折行
+7. 使用正文解释是什么和为什么而不是怎么样
+8. 在正文中可以用列表列出点, 一般用 =-= 后接一个空格表示列表
+
+** 资料
+
+- [[https://git-scm.com/book/zh/v2][Pro Git 中文版]]
+- [[https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html][编写良好的提交信息]]
+- [[https://chris.beams.io/posts/git-commit/][为什么要编写良好的提交信息]] ([[https://jiongks.name/blog/git-commit/][中文版]])
+- [[https://ohshitgit.com/][Oh Shit, Git!?!]]: 简短介绍如何从 Git 错误中恢复
+- [[https://eagain.net/articles/git-for-computer-scientists/][Git for Computer Scientists]]: 简短介绍 Git 的数据模型
+- [[https://jwiegley.github.io/git-from-the-bottom-up/][Git from the Bottom Up]]: 详细介绍 Git 实现细节
+- [[https://smusamashah.github.io/blog/2017/10/14/explain-git-in-simple-words][How to explain git in simple words]]
+- [[https://learngitbranching.js.org/][Learn Git Branching]]: 通过基于浏览器的游戏来学习 Git
