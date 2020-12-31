@@ -137,3 +137,27 @@ ssh-copy-id -i ~/.ssh/id_rsa.pub username@remote-server
 远程端口转发也有两种情况:
 - 对于远程端口 123 的访问会被转发到本地 localhost 的 456 端口上: =ssh -R 123:localhost:456 remotehost=
 - 对于远程端口 123 的访问会经本地转发到局域网内的 nearhost 的 456 端口上: =ssh -R 123:nearhost:456 remotehost=
+
+
+*** SSH 配置
+
+通过配置 =~/.ssh/config= 除了能够让使用 ssh 时更加方便外, 还可以让上面提到的工具如 scp, rsync 以及 mosh 等读取配置并将设置转换为对应的命令行选项
+
+#+begin_src sh
+Host vm
+    User foobar
+    HostName 172.16.174.141
+    Port 2222
+    IdentityFile ~/.ssh/id_rsa
+    LocalForward 9999 localhost:8888
+
+# 在配置文件中也可以使用通配符
+Host *.mit.edu
+    User foobaz
+#+end_src
+
+而服务器侧的配置通常放在 =/etc/ssh/sshd_config= 上, 用于配置免密认证, 修改 ssh 端口, 开启 X11 转发等
+
+连接远程服务器常见的问题是遇到关机, 休眠或网络环境变化时的掉线等, 而 [[https://mosh.org/][Mosh]] 则是对 ssh 进行了改进以允许连接漫游, 间歇连接, 智能本地回显等
+
+有时也会有需要将远程文件夹挂载到本地进行编辑的情况, 可以使用 [[https://github.com/libfuse/sshfs][sshfs]] 来实现
