@@ -1,0 +1,63 @@
+#+TITLE: 调试以及性能分析
+
+* 调试以及性能分析
+
+** 调试代码
+
+*** 打印调试法
+
+要发现代码中的问题最简单的方式是通过打印或记录日志, 日志的好处有:
+
+- 可以写入文件, socket或者是发送到远程服务器
+- 可以支持严重等级划分(INFO, DEBUG, WARN, ERROR等), 可以根据需要进行过滤
+- 对于新发现的问题, 很可能日志中已经包含可以帮助定位问题的足够的信息
+
+其中以彩色文本显示终端信息则可以让其可读性变得更好, 而在终端中让文本输出着色的方法是使用 [[https://en.wikipedia.org/wiki/ANSI_escape_code][ANSI escape codes]]:
+
+#+begin_src sh
+# 可以看到其实开头跟结尾都是 \e[0m
+# 只不过开头的 \e[0m 中的 0m 前嵌入了描述这个东西作用的 38;2; 表示着色
+# 255;0;0 则是三原色的色值, 也就是 Red;Green;Blue
+echo -e \e[38;2;255;0;0mThis is red\e[0m
+#+end_src
+         
+*** 第三方日志系统
+
+大多数程序会将日志保存在系统的某个地方中, 对于 UNIX 系统则通常放在 =/var/log= 下
+
+而大多数的 Linux 系统会使用 =systemd=, 其日志以某种格式放在 =/var/log/journal= 下, 可以使用 =journalctl= 命令显示记录的信息
+
+而对于 macOS 系统中类似 journal 的则是 =/var/log/system.log=, 内容可以通过使用 =log show= 显示
+
+对大多数的 UNIX 系统可以使用 dmesg 命令来读取内核的日志.
+
+当想要将日志加入到系统日志中时, 可以使用 Shell 程序 [[http://man7.org/linux/man-pages/man1/logger.1.html][logger]] 实现, 例子如下:
+如果需要日志有更好的展现和浏览方式则可以使用像 [[http://lnav.org/][lnav]] 这样的工具
+
+#+begin_src sh
+logger "Hello logs"
+
+# Show on macOS
+log show --last 1m | grep Hello
+
+# Show on Linux
+journalctl --since "1m ago" | grep Hello
+#+end_src
+
+*** 调试器
+
+以介绍 Python 的调试器 [[https://docs.python.org/3/library/pdb.html][pdb]] 为例, 先对 pdb 支持的命令进行简单介绍:
+
+- *l*(ist) - 显示当前行附近的 11 或继续执行之前的显示
+- *s*(tep) - 执行当前行, 并在第一个可能的地方停止
+- *n*(ext) - 继续执行直到当前函数的下一条语句或者 return 语句
+- *b*(reak) - 设置断点(基于传入对参数)
+- *p*(rint) - 在当前上下文对表达式求值并打印结果, 另一个命令 *pp* 则是使用 [[https://docs.python.org/3/library/pprint.html][pprint]] 打印
+- *r*(eturn) - 继续执行直到当前函数返回
+- *q*(uit) - 退出调试器
+
+除了 pdb 外还有增强型的 [[https://pypi.org/project/ipdb/][ipdb]], 它使用 IPython 作为 REPL 具备更加方便的功能还保留了 pdb 模块相同的接口
+
+而对更底层的编程语言, 可以了解一下 [[https://www.gnu.org/software/gdb/][gdb]] (改进版 [[https://github.com/pwndbg/pwndbg][pwndbg]]) 和 [[https://lldb.llvm.org/][lldb]]
+
+*** 专门工具
