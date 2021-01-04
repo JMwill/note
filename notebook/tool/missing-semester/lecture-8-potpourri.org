@@ -1,0 +1,91 @@
+#+TITLE: 杂项
+
+* 杂项
+
+** 密码管理器
+
+密码管理器能够帮助生成随机且复杂的密码, 只需要记住复杂的主密码就可以, 可以尝试使用, 如 [[https://keepassxc.org/][KeePassXC]]
+
+** 守护进程
+
+Linux 中常用 systemd 来配置和运行守护进程, 通过执行 =systemctl status= 可以看到正在运行的所有守护进程, 以下是使用 systemd 的例子, systemd 的详细指南可以参考: [[https://www.freedesktop.org/software/systemd/man/systemd.service.html][freedesktop.org]]
+
+#+begin_src sh
+# /etc/systemd/system/myapp.service
+[Unit]
+# 配置文件描述
+Description=My Custom App
+# 在网络服务启动后启动该进程
+After=network.target
+
+[Service]
+# 运行该进程的用户
+User=foo
+# 运行该进程的用户组
+Group=foo
+# 运行该进程的根目录
+WorkingDirectory=/home/foo/projects/mydaemon
+# 开始该进程的命令
+ExecStart=/usr/bin/local/python3.7 app.py
+# 在出现错误时重启该进程
+Restart=on-failure
+
+[Install]
+# 相当于Windows的开机启动。即使GUI没有启动，该进程也会加载并运行
+WantedBy=multi-user.target
+# 如果该进程仅需要在GUI活动时运行，这里应写作：
+# WantedBy=graphical.target
+# graphical.target在multi-user.target的基础上运行和GUI相关的服务
+#+end_src
+
+对于定期运行的程序, 可以直接使用 [[http://man7.org/linux/man-pages/man8/cron.8.html][cron]]
+
+** 常见命令行标志参数以及模式
+
+对于需要向命令行工具传入一个 /看上去/ 像标志参数的普通参数, 可以使用特殊参数 =--= 实现, 如:
+
+- 用 rm 删除一个叫 =-r= 的文件: =rm -- -r=
+- 通过一个程序运行另一个程序时 (ssh machine foo), 向内层程序 (foo) 传递一个标志参数: =ssh machine --for-ssh -- foo --for-foo= 里面的 =--= 会让 ssh 知道 =--for-foo= 不是 ssh 的标志参数
+
+** Live USB
+
+Live USB 是包含了完整的操作系统的闪存盘, 用途广泛, 可以:
+
+- 作为安装操作系统的启动盘
+- 在不将操作系统安装到硬盘的情况下, 直接运行 Live USB 上的操作系统
+- 对硬盘上的相同操作系统进行修复
+- 恢复硬盘上的数据
+
+Live USB 可以使用 [[https://unetbootin.github.io/][UNetbootin]], [[https://github.com/pbatard/rufus][Rufus]] 等写入工具制作
+
+=source script.sh= 与 =./script.sh= 的区别
+
+source 运行时, 执行的命令都在当前会话中执行, 所做修改会留在当前会话中. 单独运行 =./script.sh= 时, 当前 bash 会话将启动新的 bash 会话(实例), 因此所做修改如: 改变目录, 定义函数等在退出回父级会话中时将不会影响到父级会话
+
+** Linux 目录结构
+
+一般来说特定种类的文件存储有一定的规范, 可以从 [[https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard][文件系统, 层次结构标准]] 上看到更详细内容
+
+- /bin - 基本命令二进制文件
+- /sbin - 基本的系统二进制文件，通常是root运行的
+- /dev - 设备文件，通常是硬件设备接口文件
+- /etc - 主机特定的系统配置文件
+- /home - 系统用户的家目录
+- /lib - 系统软件通用库
+- /opt - 可选的应用软件
+- /sys - 包含系统的信息和配置
+- /tmp - 临时文件( /var/tmp ) 通常在重启之间删除
+- /usr/ - 只读的用户数据
+- /usr/bin - 非必须的命令二进制文件
+- /usr/sbin - 非必须的系统二进制文件，通常是由root运行的
+- /usr/local/bin - 用户编译程序的二进制文件
+- /var -变量文件 像日志或缓存
+
+** 学习资源
+
+操作系统相关
+
+- [[https://pdos.csail.mit.edu/6.828/][MIT's 6.828 class]] - 研究生阶段的操作系统课程
+- 现代操作系统 第四版 (Modern Operating Systems 4th ed) 作者: Andrew S. Tanenbaum
+- FreeBSD 的设计与实现 (The Design and implementation of the FreeBSD Operating System) 注: FreeBSD OS 不是 Linux
+- [[https://os.phil-opp.com/][用 Rust 写操作系统]] - 用于教学目的逐步实现操作系统内核
