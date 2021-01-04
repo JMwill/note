@@ -61,3 +61,191 @@ journalctl --since "1m ago" | grep Hello
 而对更底层的编程语言, 可以了解一下 [[https://www.gnu.org/software/gdb/][gdb]] (改进版 [[https://github.com/pwndbg/pwndbg][pwndbg]]) 和 [[https://lldb.llvm.org/][lldb]]
 
 *** 专门工具
+
+当需调试二进制的黑盒程序时, 如果程序进行了系统调用, 可以通过追踪执行的系统调用来获知程序的情况. Linux 中使用 [[http://man7.org/linux/man-pages/man1/strace.1.html][strace]], macOS 和 BSD 中使用 [[http://dtrace.org/blogs/about/][dtrace]], 通过使用的 [[https://www.manpagez.com/man/1/dtruss/][dtruss]] 封装, 可以具有和 strace 类似的接口. 可以通过[[https://blogs.oracle.com/linux/strace-the-sysadmins-microscope-v2][这篇文章]]来深入了解 strace. 以下是 strace 的使用例子
+
+#+begin_src sh
+# On Linux
+sudo strace -e lstat ls -l > /dev/null
+
+# On macOS
+sudo dtruss -t lstat64_extended ls -l > /dev/null
+#+end_src
+
+对于网络请求数据包的分析则需要用到 [[http://man7.org/linux/man-pages/man1/tcpdump.1.html][tcpdump]], [[https://www.wireshark.org/][Wireshark]] 等工具.
+
+** 性能分析
+
+性能分析和监控工具能够协助找到程序中最耗时耗资源的部分, 可以有针对性地进行性能优化.
+
+*** 计时
+
+Python 中提供了 time 模块, 可用于记录代码执行时间:
+
+#+begin_src python
+import time, random
+n = random.randint(1, 10) * 100
+
+# 获取当前时间
+start = time.time()
+
+# 执行一些操作
+print("Sleeping for {} ms".format(n))
+time.sleep(n / 1000)
+
+# 计算时间
+print(time.time() - start)
+
+# 得出过程执行所消耗时间
+#+end_src
+
+仅仅记录执行时间不一定能够真实反映程序的性能,  进程所消耗的 CPU 时间也会因为其他程序的执行时间, 网络等情况而增加
+
+*** 性能分析工具
+
+*CPU* 性能分析工具有两种: 追踪分析器 和 采样分析器, 追踪分析器监听每一次函数调用, 采样分析器则是周期性监测(每毫秒)程序并记录程序堆栈, 以 Python 的 cProfile 模块来分析每次函数调用所消耗的时间:
+
+#+begin_src python
+#!/usr/bin/env python
+import sys, re
+
+def grep(pattern, file):
+    with open(file, 'r') as f:
+         print(file)
+         for i, line in enumerate(f.readlines()):
+             pattern = re.compile(pattern)
+             match = pattern.search(line)
+             if match is not None:
+                print("{}:{}".format(i, line), end="")
+
+if __name__ == '__main__':
+   times = int(sys.argv[1])
+   pattern = sys.argv[2]
+   for i in range(times):
+       for file in sys.argv[3:]:
+           grep(pattern, file)
+#+end_src
+
+使用 cProfile 分析器
+
+#+begin_src sh
+python -m cProfile -s tottime grep.py 1000 '^(import|\s*def)[^,]*$' *.py
+#+end_src
+
+更加符合直觉的分析信息的方式是显示包括每行代码的执行时间, 这需要用到 _行分析器_:
+
+#+begin_src python
+#!/usr/bin/env python
+import requests
+from bs4 import BeautifulSoup
+
+# 下面的装饰器表示需要分析这个函数
+@profile
+def get_urls():
+    response = requests.get('https://missing.csail.mit.edu')
+    s = BeautifulSoup(response.content, 'lxml')
+    urls = []
+    for url in s.find_all('a'):
+        urls.append(url['href'])
+
+if __name__ == '__main__':
+   get_urls()
+#+end_src
+
+使用 行分析器 来基于行分析程序时间都用在哪里
+
+#+begin_src txt
+kernprof -l -v a.py
+
+Wrote profile results to urls.py.lprof
+Timer unit: 1e-06 s
+
+Total time: 0.636188 s
+File: a.py
+Function: get_urls at line 5
+
+Line #  Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+ 5                                           @profile
+ 6                                           def get_urls():
+ 7         1     613909.0 613909.0     96.5      response = requests.get('https://missing.csail.mit.edu')
+ 8         1      21559.0  21559.0      3.4      s = BeautifulSoup(response.content, 'lxml')
+ 9         1          2.0      2.0      0.0      urls = []
+ 10        25        685.0     27.4     0.1      for url in s.find_all('a'):
+ 11        24         33.0      1.4     0.0          urls.append(url['href'])
+#+end_src
+
+*** 内存
+
+为了检查由于内存泄漏造成的问题, 对于 C, C++ 等语言可以使用 [[https://valgrind.org/][Valgrind]] 工具检查, 而 Python 等具有垃圾回收机制的语言通过内存分析器来分析也很有用, 下面是使用 [[https://pypi.org/project/memory-profiler/][memory-profiler]] 的例子:
+
+#+begin_src python
+@profile
+def my_func():
+    a = [1] * (10 ** 6)
+    b = [2] * (2 * 10 ** 7)
+    del b
+    return a
+
+if __name__ == '__main__':
+   my_func()
+#+end_src
+
+#+begin_src txt
+$ python -m memory_profiler example.py
+Line #    Mem usage  Increment   Line Contents
+==============================================
+     3                           @profile
+     4      5.97 MB    0.00 MB   def my_func():
+     5     13.61 MB    7.64 MB       a = [1] * (10 ** 6)
+     6    166.20 MB  152.59 MB       b = [2] * (2 * 10 ** 7)
+     7     13.61 MB -152.59 MB       del b
+     8     13.61 MB    0.00 MB       return a
+#+end_src
+
+*** 事件分析
+
+[[http://man7.org/linux/man-pages/man1/perf.1.html][perf]] 命令将 CPU 的区别进行抽象, 不会报告时间和内存的消耗, 而是报告与程序相关的系统事件. perf 可以报告不佳的缓存局部性, 页错误, 活锁等:
+
+- =perf list= - 列出可以被 pref 追踪的事件
+- =perf stat COMMAND ARG1 ARG2= - 收集与某个进程或指令相关的事件
+- =perf record COMMAND ARG1 ARG2= - 记录命令执行的采样信息并将统计数据存储在 perf.data 中
+- =perf report= - 格式化并打印 perf.data 中的数据
+
+
+*** 资源监控
+
+分析程序的另一种方式是通过分析资源消耗来获知程序的运行情况, 分析的工具有很多:
+
+- *通用监控* - 最流行的工具是 [[https://hisham.hm/htop/index.php][htop]](top 的改进版), [[https://nicolargo.github.io/glances/][glances]] 是类似实现但用户界面更友好, 合并测量全部进程则 [[http://dag.wiee.rs/home-made/dstat/][dstat]] 也非常好用.
+- *I/O 操作* - [[http://man7.org/linux/man-pages/man8/iotop.8.html][iotop]] 可以实时显示 I/O 占用信息等
+- *磁盘使用* - [[http://man7.org/linux/man-pages/man1/df.1.html][df]] 显示每个分区信息, [[http://man7.org/linux/man-pages/man1/du.1.html][du]] 显示当前目录每个文件磁盘使用情况, 一般加 =-h= 选项, [[https://dev.yorhel.nl/ncdu][ncdu]] 则是交互性更好的 du
+- *内存使用* - [[http://man7.org/linux/man-pages/man1/free.1.html][free]] 可以显示系统当前空闲的内存, 也可以用 htop 这样的工具显示
+- *打开文件* - [[http://man7.org/linux/man-pages/man8/lsof.8.html][lsof]] 可以列出被进程打开的文件信息, 需要查看文件被哪个进程打开时很有用
+- *网络连接和配置* - [[http://man7.org/linux/man-pages/man8/ss.8.html][ss]] 用于监控网络包的收发情况以及网络接口的显示信息. 常见的使用场景是找到端口被进程占用的信息, 要显示路由, 网络设备和接口信息可以使用 [[http://man7.org/linux/man-pages/man8/ip.8.html][ip]] 命令
+- *网络使用* - [[https://github.com/raboof/nethogs][nethogs]] 和 [[http://www.ex-parrot.com/pdw/iftop/][iftop]] 是对于网络占用进行监控的交互式命令行工具
+
+*** 专用工具
+
+对黑盒程序进行基准测试, 可以使用类似 [[https://github.com/sharkdp/hyperfine][hyperfine]] 等的命令行工具来快速进行基准测试, 以下是对 fd 与 find 的比较
+
+#+begin_src txt
+$ hyperfine --warmup 3 'fd -e jpg' 'find . -iname "*.jpg"'
+Benchmark #1: fd -e jpg
+  Time (mean ± σ):      51.4 ms ±   2.9 ms    [User: 121.0 ms, System: 160.5 ms]
+  Range (min … max):    44.2 ms …  60.1 ms    56 runs
+
+Benchmark #2: find . -iname "*.jpg"
+  Time (mean ± σ):      1.126 s ±  0.101 s    [User: 141.1 ms, System: 956.1 ms]
+  Range (min … max):    0.975 s …  1.287 s    10 runs
+
+Summary
+  'fd -e jpg' ran
+   21.89 ± 2.33 times faster than 'find . -iname "*.jpg"'
+#+end_src
+
+
+** 资料
+
+[[https://github.com/spiside/pdb-tutorial][pdb 实践教程]] 和 更深入的[[https://realpython.com/python-debugging-pdb][教程]]
+使用 [[https://rr-project.org/][rr]] 或 [[https://morepypy.blogspot.com/2016/07/reverse-debugging-for-python.html][RevPDB]] 进行 [[https://undo.io/resources/reverse-debugging-whitepaper/][可逆调试]]
