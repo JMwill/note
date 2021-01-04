@@ -81,6 +81,14 @@ source 运行时, 执行的命令都在当前会话中执行, 所做修改会留
 - /usr/local/bin - 用户编译程序的二进制文件
 - /var -变量文件 像日志或缓存
 
+** 浏览器插件推荐
+
+- [[https://github.com/gorhill/uBlock][uBlockOrigin]] 是一个[[https://github.com/gorhill/uBlock/wiki/Blocking-mode][用途广泛]]的拦截器, 不仅可以拦截广告, 还可以拦截第三方页面, 内部脚本和其他种类资源的加载, 如果打算花更多时间去配置, 可以参考 [[https://github.com/gorhill/uBlock/wiki/Blocking-mode:-medium-mode][中等模式]] 或者 [[https://github.com/gorhill/uBlock/wiki/Blocking-mode:-hard-mode][强力模式]], 而 [[https://github.com/gorhill/uBlock/wiki/Blocking-mode:-easy-mode][简易模式]] 作为默认模式已经可以拦截大部分广告和跟踪
+- [[https://github.com/openstyles/stylus/][Stylus]] 是 Stylish(会[[https://www.theregister.co.uk/2018/07/05/browsers_pull_stylish_but_invasive_browser_extension/][窃取浏览记录]], 不要使用) 的分支, 允许将自定义 CSS 样式加载到网站, 还可以在 [[https://userstyles.org/][userstyles.org]] 中找到其他人编写的样式
+- 整页屏幕捕获 内置于 Firefox 和 [[https://chrome.google.com/webstore/detail/full-page-screen-capture/fdpohaocaechififmbbbbbknoalclacl?hl=en][Chrome 扩展程序]]中, 提供完整的网站截图, 比打印要好用
+- [[https://addons.mozilla.org/en-US/firefox/addon/multi-account-containers/][多账户容器]] - 该插件能将 Cookie 分为 "容器", 从而允许以不同的身份浏览 Web 网页并且/或确保网站无法在它们之间共享信息
+
+
 ** 学习资源
 
 操作系统相关
