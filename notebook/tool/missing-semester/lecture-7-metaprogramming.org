@@ -1,0 +1,31 @@
+#+TITLE: 构建系统
+
+* 构建系统
+
+构建工具从本质上来说都基本类似, 需要定义依赖, 目标和规则. 而 make 作为最常用的构建系统之一, 虽然不完美但对于中小型的项目而言已经十分足够. 使用 make 需要定义一份 Makefile 文件, 所有的构建目标, 相关依赖和规则都需要在该文件中定义. 如下例子:
+
+#+begin_src makefile
+paper.pdf: paper.tex plot-data.png
+        pdflatex paper.tex
+
+plot-%.png: %.dat plot.py
+        ./plot.py -i $*.dat -o $@
+#+end_src
+
+上面的文件指令表示用 冒号 右侧文件来构建左侧文件, 也就是冒号左侧为构建目标, 右侧为所需依赖. 缩进部分是从依赖构建目标时需要用到的程序.
+
+规则中的 =%= 是一种模式, 它会匹配左右两侧相同的字符串, 如果目标是 =plot-foo.png=, 则 make 程序执行时会去寻找 =foo.dat= 和 =plot.py= 作为依赖
+
+对项目本身而言需要注意的还有版本号的管理, 一般来说版本号组成是: "主版本号.次版本号.补丁号", 而且遵循规则:
+
+- 新版本没有改变 API, 则将补丁号递增
+- 添加了 API 且改动是向后兼容的, 将次版本号递增
+- 修改了 API 但是并不向后兼容, 将主版本号递增
+
+也可以参考常用的标准: [[https://semver.org/][语义版本号]]
+
+** 资源
+
+- 有用的 make [[https://www.gnu.org/software/make/manual/html_node/Standard-Targets.html#Standard-Targets][构建目标]]
+- [[https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html][Rust 构建系统]]的依赖管理, 可以作为样例学习
+- shellcheck 的 [[https://github.com/features/actions][GitHub Action]]
