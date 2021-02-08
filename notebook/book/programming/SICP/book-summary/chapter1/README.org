@@ -1,0 +1,135 @@
+#+TITLE: 计算机程序的构造和解释 (SICP)
+
+* COMMENT 第一章: 构造过程抽象
+
+心智活动的三个主要表现:
+
+1) 将若干个简单认识组合成一个复杂的认识, 由此产生各种复杂的认识
+2) 将两个认识放在一起对照, 不管它们如何简单或复杂, 这里并不用将它们合而为一. 通过这样的方式得到有关它们相互关系的认识
+3) 将有关认识与实际中同等存在的认识隔离开, 就称为抽象, 所有具有普遍性的认识都是这样得到的
+
+对应到语言上, 其也需要提供三种机制:
+
+1) *基本表达形式*, 用于表示语言所关心的最简单的个体;
+2) *组合的方法*, 通过它们可以从较简单的东西出发构造出复合的元素;
+3) *抽象的方法*, 通过它们可以为符合对象命名, 并将它们当作单元去操作;
+
+
+绝对值的实现
+#+begin_src scheme :tangle abs.scm
+(define (abs x)
+  (cond ((< x 0) (- x))
+        (else x)))
+
+(define (abs x)
+  (if (< x 0)
+       (- x)
+       x))
+#+end_src
+
+实现平方函数
+#+begin_src scheme :tangle square.scm
+(define (square x)
+  (* x x))
+#+end_src
+
+实现平均值计算函数
+#+begin_src scheme :tangle average.scm
+(define (average x y)
+  (/ (+ x y) 2))
+#+end_src
+
+在 lisp 的解析器中, 有分应用序以及正则序, 两个过程简单地说就是先将传入参数求值后代入过程, 还是先将过程展开平铺后从内过程到外过程不断归约.
+
+一般的解释器都使用应用序, 而我当前知识量上能够感知的问题就是正则序会导致多个过程重复计算的问题. 比如:
+
+#+begin_src scheme
+(define (p) (p))
+
+(define (test x y)
+  (if (= x 0)
+      0
+      y))
+#+end_src
+
+上述的程序在使用 "应用序" 时, 因为先计算参数 x 与 y, 因此过程会陷入 p 的不断递归, 而如果解析器存在尾递归优化, 则 test 将会无限执行. 如果是 "正则序" 则过程展开后, 从内部过程先执行, if 作为一个特殊过程, 将只执行返回 0 的操作, y 将不会被执行.
+
+需要说明一下的是 if 这个特殊过程有其存在的意义, 想一下如果 if 不是在先行条件为 False 的情况下才执行 else 的话会出现什么问题?
+
+#+begin_src scheme :tangle new-if.scm
+(define (new-if predicate then-clause else-clause)
+  (cond (predicate then-clause)
+        (else-clause)))
+
+(new-if (= 2 3) 0 5)
+(new-if (= 1 1) 0 5)
+#+end_src
+
+上述的 new-if 能够执行一般的任务, 但是对于一些特殊的任务则会陷入困难:
+
+#+begin_src scheme :tangle sqrt.scm
+(load "average.scm")
+(load "abs.scm")
+(load "new-if.scm")
+(load "square.scm")
+
+(define (improve guess x)
+  (average guess (/ x guess)))
+
+(define (good-enough? guess x)
+  (< (abs (- (square guess) x)) 0.001))
+
+(define (sqrt-iter guess x)
+  ;; (new-if (good-enough? guess x)
+  (if (good-enough? guess x)
+      guess
+      (sqrt-iter (improve guess x)
+                 x)))
+(define (sqrt x)
+  (sqrt-iter 1.0 x))
+
+;; 如果使用 new-if 这里将会无限执行
+(sqrt-iter 9)
+#+end_src
+
+上述的 sqrt-iter 将会无限执行直到栈溢出, 因为 new-if 只是一个普通过程, 因此根据应用序解释的逻辑, 传入的参数执行计算后就会陷入循环.
+
+
+对于 good-enough? 的实现, 过于小或者大的数都无法正确执行, 因为原实现上, 过小的数简单相减就会达到要求退出求解, 过大的数会由于精度的原因出现死循环. 即 improve 每次得到的值都很大, 从而 =(- (square guess) x)= 一直是个大数
+
+#+begin_src scheme :tangle p16-1-7.scm
+(load "sqrt.scm")
+
+(define (good-enough? new-guess old-guess)
+  (> 0.0001
+     (/ (abs (- new-guess old-guess))
+        old-guess)))
+
+(sqrt 9)
+#+end_src
+
+通过将新旧值相减并求比值, 当比值小于某个阈值时停止, 这种方式能够避免大数进行平方时的问题以及小数之间的精度丢失问题.
+
+
+求解立方根实现
+#+begin_src scheme :tangle p17-1-8.scm
+(define (improve guess x)
+  (/ (+
+       (/ x (square guess))
+       (* 2 guess))
+     3))
+
+(define (good-enough? guess x)
+  (< (abs (- (cube guess) x))
+     0.0001))
+
+(define (cuberoot-iter guess x)
+  (if (good-enough? guess x)
+      guess
+      (cuberoot-iter (improve guess x) x)))
+
+(define (cuberoot x)
+  (cuberoot-iter 1.0 x))
+
+(cuberoot 9)
+#+end_src
