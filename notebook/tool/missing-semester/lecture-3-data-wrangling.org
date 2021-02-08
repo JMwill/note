@@ -1,0 +1,122 @@
+#+TITLE: [[https://missing-semester-cn.github.io/2020/data-wrangling/][整理数据]]
+
+* 命令行下整理数据
+
+** sed
+
+sed 适合采用简短的命令来修改文件, 常用的是 =s= 替换命令操作.
+
+#+begin_src sh
+ssh myserver journalctl
+  | grep sshd
+  | grep "Disconnected from"
+  | sed 's/.*Disconnected from //'
+#+end_src
+
+上面就是将以任意字符开头, 并紧接着包含有 "Disconnected from " 的字符串.
+
+sed 并不支持非贪婪匹配, 如果较为依赖更全模式的正则匹配的话可以考虑使用 perl =perl -pe 's/.*?Disconnected from //'=
+
+使用正则表达式匹配需要的字符串很容易出错, 因此可以借助一些[[https://regex101.com/r/qqbZqh/2][验证工具]]来进行解析验证正则表达式的正确性, 以保证能够达到预期的效果
+
+在 sed 中可以捕获组的内容用在替换的内容当中, 基本采用的 =\1=, =\2= 等表示
+
+#+begin_src sh
+ssh myserver journalctl
+  | grep sshd
+  | grep "Disconnected from"
+  | sed -E 's/.*Disconnected from (invalid |authenticating )?user (.*) [^ ]+ port [0-9]+( \[preauth\])?$/\2/'
+#+end_src
+
+上面的 sed 表示语句用第二个捕获组的内容来替换整个匹配的部分, sed 除了能够进行替换外, 还可以进行文本注入, 打印特定的行, 基于索引搜索等, 可以通过 =man sed= 来了解具体能力
+
+学习正则表达式是很有用的, 在很多情况下能够减少并简化工作, 可以通过[[https://regexone.com/][这个交互式教程]]来进行初步学习
+
+** 更多过滤
+
+除了进行文本过滤之外, 有时候还需要对文本结果进行处理, 一般可能会使用到 sort, uniq 等工具, 比如:
+
+#+begin_src sh
+ssh myserver journalctl
+  | grep sshd
+  | grep "Disconnected from"
+  | sed -E 's/.*Disconnected from (invalid |authenticating )?user (.*) [^ ]+ port [0-9]+( \[preauth\])?$/\2/'
+  | sort | uniq -c
+#+end_src
+
+上面的 =sort= 对文本进行了排序, 之后的 =uniq -c= 则是对连续出现的行折叠成为一行并将出现次数作为前缀
+
+为了以次数作为顺序进行排序还可以进行二次处理
+
+#+begin_src sh
+ssh myserver journalctl
+  | grep sshd
+  | grep "Disconnected from"
+  | sed -E 's/.*Disconnected from (invalid |authenticating )?user (.*) [^ ]+ port [0-9]+( \[preauth\])?$/\2/'
+  | sort | uniq -c
+  | sort -nk1,1 | tail -n10
+#+end_src
+
+=sort -n= 表示按照数字顺序对输入进行排序而不是默认的字典序排序, 而 =-k1,1= 则表示 "基于以空格分割的第一列进行排序", =,n= 的部分则是 "仅排序到第 n 个部分"
+
+** awk
+
+如果需要提取某个部分, 并合并行需要怎么做呢?
+
+#+begin_src sh
+ssh myserver journalctl
+  | grep sshd
+  | grep "Disconnected from"
+  | sed -E 's/.*Disconnected from (invalid |authenticating )?user (.*) [^ ]+ port [0-9]+( \[preauth\])?$/\2/'
+  | sort | uniq -c
+  | sort -nk1,1 | tail -n10
+  | awk '{print $2}' | paste -sd,
+#+end_src
+
+这里选择使用的是 =awk= 这个工具, 效果就是输出第二列的信息. 而 paste 的 =-s= 则是表示合并行, 用 =-d= 指定分割符为 =,=
+
+上面的 awk 可以通过下面的语句来执行统计以 c 开头, e 结尾并且只出现过一次的用户:
+
+#+begin_src sh
+  | awk '$1 == 1 && $2 ~ /^c[^ ]*e$/ { print $2 }' | wc -l
+#+end_src
+
+在 awk 中, =$0= 表示本行的内容, =$1= 直到 =$n= 则是一行中的 n 个区域, 区域的分割基于 awk 的域划分符(默认是空格, 通过 =-F= 来修改)
+
+awk 的功能很多, 算是一种编程语言, 可以解决包含 grep 以及 sed 的[[https://backreference.org/2010/02/10/idiomatic-awk][所有问题]]
+
+** 分析数据
+
+需要进行简单的统计时, 可以通过结合 paste 以及 bc 等工具进行计算
+
+#+begin_src sh
+  | paste -sd+ | bc -l
+
+  # 或者复杂点
+  | echo "2*($(data | paste -sd+))" | bc -l
+#+end_src
+
+如果需要获取统计数据等则需要使用其他如 [[https://github.com/nferraz/st][R 语言]] 等的工具:
+
+#+begin_src sh
+  | awk '{print $1}' | R --slave -e 'x <- scan(file="stdin", quiet=TRUE); summary(x)'
+#+end_src
+
+** 确定参数
+
+通过结合 grep, sed, awk 等工具, 再通过 xargs 还可以确定需要输入命令中的参数
+
+#+begin_src sh
+rustup toolchain list | grep nightly | grep -vE "nightly-x86" | sed 's/-x86.*//' | xargs rustup toolchain uninstall
+#+end_src
+
+** 整理二进制数据
+
+#+begin_src sh
+ffmpeg -loglevel panic -i /dev/video0 -frames 1 -f image2 -
+ | convert - -colorspace gray -
+ | gzip
+ | ssh mymachine 'gzip -d | tee copy.jpg | env DISPLAY=:0 feh -'
+#+end_src
+
+上面是使用 ffmpeg 从相机中捕获图片, 进行转换后通过 SSH 将压缩后的文件发送到远端服务器, 并解压, 存档和显示

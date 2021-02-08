@@ -1,0 +1,163 @@
+#+TITLE: [[https://missing-semester-cn.github.io/2020/command-line/][命令行环境]]
+
+* 命令行环境
+
+** 任务控制
+
+*** 结束进程
+
+在一般情况下, 通常使用 =ctrl-c= 来发送 =SIGINT= 信号给进程通知其停止执行. 但是有的时候程序并不理会这个信号, 这时可以通过 =ctrl-\= 来发送 =SIGQUIT= 信号.
+
+=SIGINT=, =SIGQUIT= 都是用来发出和终止程序相关的请求, 而另一种优雅的方式是通过 [[http://man7.org/linux/man-pages/man1/kill.1.html][kill]] 命令发出 =SIGTERM= 信号, =kill -TERM <PID>=
+
+*** 暂停和后台执行进程
+
+通过 =ctrl-z= 来发出 =SIGTSTP= 信号, 而发出 =SIGSTOP= 信号则会让进程暂停. 当需要将暂停的工作恢复时, 可以通过 [[http://man7.org/linux/man-pages/man1/fg.1p.html][fg]] 以及 [[http://man7.org/linux/man-pages/man1/bg.1p.html][bg]] 命令实现, 分别表示在前台继续运行或者是在后台继续运行
+
+当具有多个任务时, 通过使用 jobs 来获取后台任务的信息, 在获取到任务信息后, 通过 =%1= 百分号 + 任务编号的形式来选取对应的任务, 比如: =fg %2= 等, 需要选取最近的任务可以使用 =$!= 特殊参数
+
+需要任务在后台运行除了用 =ctrl-z= 后执行 bg 命令外, 还可以直接在对应命令后加上 =&= 后缀直接让命令在后台运行, 这种方式让命令在后台运行, 其输出可以通过重定向的方式消除掉, 避免输出到标准输出中
+
+通过这些方式实现的后台运行的程序都是终端进程的子进程, 一旦终端关闭则这些进程会收到 =SIGHUP= 信号从而中止, 如果需要终端关闭后进程依然运行, 可以使用 [[http://man7.org/linux/man-pages/man1/nohup.1.html][nohup]] (忽略 SIGHUP 的封装) 来运行程序/命令, 已经在运行的程序可以使用 =disown=
+
+#+begin_src txt
+sleep 1000
+
+nohup sleep 2000 &
+$ sleep 1000
+^Z
+[1]  + 18653 suspended  sleep 1000
+
+$ nohup sleep 2000 &
+[2] 18745
+appending output to nohup.out
+
+$ jobs
+[1]  + suspended  sleep 1000
+[2]  - running    nohup sleep 2000
+
+$ bg %1
+[1]  - 18653 continued  sleep 1000
+
+$ jobs
+[1]  - running    sleep 1000
+[2]  + running    nohup sleep 2000
+
+$ kill -STOP %1
+[1]  + 18653 suspended (signal)  sleep 1000
+
+$ jobs
+[1]  + suspended (signal)  sleep 1000
+[2]  - running    nohup sleep 2000
+
+$ kill -SIGHUP %1
+[1]  + 18653 hangup     sleep 1000
+
+$ jobs
+[2]  + running    nohup sleep 2000
+
+$ kill -SIGHUP %2
+
+$ jobs
+[2]  + running    nohup sleep 2000
+
+$ kill %2
+[2]  + 18745 terminated  nohup sleep 2000
+
+$ jobs
+#+end_src
+
+如果使用不能被进程捕获的特殊信号 =SIGKILL= 有可能会产生副作用, 关于信号的内容可以查看 [[http://man7.org/linux/man-pages/man7/signal.7.html][man signal]] 或 [[https://en.wikipedia.org/wiki/Signal_(IPC)][这里]] 或者使用 =kill -t= 获取更多信息
+
+** 终端多路复用 tmux
+
+tmux 能够在操作远程设备时不用使用 nohup 等技巧也能够避免因意外的连接中断而导致运行的程序结束, 还能够提供基于面板和标签分割出多个终端窗口, 同时与多个 shell 会话进行交互
+
+*** tmux 常用快捷键
+
+- *会话*: 独立工作区, 包含一个或多个窗口
+  - =tmux= 启动新会话
+  - =tmux new -s NAME= 以指定名称开始新会话
+  - =tmux ls= 列出当前所有会话
+  - 在 =tmux= 中输入 =ctrl-b d=, 将当前会话分离
+  - =tmux a= 重新连接最后一个会话, 或者通过 =-t= 指定具体会话
+- *窗口*: 相当于浏览器的标签页, 视觉上将一个会话分割为多个部分
+  - =ctrl-b c= 创建新窗口, 使用 =ctrl-d= 关闭
+  - =ctrl-b N= 转跳到第 N 个窗口, 每个窗口都有编号
+  - =ctrl-b p= 切换到前一个窗口
+  - =ctrl-b n= 切换到下一个窗口
+  - =ctrl-b ,= 重命名当前窗口
+  - =ctrl-b w= 列出当前所有窗口
+- *面板*: 类似 vim 的分屏, 在一个屏幕中显示多个 shell
+  - =ctrl-b "=: 水平分割
+  - =ctrl-b %=: 垂直分割
+  - =ctrl-b <方向键>=: 切换到指定方向的面板
+  - =ctrl-b z=: 切换当前面板的缩放
+  - =ctrl-b [=: 开始往回卷动屏幕, 可以按空格键开始选择, 回车键复制选中部分
+  - =ctrl-b <空格>= 在不同面板排布间切换
+
+
+** 远程设备
+
+*** 执行命令
+
+ssh 具备直接远程执行命令的特性 =ssh username@server ls | grep PATTERN= 会直接在远端执行 =ls= 输出的结果并用本地的 =grep= 过滤, =ls | ssh username@server grep PATTERN= 则是用远端的 =grep= 对本地的 =ls= 输出结果进行查询
+
+*** 基于密钥的认证机制
+
+如果需要限制允许被登录的用户可以通过下面的命令将公钥拷贝到 =~/.ssh/authorized_keys= 中:
+
+#+begin_src sh
+cat ~/.ssh/id_rsa.pub | ssh username@remote-server 'cat >> ~/.ssh/authorized_keys'
+#+end_src
+
+在支持 =ssh-copy-id= 的情况下可以使用
+
+#+begin_src sh
+ssh-copy-id -i ~/.ssh/id_rsa.pub username@remote-server
+#+end_src
+
+*** 通过 SSH 复制文件
+
+- =ssh+tee= 最简单的方式. 通过利用标准输入实现: =cat localfile | ssh remote_server tee serverfile=
+- [[http://man7.org/linux/man-pages/man1/scp.1.html][scp]] 拷贝大量文件时更方便: =scp path/to/local_file remote_host:path/to/remote_file=
+- [[http://man7.org/linux/man-pages/man1/rsync.1.html][rsync]] 语法与 scp 相似, 具备防止重复拷贝, 断点续传等功能
+
+
+*** 端口转发
+
+*本地端口转发*
+
+本地端口转发有两种情况:
+- 一种是本地转发到远端的服务器localhost: =ssh -L 123:localhost:456 remotehost= 访问本地 123 端口即会转发到远端的 localhost 的 456 端口上
+- 一种是本地经远端服务器转发到另一个服务器: =ssh -L 123:farawayhost:456 remotehost= 访问本地的 123 端口时会经远端服务器转发请求到另一个服务器的 456 端口进行访问
+
+*远程端口转发*
+
+远程端口转发也有两种情况:
+- 对于远程端口 123 的访问会被转发到本地 localhost 的 456 端口上: =ssh -R 123:localhost:456 remotehost=
+- 对于远程端口 123 的访问会经本地转发到局域网内的 nearhost 的 456 端口上: =ssh -R 123:nearhost:456 remotehost=
+
+
+*** SSH 配置
+
+通过配置 =~/.ssh/config= 除了能够让使用 ssh 时更加方便外, 还可以让上面提到的工具如 scp, rsync 以及 mosh 等读取配置并将设置转换为对应的命令行选项
+
+#+begin_src sh
+Host vm
+    User foobar
+    HostName 172.16.174.141
+    Port 2222
+    IdentityFile ~/.ssh/id_rsa
+    LocalForward 9999 localhost:8888
+
+# 在配置文件中也可以使用通配符
+Host *.mit.edu
+    User foobaz
+#+end_src
+
+而服务器侧的配置通常放在 =/etc/ssh/sshd_config= 上, 用于配置免密认证, 修改 ssh 端口, 开启 X11 转发等
+
+连接远程服务器常见的问题是遇到关机, 休眠或网络环境变化时的掉线等, 而 [[https://mosh.org/][Mosh]] 则是对 ssh 进行了改进以允许连接漫游, 间歇连接, 智能本地回显等
+
+有时也会有需要将远程文件夹挂载到本地进行编辑的情况, 可以使用 [[https://github.com/libfuse/sshfs][sshfs]] 来实现

@@ -1,0 +1,51 @@
+#+TITLE: [[https://missing-semester-cn.github.io/2020/editors/][编辑器]]
+
+* 编辑器 Vim
+
+Vim 编辑器的编辑模式绝对是编程的一大助力, 学习并熟练其操作技巧绝对可以提升文档编辑的体验. 由于本身已经对 vim 具有一定程度的熟悉, 所以这里仅保存一些陌生或者需要记录的内容
+
+** 扩展 Vim
+
+在 Vim 8.0 以上的版本开始已经内置插件管理系统, 所以在需要使用插件时只需要创建文件夹: =~/.vim/pack/vendor/start/= 然后将所需要的插件(通过 git clone 等)下载/保存到这里
+
+推荐使用的插件: [[https://github.com/ctrlpvim/ctrlp.vim][ctrlp.vim]], [[https://github.com/mileszs/ack.vim][ack.vim]], [[https://github.com/scrooloose/nerdtree][nerdtree]], [[https://github.com/easymotion/vim-easymotion][vim-easymotion]]
+
+** 其他程序上的 Vim 模式
+
+*** Shell
+
+在使用 Shell 时, 通过设置能够实现类似 Vim 的键位操作模式
+
+- Bash: =set -o vi=
+- Zsh: =bindkey -v=
+- Fish: =fish_vi_key_bindings=
+
+如果需要使用 Vim 作为其他程序启动编辑时的默认编辑器则可以在 Shell 配置文件中设置: ~export EDITOR=vim~
+
+*** Readline
+
+使用 [[https://tiswww.case.edu/php/chet/readline/rltop.html][GNU Readline]] 作为命令行控制界面的程序可以通过在 =~/.inputrc= 设置 =set editing-mode vi= 来开启基本的 Vim 模式支持. 开启后, 如 Python REPL 就会支持 Vim 快捷键
+
+**  Vim 进阶
+
+*** 搜索替换
+
+=:s= (替换) 命令 ([[http://vim.wikia.com/wiki/Search_and_replace][文档]])
+
+- =%s/foo/bar/g=  : 在整个文件中将 foo 全局替换为 bar
+- =%s/\[.*\](\(.*\))/\1/g=  : 将有命名的 Markdown 链接替换成简单的 URLs
+
+*** 多窗口
+
+用 =:sp= / =:vsp= 来对窗口进行分割
+
+** 扩展资料
+
+- =vimtutor= Vim 自带的教程
+- [[https://vim-adventures.com/][Vim Adventures]] 用游戏学习 Vim
+- [[http://vim.wikia.com/wiki/Vim_Tips_Wiki][Vim Tips Wiki]]
+- [[https://vimways.org/2019/][Vim Advent Calendar]] Vim 小技巧
+- [[http://www.vimgolf.com/][Vim Golf]] 用 Vim 的用户界面作为程序语言的 [[https://en.wikipedia.org/wiki/Code_golf][code golf]]
+- [[https://vi.stackexchange.com/][Vi/Vim Stack Exchange]]
+- [[http://vimcasts.org/][Vim Screencasts]]
+- [[https://pragprog.com/book/dnvim2/practical-vim-second-edition][Practical Vim]] (书)
