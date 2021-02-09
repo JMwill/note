@@ -1,6 +1,6 @@
 #+TITLE: 计算机程序的构造和解释 (SICP)
 
-* COMMENT 第一章: 构造过程抽象
+* TODO 第一章: 构造过程抽象
 
 心智活动的三个主要表现:
 
@@ -131,5 +131,63 @@
 (define (cuberoot x)
   (cuberoot-iter 1.0 x))
 
-(cuberoot 9)
+(cuberoot 8)
 #+end_src
+
+** 过程与产生的计算
+
+了解过程的执行, 有利于认识不同过程起到的影响. 以阶乘函数为例来了解 "线性递归过程" 与 "线性迭代过程" 之间的差异
+
+#+begin_src scheme :tangle factorial.scm
+;; 本实现是按照阶乘的定义: n! = n * (n - 1)! 来实现
+;; 最终效果就是:
+;; (factorial 6)
+;; (* 6 (factorial 5))
+;; (* 6 (* 5 (factorial 4)))
+;; ...
+(define (factorial n)
+  (if (= n 1)
+      1
+      (* n (factorial (- n 1)))))
+
+;; 这一实现是基于 n! = 1 * 2 ... * (n - 1) * n
+;; 最终效果是:
+;; (factorial 6)
+;; (factorial 1 1 6)
+;; (factorial 1 2 6)
+;; (factorial 2 3 6)
+;; ...
+(define (factorial n)
+  (fact-iter 1 1 n))
+
+(define (fact-iter product counter max-count)
+  (if (> counter max-count)
+      product
+      (fact-iter (* product counter)
+                 (+ counter 1)
+                 max-count)))
+#+end_src
+
+上述的阶乘实现都没有问题, 但是第一个实现具有线性依赖, 必须要等过程展开到最后一个位置返回 1 才能够逐步进行收敛直到最终得到结果; 这种随着计算过程进行, 构造起了一个推迟执行的链条, 其链条长度随着 n 值线性增长, 则这样的过程称之为 /*线性递归过程*/;
+
+而第二个实现, 并不依赖前后过程, 即使运算过程中断了, 只需要存储好 product, counter, max-counter 的信息就可以立即恢复原计算过程; 这种过程称之为 /*线性迭代过程*/; 一般线性迭代过程其 *状态* 可以用固定数目的 *状态变量* 描述, 同时存在一套固定的规则, 描述了计算过程从一个状态到下一状态转换时, 变量的更新方式, 以及可能有的: 结束检测, 用于终止计算过程; 因其所需计算步骤随着 n 增长所以才叫 线性迭代过程;
+
+区分两者的最明显标志是: 线性迭代过程具有 程序变量 来提供计算状态的完整描述, 而线性递归过程只具有描述计算过程在何处的信息, 而无状态的描述.
+
+这里需要区分好递归与递归的计算过程, 前者表示程序调用自身, 后者表示计算的过程其进展的方式是递归的, 一层套一层, 而迭代的计算过程则是根据状态描述进行步进, 不形成依赖
+
+*** 斐波那契数列的迭代实现
+
+#+begin_src scheme :tangle fib.scm
+(define (fib n)
+  (fib-iter 1 0 n))
+
+(define (fib-iter a b count)
+  (if (= count 0)
+      b
+      (fib-iter (+ a b) a (- count 1))))
+
+(fib 1000)
+#+end_src
+
+线性迭代形式的斐波那契数列计算量级下降巨大, 但是不代表递归形式一无所长. 递归更加直截了当, 在对层次结构性的数据进行操作时更自然, 强大.
