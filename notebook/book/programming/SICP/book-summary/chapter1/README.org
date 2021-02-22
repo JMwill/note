@@ -191,3 +191,69 @@
 #+end_src
 
 线性迭代形式的斐波那契数列计算量级下降巨大, 但是不代表递归形式一无所长. 递归更加直截了当, 在对层次结构性的数据进行操作时更自然, 强大.
+
+递归算法的实现需要满足的条件一定是能够将大问题进行 "归约", 从而将大问题在每一次递归中变成更小的问题, 最终满足跳出条件, 从而结束整个过程.
+
+以兑换硬币为例子, 假设从大到小有四种类型的硬币, 则在兑换金额为 a 的金额时有多少种组成方式.
+
+从描述中可以得到的信息是总金额为 a, 换成 n 种硬币的不同方式有几种. 则问题可细分为:
+
+- 现金数 a 兑换除第一种硬币外的所有其他硬币的方式的数目.
+- 现金数 a - d 兑换成所有种类的硬币的不同方式的数目, d 表示上一条提到的第一种硬币的币值.
+
+以上两个数目相加则能够得出结果.
+
+从上面的描述可以看出, 第一个条件将硬币的种类缩减了, 第二个条件将金额缩小了. 两个条件最终会缩减到如下的结果:
+
+- a 为 0 算作 1 种换零钱的方法
+- a 小于 0 算作 0 种换零钱的方法
+- n 为 0 算作 0 种换零钱的方法
+
+上述的三个条件则是跳出的最终结果. 翻译成代码则为:
+
+#+begin_src scheme :tangle count-change.scm
+(define (count-change amount)
+  (cc amount 5))
+
+(define (cc amount kinds-of-coins)
+  (cond ((= amount 0) 1)
+        ((or (< amount 0) (= kinds-of-coins 0)) 0)
+        (else (+ (cc amount
+                     (- kinds-of-coins 1))
+                 (cc (- amount
+                        (first-denomination kinds-of-coins))
+                     kinds-of-coins)))))
+
+(define (first-denomination kinds-of-coins)
+  (cond ((= kinds-of-coins 1) 1)
+        ((= kinds-of-coins 2) 5)
+        ((= kinds-of-coins 3) 10)
+        ((= kinds-of-coins 4) 25)
+        ((= kinds-of-coins 5) 50)))
+#+end_src
+
+
+*** 练习题 1.11
+
+#+begin_src scheme :tangle p27-1-11.scm
+;; 两者的速度差距是巨大的
+;; 基本上，如果 n > 20 就能明显感觉到速度上的差异
+(define (f n)
+  (if (< n 3)
+      n
+      (+ (f (- n 1)) (* (f (- n 2)) 2) (* (f (- n 3)) 3))))
+
+(f 30) 
+
+(define (f2 n)
+  (cond ((= n 1) 1)
+        ((= n 2) 2)
+        (else (f2-iter 0 1 2 2 n))))
+
+(define (f2-iter va vb vc counter max-counter)
+  (if (= counter max-counter)
+      vc
+      (f2-iter vb vc (+ vc (* vb 2) (* va 3)) (+ counter 1) max-counter)))
+
+(f2 30)
+#+end_src
