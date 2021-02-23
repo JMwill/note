@@ -234,10 +234,12 @@
 
 
 *** 练习题 1.11
+计算如下定义规则的函数: 如果 =n < 3= 则 =f(n) = n=, 如果 =n > 3= 则 =f(n) = f(n-1) + 2f(n-2) + 3f(n-3)=
 
 #+begin_src scheme :tangle p27-1-11.scm
 ;; 两者的速度差距是巨大的
 ;; 基本上，如果 n > 20 就能明显感觉到速度上的差异
+;; 递归计算过程实现
 (define (f n)
   (if (< n 3)
       n
@@ -245,6 +247,7 @@
 
 (f 30) 
 
+;; 迭代过程计算实现
 (define (f2 n)
   (cond ((= n 1) 1)
         ((= n 2) 2)
@@ -256,4 +259,19 @@
       (f2-iter vb vc (+ vc (* vb 2) (* va 3)) (+ counter 1) max-counter)))
 
 (f2 30)
+#+end_src
+
+*** 练习题 1.12
+使用递归计算过程算出 *帕斯卡三角形* 某一项的值
+
+#+begin_src scheme :tangle p27-1-12.scm
+;; 可以将元素位置参数传入, 可以获知的是 (row, col) 等于 (row-1, col-1) + (row-1, col)
+;; 如果 col = 0 或者 col = row 时, 则直接等于 1
+(define (pascal row col)
+  (cond ((> col row) 0)
+        ((= col 0) 1)
+        ((= row col) 1)
+        ((+ (pascal (- row 1) (- col 1)) (pascal (- row 1) col)))))
+
+(pascal 4 2)
 #+end_src
