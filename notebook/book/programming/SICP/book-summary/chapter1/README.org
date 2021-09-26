@@ -50,6 +50,8 @@
   (if (= x 0)
       0
       y))
+
+(test 0 (p))
 #+end_src
 
 上述的程序在使用 "应用序" 时, 因为先计算参数 x 与 y, 因此过程会陷入 p 的不断递归, 而如果解析器存在尾递归优化, 则 test 将会无限执行. 如果是 "正则序" 则过程展开后, 从内部过程先执行, if 作为一个特殊过程, 将只执行返回 0 的操作, y 将不会被执行.
@@ -275,3 +277,66 @@
 
 (pascal 4 2)
 #+end_src
+
+*** 练习题 1.16
+按照给定关系，并使用一个不变量记录中间结果，写出对数步数内迭代计算幂的函数
+
+#+begin_src scheme :tangle p30-1-16.scm
+(define (fast-expt b n)
+  (expt-iter b n 1))
+
+(define (expt-iter b n a)
+  (cond ((= n 0)
+         a)
+        ((even? n)
+         (expt-iter (square b)
+                    (/ n 2)
+                    a))
+        ((odd? n)
+         (expt-iter b
+                    (- n 1)
+                    (* b a)))))
+
+;; remainder 是基本过程，求余数
+(define (even? n)
+  (= (remainder n 2) 0))
+
+(define (odd? n)
+  (= (remainder n 2) 1))
+#+end_src
+
+
+*** 练习题 1.17
+
+以与求幂相似的方式来通过加法实现乘法的功能，使得加法的次数以对数级增长
+
+#+begin_src scheme :tangle p31-1-17.scm
+;; 简单实现
+(define (* a b)
+  (if (= b 0)
+      0
+      (+ a (* a (- b 1)))))
+
+;; 构建对数次数的计算过程
+;; 现在假定具有 double 方法以及 halve 方法
+;; double 负责求整数的两倍，halve 负责将一个（偶数）除以 2
+(define (fast-* a b)
+  (cond ((= 0 b) 0)
+        ((even? b) (double (fast-* a (halve b))))
+        (else (+ a (fast-* a (- b 1))))))
+#+end_src
+
+*** 练习题 1.18
+
+#+begin_src scheme :tangle p31-1-18.scm
+;; 使用 1.16 与 1.17 提供的基础函数实现迭代版本的乘积方法
+(define (multi a b result)
+  (multi-iter (a b 0)))
+
+(define (multi-iter a b result)
+  (cond ((= b 0) 0)
+        ((even? b) (multi-iter (double a) (halve b) result))
+        (else (multi-iter a (- b 1) (+ a result)))))
+#+end_src
+
+
