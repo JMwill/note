@@ -12,9 +12,3 @@
          (expt-iter b
                     (- n 1)
                     (* b a)))))
-
-(define (even? n)
-  (= (remainder n 2) 0))
-
-(define (odd? n)
-  (= (remainder n 2) 1))

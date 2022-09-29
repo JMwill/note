@@ -281,6 +281,16 @@
 *** 练习题 1.16
 按照给定关系，并使用一个不变量记录中间结果，写出对数步数内迭代计算幂的函数
 
+#+begin_src scheme :tangle odd-even.scm
+;; remainder 是基本过程，求余数
+(define (even? n)
+  (= (remainder n 2) 0))
+
+(define (odd? n)
+  (= (remainder n 2) 1))
+#+end_src
+
+
 #+begin_src scheme :tangle p30-1-16.scm
 (define (fast-expt b n)
   (expt-iter b n 1))
@@ -296,13 +306,6 @@
          (expt-iter b
                     (- n 1)
                     (* b a)))))
-
-;; remainder 是基本过程，求余数
-(define (even? n)
-  (= (remainder n 2) 0))
-
-(define (odd? n)
-  (= (remainder n 2) 1))
 #+end_src
 
 
@@ -340,3 +343,190 @@
 #+end_src
 
 
+** 用高阶过程定制抽象
+
+#+begin_src scheme :tangle 1-3-1-sum.scm
+;; 实现抽象的连加逻辑
+(define (sum term a next b)
+  (if (> a b)
+      0
+      (+ (term a)
+         (sum term (next a) next b))))
+#+end_src
+
+#+begin_src scheme :tangle p-1-29.scm
+(load "1-3-1-sum.scm")
+(load "odd-even.scm")
+(define (cube x) (* x x x))
+
+(define (integral-simpson2 f a b n)
+  (define h (/ (- b a) n))
+  (define (add-2h x) (+ x h h))
+  (* (+ (f a)
+        (* 2 (sum f a       add-2h b))
+        (* 4 (sum f (+ a h) add-2h b))
+        (f b))
+     (/ h 3)))
+
+(integral-simpson2 cube 0 1.0 1000)
+#+end_src
+
+#+begin_src scheme :tangle p-1-30.scm
+;; 用线性迭代的方法实现 sum 函数
+;; 填充模板内的 <??>
+;; (define (sum term a next b)
+;;   (define (iter a result)
+;;     (if <??>
+;;         <??>
+;;         (iter <??> <??>)))
+;;   (iter <??> <??>))
+(define (sum term a next b)
+  (define (iter a result)
+    (if <??>
+        <??>
+        (iter <??> <??>)))
+  (iter <??> <??>))
+#+end_src
+
+#+begin_src scheme :tangle p-1-31.scm
+;; 用相似方法实现 product（连乘） 过程
+;; 如果连乘过程生成的是递归过程则实现另一个迭代过程的实现，相反则实现递归过程实现
+#+end_src
+
+#+begin_src scheme :tangle p-1-32.scm
+;; 练习题 1.31 的 product（连乘）跟 sum（连加）都是更一般过程的特殊实现
+;; 这个一般过程称为：accumulate（累积），实现累积过程
+;; 迭代与递归各实现一种
+(accmulate combiner null-value term a next b)
+#+end_src
+
+#+begin_src scheme :tangle p-1-33.scm
+;; 在 1.32 的基础上还可以得到更加通用的版本，这版里面引入了 filter 的概念
+;; 让符合某种特殊条件下的区间执行计算，可以叫做：filtered-accumulate
+;; filtered-accumulate 所用的参数跟 accumulate 一样，只是需要多增加一个 filter 参数来引入过滤过程
+;; 一样，迭代跟递归都实现一种
+(filtered-accumulate filter combiner null-value term a next b)
+#+end_src
+
+*** lambda 跟 let
+
+lambda 用于创建匿名过程，基本用法：
+
+#+begin_src scheme
+;; 一般用法：(lambda (<formal-parameters) <body>)
+(lambda (x) (+ x x))
+
+;; 立即执行匿名函数
+((lambda (x y z) (+ x y (square z))) 1 2 3)
+#+end_src
+
+#+begin_src scheme
+;; 用 let 创建本地变量
+;; (let ((<var1> <exp1>)
+;;       (<var2> <exp2>)
+;;       ...
+;;       (<varn> <expn>))
+;;      <body>)
+(define (f x y)
+    (let ((a (+ 1 (* x y)))
+          (b (- 1 y)))
+      (+ (* x (square a))
+         (* y b)
+         (* a b))))
+
+(define (f x y)
+  (define a (+ 1 (* x y)))
+  (define b (- 1 y))
+  (+ (* x (square a))
+     (* y b)
+     (* a b)))
+
+;; define 跟 let 都能实现相似功能
+;; 但是 let 是创建了本地变量
+;; 而 define 则是定义了一个过程，使用时是重复执行过程得出结果
+#+end_src
+
+*** 程序作为返回值
+
+高阶程序的意义在于能够将“抽象”显式地表示为编程语言中的元素，从而能作为计算元素而被使用。编程中的一等公民通常指的是：
+
+- 可以用变量来命名
+- 可以作为参数传递到（procedures）程序中
+- 可以作为程序的结果返回
+- 可以被引入到数据结构中
+
+* TODO 第二章: 通过数据构建抽象
+
+** 2.1 数据抽象介绍
+
+*** 计算有理数
+
+先定义过程
+
+#+begin_src scheme :tangle rational-number.scm
+(define (add-rat x y)
+  (make-rat (+ (* (numer x) (denom y))
+               (* (numer y) (denom x)))
+            (* (denom x) (denom y))))
+
+(define (sub-rat x y)
+  (make-rat (- (* (numer x) (denom y))
+               (* (numer y) (denom x)))
+            (* (denom x) (denom y))))
+
+(define (mul-rat x y)
+  (make-rat (* (numer x) (numer y))
+            (* (denom x) (denom y))))
+
+(define (div-rat x y)
+  (make-rat (* (numer x) (numer y))
+            (x (denom x) (numer y))))
+
+(define (equal-rat? x y)
+  (= (* (numer x) (denom y))
+     (* (numer y) (denom x))))
+#+end_src
+
+#+begin_src scheme :tangle make-rat-numer-denom.scm
+;; 实现有理数表示
+(define (make-rat n d) (cons n d))
+(define (numer x) (car x))
+(define (denom x) (cdr x))
+
+;; make-rat 改良版
+(define (make-rat2 n d)
+  (let ((g (gcd n d)))
+    (cons (/ n g)
+          (/ d g))))
+
+;; 输出有理数
+(define (print-rat a)
+  (newline)
+  (display (numer x))
+  (display "/")
+  (display (denom x)))
+#+end_src
+
+#+begin_src scheme :tangle p-2-1.scm
+;; 写出第三版 make-rat 保证符号的正负；
+;; 如果正，则分子分母皆为正；如果负，则只有分子为负
+#+end_src
+
+#+begin_src scheme :tangle p-2-4.scm
+;; cons、跟 car 都是另一个版本的实现；
+;; 试验下等式 (car (cons x y)) 会对任意对象输出 x
+;; 对应的 cdr 实现是怎样的
+(define (cons x y)
+  (lambda (m) (m x y)))
+
+(define (car z)
+  (z (lambda (p q) p))
+#+end_src
+
+#+begin_src scheme :tangle p-2-5.scm
+
+#+end_src
+
+#+begin_src scheme :tangle p-2-6.scm
+
+#+end_src
