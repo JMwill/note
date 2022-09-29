@@ -1,0 +1,135 @@
+#+STARTUP: indent
+
+* 语法篇
+
+*=#define= 的用法*
+
+#+begin_src c
+/* C 语言中 define 的用法 */
+// #define 名称 替换文本
+#include <stdio.h>
+#define LOWER 0
+#define UPPER 300
+#define STEP 20
+
+int main() {
+  int fahr;
+  for (fahr = LOWER; fahr <= UPPER; fahr += + STEP)
+    printf("%3d %6.1f\n", fahr, (5.0 / 9.0) * (fahr - 32));
+}
+#+end_src
+
+*文件复制*
+
+利用标准库提供的输入输出方法: =getchar= , =putchar= 可以实现许多有用的程序
+
+1. 复制文件
+
+#+begin_src c
+#include <stdio.h>
+int main() {
+    int c;
+    while((c = getchar()) != EOF) {
+        putchar(c);
+    }
+}
+#+end_src
+
+2. 字符计数
+
+#+begin_src c
+#include <stdio.h>
+int main() {
+    long nc = 0;
+    while (getchar() != EOF) {
+        ++nc;
+    }
+    printf("%ld\n", nc);
+}
+#+end_src
+
+#+begin_src c
+#include <stdio.h>
+int main() {
+    double nc;
+    for (nc = 0; getchar() != EOF; ++nc)
+    ; // C 语言要求循环体非空, 单独分号可以当做一条空语句
+    printf("%.0f\n", nc);
+}
+#+end_src
+
+3. 统计行数
+
+#+begin_src c
+#include <stdio.h>
+int main() {
+    int c, nl;
+    nl = 0;
+
+    while ((c = getchar()) != EOF) {
+        if (c == '\n') {
+            ++nl;
+        }
+    }
+    printf("%d\n", nl);
+}
+#+end_src
+
+4. 拆分函数
+
+#+begin_src c
+#include <stdio.h>
+#define MAXLINE 1000
+
+int myGetline(char line[], int maxline);
+void copy(char to[], char from[]);
+
+int main() {
+    int len;
+    int max;
+    char line[MAXLINE];
+    char longest[MAXLINE];
+
+    max = 0;
+    while ((len = myGetline(line, MAXLINE)) > 0)
+        if (len > max) {
+            max = len;
+            copy(longest, line);
+        }
+    if (max > 0)
+        printf("%s", longest);
+    return 0;
+}
+
+int myGetline(char s[], int lim) {
+    int c, i;
+    for (i = 0; i < lim - 1 && (c = getchar()) != EOF && c != '\n'; ++i)
+        s[i] = c;
+    if (c == '\n') {
+        s[i] = c;
+        ++i;
+    }
+    s[i] = '\0';
+    return i;
+}
+
+void copy(char to[], char from[]) {
+    int i;
+    i = 0;
+    while ((to[i] = from[i]) != '\0')
+        ++i;
+}
+#+end_src
+
+*** 头文件
+一般情况下都是期望文件只能访问它完成任务所需的信息，而过多的头文件的维护比较困难，因此对于中等规模的程序，最好只用一个头文件存放程序中各部分共享的对象。而较大的程序则需要使用更多的头文件，维护时需要精心地组织。
+
+
+* 指针与数组
+
+取一个对象的地址通过： =&= 运算符实现： ~p = &c;~ p 为 “指向” c 的指针，这种取指针的方式只能用于内存中的对象：变量/数组元素，不能用于表达式、常量或 register 类型的变量。
+
+获取到对象地址，那接下来就到使用了，使用方法是先定义一个对应类型的指针： =int *ip= ，然后用取指针运算符取指针赋值 ~ip = &x~ 。函数的声明也是采用相似的方式： ~double atof(char *)~ 。
+
+每个指针都必须指向某种特定的数据类型。一个例外的情况是指向 void 类型的指针可以存放指向任何类型的指针，但它 *不能间接引用其自身* 
+
